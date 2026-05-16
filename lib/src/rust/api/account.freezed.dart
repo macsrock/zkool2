@@ -3648,6 +3648,7 @@ mixin _$Tx {
   int get height;
   int get time;
   PlatformInt64 get value;
+  PlatformInt64 get fee;
   int? get tpe;
   String? get category;
   PlatformInt64 get zsaValue;
@@ -3674,6 +3675,7 @@ mixin _$Tx {
             (identical(other.height, height) || other.height == height) &&
             (identical(other.time, time) || other.time == time) &&
             (identical(other.value, value) || other.value == value) &&
+            (identical(other.fee, fee) || other.fee == fee) &&
             (identical(other.tpe, tpe) || other.tpe == tpe) &&
             (identical(other.category, category) ||
                 other.category == category) &&
@@ -3698,6 +3700,7 @@ mixin _$Tx {
       height,
       time,
       value,
+      fee,
       tpe,
       category,
       zsaValue,
@@ -3710,7 +3713,7 @@ mixin _$Tx {
 
   @override
   String toString() {
-    return 'Tx(id: $id, txid: $txid, height: $height, time: $time, value: $value, tpe: $tpe, category: $category, zsaValue: $zsaValue, assetId: $assetId, assetDisplay: $assetDisplay, price: $price, memo: $memo, isUserMemo: $isUserMemo, contactName: $contactName)';
+    return 'Tx(id: $id, txid: $txid, height: $height, time: $time, value: $value, fee: $fee, tpe: $tpe, category: $category, zsaValue: $zsaValue, assetId: $assetId, assetDisplay: $assetDisplay, price: $price, memo: $memo, isUserMemo: $isUserMemo, contactName: $contactName)';
   }
 }
 
@@ -3724,6 +3727,7 @@ abstract mixin class $TxCopyWith<$Res> {
       int height,
       int time,
       PlatformInt64 value,
+      PlatformInt64 fee,
       int? tpe,
       String? category,
       PlatformInt64 zsaValue,
@@ -3752,6 +3756,7 @@ class _$TxCopyWithImpl<$Res> implements $TxCopyWith<$Res> {
     Object? height = null,
     Object? time = null,
     Object? value = null,
+    Object? fee = null,
     Object? tpe = freezed,
     Object? category = freezed,
     Object? zsaValue = null,
@@ -3782,6 +3787,10 @@ class _$TxCopyWithImpl<$Res> implements $TxCopyWith<$Res> {
       value: null == value
           ? _self.value
           : value // ignore: cast_nullable_to_non_nullable
+              as PlatformInt64,
+      fee: null == fee
+          ? _self.fee
+          : fee // ignore: cast_nullable_to_non_nullable
               as PlatformInt64,
       tpe: freezed == tpe
           ? _self.tpe
@@ -3920,6 +3929,7 @@ extension TxPatterns on Tx {
             int height,
             int time,
             PlatformInt64 value,
+            PlatformInt64 fee,
             int? tpe,
             String? category,
             PlatformInt64 zsaValue,
@@ -3941,6 +3951,7 @@ extension TxPatterns on Tx {
             _that.height,
             _that.time,
             _that.value,
+            _that.fee,
             _that.tpe,
             _that.category,
             _that.zsaValue,
@@ -3976,6 +3987,7 @@ extension TxPatterns on Tx {
             int height,
             int time,
             PlatformInt64 value,
+            PlatformInt64 fee,
             int? tpe,
             String? category,
             PlatformInt64 zsaValue,
@@ -3996,6 +4008,7 @@ extension TxPatterns on Tx {
             _that.height,
             _that.time,
             _that.value,
+            _that.fee,
             _that.tpe,
             _that.category,
             _that.zsaValue,
@@ -4028,6 +4041,7 @@ extension TxPatterns on Tx {
             int height,
             int time,
             PlatformInt64 value,
+            PlatformInt64 fee,
             int? tpe,
             String? category,
             PlatformInt64 zsaValue,
@@ -4048,6 +4062,7 @@ extension TxPatterns on Tx {
             _that.height,
             _that.time,
             _that.value,
+            _that.fee,
             _that.tpe,
             _that.category,
             _that.zsaValue,
@@ -4072,6 +4087,7 @@ class _Tx implements Tx {
       required this.height,
       required this.time,
       required this.value,
+      required this.fee,
       this.tpe,
       this.category,
       required this.zsaValue,
@@ -4092,6 +4108,8 @@ class _Tx implements Tx {
   final int time;
   @override
   final PlatformInt64 value;
+  @override
+  final PlatformInt64 fee;
   @override
   final int? tpe;
   @override
@@ -4128,6 +4146,7 @@ class _Tx implements Tx {
             (identical(other.height, height) || other.height == height) &&
             (identical(other.time, time) || other.time == time) &&
             (identical(other.value, value) || other.value == value) &&
+            (identical(other.fee, fee) || other.fee == fee) &&
             (identical(other.tpe, tpe) || other.tpe == tpe) &&
             (identical(other.category, category) ||
                 other.category == category) &&
@@ -4152,6 +4171,7 @@ class _Tx implements Tx {
       height,
       time,
       value,
+      fee,
       tpe,
       category,
       zsaValue,
@@ -4164,7 +4184,7 @@ class _Tx implements Tx {
 
   @override
   String toString() {
-    return 'Tx(id: $id, txid: $txid, height: $height, time: $time, value: $value, tpe: $tpe, category: $category, zsaValue: $zsaValue, assetId: $assetId, assetDisplay: $assetDisplay, price: $price, memo: $memo, isUserMemo: $isUserMemo, contactName: $contactName)';
+    return 'Tx(id: $id, txid: $txid, height: $height, time: $time, value: $value, fee: $fee, tpe: $tpe, category: $category, zsaValue: $zsaValue, assetId: $assetId, assetDisplay: $assetDisplay, price: $price, memo: $memo, isUserMemo: $isUserMemo, contactName: $contactName)';
   }
 }
 
@@ -4179,6 +4199,7 @@ abstract mixin class _$TxCopyWith<$Res> implements $TxCopyWith<$Res> {
       int height,
       int time,
       PlatformInt64 value,
+      PlatformInt64 fee,
       int? tpe,
       String? category,
       PlatformInt64 zsaValue,
@@ -4207,6 +4228,7 @@ class __$TxCopyWithImpl<$Res> implements _$TxCopyWith<$Res> {
     Object? height = null,
     Object? time = null,
     Object? value = null,
+    Object? fee = null,
     Object? tpe = freezed,
     Object? category = freezed,
     Object? zsaValue = null,
@@ -4237,6 +4259,10 @@ class __$TxCopyWithImpl<$Res> implements _$TxCopyWith<$Res> {
       value: null == value
           ? _self.value
           : value // ignore: cast_nullable_to_non_nullable
+              as PlatformInt64,
+      fee: null == fee
+          ? _self.fee
+          : fee // ignore: cast_nullable_to_non_nullable
               as PlatformInt64,
       tpe: freezed == tpe
           ? _self.tpe

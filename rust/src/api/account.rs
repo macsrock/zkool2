@@ -324,6 +324,7 @@ pub struct Tx {
     pub height: u32,
     pub time: u32,
     pub value: i64,
+    pub fee: i64,
     pub tpe: Option<u8>,
     pub category: Option<String>,
     pub zsa_value: i64,
@@ -390,6 +391,12 @@ pub async fn get_addresses(ua_pools: u8, c: &Coin) -> Result<Addresses> {
 pub async fn get_account_addresses(account: u32, ua_pools: u8, c: &Coin) -> Result<Addresses> {
     let mut connection = c.get_connection().await?;
     crate::account::get_addresses(&c.network(), &mut connection, account, ua_pools).await
+}
+
+#[cfg_attr(feature = "flutter", frb)]
+pub async fn list_owned_addresses(c: &Coin) -> Result<Vec<String>> {
+    let mut connection = c.get_connection().await?;
+    crate::account::list_owned_addresses(&c.network(), &mut connection, c.account).await
 }
 
 pub struct Addresses {

@@ -151,7 +151,7 @@ class RustBuilder {
         manifestPath,
         '-p',
         environment.crateInfo.packageName,
-        if (!environment.configuration.isDebug) '--release',
+        '--release',
         '--target',
         target.rust,
         '--target-dir',
@@ -168,7 +168,9 @@ class RustBuilder {
 
   Future<Map<String, String>> _buildEnvironment() async {
     if (target.android == null) {
-      return {};
+      return {
+        "RUSTFLAGS": '--cfg zcash_unstable="nu7"'
+      };
     } else {
       final sdkPath = environment.androidSdkPath;
       final ndkVersion = environment.androidNdkVersion;

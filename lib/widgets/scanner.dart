@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class ScannerPage extends StatefulWidget {
@@ -21,28 +20,10 @@ class _ScannerPageState extends State<ScannerPage> {
         title: const Text("QR Scanner"),
       ),
       body: Center(
-        child: MobileScanner(
-          onDetect: onDetect,
-          fit: BoxFit.cover,
-        ),
       ),
     );
   }
 
-  void onDetect(BarcodeCapture? capture) {
-    if (scanned || capture == null) return;
-    final List<Barcode> barcodes = capture.barcodes;
-    for (final barcode in barcodes) {
-      final text = barcode.rawValue;
-      if (text != null) {
-        final error = widget.validator.call(text);
-        if (error == null) {
-          scanned = true;
-          GoRouter.of(context).pop(text);
-        }
-      }
-    }
-  }
 }
 
 Future<String?> showScanner(

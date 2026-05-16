@@ -7,7 +7,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:zkool/src/rust/api/raptor.dart';
 import 'package:zkool/store.dart';
@@ -120,7 +119,6 @@ class ScanAnimatedQRPage extends StatefulWidget {
 
 class ScanAnimatedQRPageState extends State<ScanAnimatedQRPage> {
   Widget? scanner;
-  final controller = MobileScannerController();
   Map<int, Uint8List> packets = {};
 
   @override
@@ -129,25 +127,8 @@ class ScanAnimatedQRPageState extends State<ScanAnimatedQRPage> {
 
     Future(() async {
       final completed = Completer<Uint8List>();
-      final sub = controller.barcodes.listen((qr) async {
-        final barcode = qr.barcodes.first;
-        var data = barcode.rawBytes!;
-        if (Platform.isMacOS) data = getQrBytes(data: data);
-        if (data.length < 16) return;
-        final id = ByteData.sublistView(data).getUint32(12, Endian.big);
-
-        if (!packets.containsKey(id)) {
-          packets[id] = data;
-          setState(() {});
-          final result = await decode(packet: data);
-          if (result != null) {
-            completed.complete(result);
-          }
-        }
-      });
-      final data = await completed.future;
-      sub.cancel();
-      GoRouter.of(context).pop(data.toList());
+     
+      GoRouter.of(context).pop([].toList());
     });
   }
 
@@ -156,7 +137,6 @@ class ScanAnimatedQRPageState extends State<ScanAnimatedQRPage> {
     return Scaffold(
       body: Stack(
         children: [
-          MobileScanner(controller: controller),
           Positioned(
             bottom: 10,
             left: 10,
