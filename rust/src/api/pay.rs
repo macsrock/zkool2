@@ -100,6 +100,18 @@ pub enum SigningEvent {
     Result(PcztPackage),
 }
 
+/// Proves and finalizes a PCZT signed by an external airgapped signer
+/// (Keystone, Cupcake). Uses no spending keys, so it works on watch-only
+/// accounts; pass the result to [`extract_transaction`] to broadcast.
+#[cfg_attr(feature = "flutter", frb)]
+pub async fn prove_and_finalize(pczt: &PcztPackage, c: &Coin) -> Result<PcztPackage> {
+    let network = c.network();
+
+    let tx = crate::pay::plan::prove_and_finalize(&network, pczt).await?;
+
+    Ok(tx)
+}
+
 #[cfg_attr(feature = "flutter", frb)]
 pub async fn extract_transaction(package: &PcztPackage) -> Result<Vec<u8>> {
     crate::pay::plan::extract_transaction(package).await
