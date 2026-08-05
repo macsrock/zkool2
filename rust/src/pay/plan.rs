@@ -1485,6 +1485,74 @@ pub async fn sign_transaction(
     })
 }
 
+/// Proves and finalizes a PCZT whose signatures were produced elsewhere (an
+/// airgapped signer such as Keystone or Cupcake, which never proves).
+///
+/// This is the second half of [`sign_transaction`]: the caller supplies a PCZT
+/// that already carries spend authorization signatures, and this runs the
+/// Prover and Spend Finalizer so the result can be extracted and broadcast.
+/// No spending keys are touched, so it is safe for watch-only accounts.
+pub async fn prove_and_finalize(
+    network: &crate::api::coin::Network,
+    package: &PcztPackage,
+) -> Result<PcztPackage> {
+    let span = span!(Level::INFO, "transaction");
+
+    let PcztPackage {
+        pczt,
+        n_spends,
+        sapling_indices,
+        orchard_indices,
+        ironwood_indices,
+        price,
+        category,
+        is_issuance,
+        ..
+    } = package;
+    let pczt = Pczt::parse(pczt).map_err(|e| anyhow!("failed to parse PCZT: {e:?}"))?;
+
+    let ironwood_active = network.is_nu_active(
+        NetworkUpgrade::Nu6_3,
+        BlockHeight::from_u32(*pczt.global().expiry_height()),
+    );
+
+    span.in_scope(|| {
+        info!("Adding Proofs to externally signed PCZT");
+    });
+
+    let sapling_prover = get_sapling_prover().await?;
+    let orchard_pk = get_orchard_pk(network, ironwood_active);
+    let pczt = Prover::new(pczt)
+        .create_sapling_proofs(sapling_prover, sapling_prover)
+        .map_err(|e| anyhow!("sapling proving failed: {e:?}"))?
+        .create_orchard_proof(orchard_pk)
+        .map_err(|e| anyhow!("orchard proving failed: {e:?}"))?
+        .create_ironwood_proof(&IRONWOOD_PK)
+        .map_err(|e| anyhow!("ironwood proving failed: {e:?}"))?
+        .finish();
+    info!("Proved");
+
+    let pczt = SpendFinalizer::new(pczt)
+        .finalize_spends()
+        .map_err(|e| anyhow!("spend finalization failed: {e:?}"))?;
+    info!("Spend Finalized");
+
+    Ok(PcztPackage {
+        pczt: pczt
+            .serialize()
+            .map_err(|e| anyhow!("failed to serialize PCZT: {e:?}"))?,
+        n_spends: *n_spends,
+        sapling_indices: sapling_indices.clone(),
+        orchard_indices: orchard_indices.clone(),
+        ironwood_indices: ironwood_indices.clone(),
+        can_sign: false,
+        can_broadcast: true,
+        price: *price,
+        category: *category,
+        is_issuance: *is_issuance,
+    })
+}
+
 pub async fn extract_transaction(package: &PcztPackage) -> Result<Vec<u8>> {
     let span = span!(Level::INFO, "transaction");
     span.in_scope(|| {
