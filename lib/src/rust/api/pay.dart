@@ -36,6 +36,13 @@ Future<PcztPackage> signTransaction(
         {required PcztPackage pczt, required Coin c}) =>
     RustLib.instance.api.crateApiPaySignTransaction(pczt: pczt, c: c);
 
+/// Proves and finalizes a PCZT signed by an external airgapped signer
+/// (Keystone, Cupcake). Uses no spending keys, so it works on watch-only
+/// accounts; pass the result to [`extract_transaction`] to broadcast.
+Future<PcztPackage> proveAndFinalize(
+        {required PcztPackage pczt, required Coin c}) =>
+    RustLib.instance.api.crateApiPayProveAndFinalize(pczt: pczt, c: c);
+
 Future<Uint8List> extractTransaction({required PcztPackage package}) =>
     RustLib.instance.api.crateApiPayExtractTransaction(package: package);
 
