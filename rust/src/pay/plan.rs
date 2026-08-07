@@ -906,6 +906,22 @@ pub async fn plan_transaction(
     let pczt = Creator::build_from_parts(r.pczt_parts).unwrap();
     info!("Created");
 
+    // An external signer identifies its own inputs by the ZIP-32 seed
+    // fingerprint and the full BIP-44 path. Both were previously placeholders
+    // — a zeroed fingerprint and a two-element path — which nothing checked,
+    // because signing happened locally. A hardware wallet does check, and
+    // rejects the transaction as belonging to a different wallet.
+    let seed_fingerprint: [u8; 32] = crate::db::get_account_fingerprint(&mut *connection, account)
+        .await?
+        .and_then(|fp| <[u8; 32]>::try_from(fp).ok())
+        .unwrap_or([0u8; 32]);
+    let aindex = crate::db::get_account_aindex(&mut *connection, account).await?;
+    const HARDENED: u32 = 0x8000_0000;
+    let coin_type: u32 = match network {
+        Network::Main => 133,
+        _ => 1,
+    };
+
     let updater = Updater::new(pczt);
     let updater = updater
         .update_transparent_with(|mut u| {
@@ -913,8 +929,14 @@ pub async fn plan_transaction(
                 tsk_dindex.into_iter().enumerate()
             {
                 u.update_input_with(i, |mut u| {
-                    let derivation_path = vec![scope, dindex_t];
-                    let path = Bip32Derivation::parse([0u8; 32], derivation_path).unwrap();
+                    let derivation_path = vec![
+                        44 | HARDENED,
+                        coin_type | HARDENED,
+                        aindex | HARDENED,
+                        scope,
+                        dindex_t,
+                    ];
+                    let path = Bip32Derivation::parse(seed_fingerprint, derivation_path).unwrap();
                     u.set_bip32_derivation(pubkey.serialize(), path);
                     u.set_proprietary("scope".to_string(), scope.to_le_bytes().to_vec());
                     u.set_proprietary("dindex".to_string(), dindex_t.to_le_bytes().to_vec());
