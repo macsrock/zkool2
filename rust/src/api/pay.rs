@@ -112,6 +112,22 @@ pub async fn prove_and_finalize(pczt: &PcztPackage, c: &Coin) -> Result<PcztPack
     Ok(tx)
 }
 
+/// Rewrites a PCZT into the encoding a Keystone reads.
+///
+/// Cake pins an older `pczt` than the device's firmware, and the two disagree
+/// on enough of the v2 layout that each silently misreads the other. Translate
+/// on the way out, and [`pczt_from_keystone`] on the way back.
+#[cfg_attr(feature = "flutter", frb)]
+pub fn pczt_to_keystone(pczt: Vec<u8>) -> Result<Vec<u8>> {
+    crate::keystone_wire::to_keystone(&pczt).map_err(|e| anyhow::anyhow!(e))
+}
+
+/// Rewrites a PCZT signed by a Keystone back into the encoding Cake uses.
+#[cfg_attr(feature = "flutter", frb)]
+pub fn pczt_from_keystone(pczt: Vec<u8>) -> Result<Vec<u8>> {
+    crate::keystone_wire::from_keystone(&pczt).map_err(|e| anyhow::anyhow!(e))
+}
+
 #[cfg_attr(feature = "flutter", frb)]
 pub async fn extract_transaction(package: &PcztPackage) -> Result<Vec<u8>> {
     crate::pay::plan::extract_transaction(package).await
