@@ -1230,6 +1230,57 @@ pub async fn plan_transaction(
         }
         .map_err(|error| anyhow!("Failed to attach Orchard asset names: {error:?}"))?;
 
+    // Shielded spends carry no key material of their own, so an external
+    // signer identifies them by the ZIP-32 path of the account that can spend
+    // them. Without this the spend reaches the device with no derivation at
+    // all and is refused as belonging to another wallet.
+    //
+    // Orchard requires every element hardened, and the path is exactly the
+    // three-element m/32'/coin_type'/account' — not the five-element BIP 44
+    // path used for transparent inputs, which this rejects.
+    let orchard_zip32 = || {
+        orchard::pczt::Zip32Derivation::parse(
+            seed_fingerprint,
+            vec![32 | HARDENED, coin_type | HARDENED, aindex | HARDENED],
+        )
+        .expect("orchard ZIP-32 path is fully hardened")
+    };
+
+    // Dummy spends are the builder's padding and belong to nobody, so leave
+    // them unclaimed.
+    fn real_spend_indices(bundle: &orchard::pczt::Bundle) -> Vec<usize> {
+        bundle
+            .actions()
+            .iter()
+            .enumerate()
+            .filter_map(|(i, a)| a.spend().dummy_sk().is_none().then_some(i))
+            .collect()
+    }
+
+    let updater = updater
+        .update_orchard_with(|mut u| {
+            for i in real_spend_indices(u.bundle()) {
+                u.update_action_with(i, |mut a| {
+                    a.set_spend_zip32_derivation(orchard_zip32());
+                    Ok(())
+                })?;
+            }
+            Ok(())
+        })
+        .map_err(|e| anyhow!("orchard updater failed: {e:?}"))?;
+
+    let updater = updater
+        .update_ironwood_with(|mut u| {
+            for i in real_spend_indices(u.bundle()) {
+                u.update_action_with(i, |mut a| {
+                    a.set_spend_zip32_derivation(orchard_zip32());
+                    Ok(())
+                })?;
+            }
+            Ok(())
+        })
+        .map_err(|e| anyhow!("ironwood updater failed: {e:?}"))?;
+
     let pczt = updater.finish();
 
     // Issuer phase 1: build the AwaitingSighash issue bundle
