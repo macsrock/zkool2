@@ -6064,6 +6064,7 @@ dependencies = [
  "nonempty",
  "orchard",
  "pczt",
+ "postcard",
  "prost",
  "qrcode",
  "rand 0.6.5",

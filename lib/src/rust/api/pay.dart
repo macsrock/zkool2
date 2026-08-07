@@ -43,6 +43,18 @@ Future<PcztPackage> proveAndFinalize(
         {required PcztPackage pczt, required Coin c}) =>
     RustLib.instance.api.crateApiPayProveAndFinalize(pczt: pczt, c: c);
 
+/// Rewrites a PCZT into the encoding a Keystone reads.
+///
+/// Cake pins an older `pczt` than the device's firmware, and the two disagree
+/// on enough of the v2 layout that each silently misreads the other. Translate
+/// on the way out, and [`pczt_from_keystone`] on the way back.
+Future<Uint8List> pcztToKeystone({required List<int> pczt}) =>
+    RustLib.instance.api.crateApiPayPcztToKeystone(pczt: pczt);
+
+/// Rewrites a PCZT signed by a Keystone back into the encoding Cake uses.
+Future<Uint8List> pcztFromKeystone({required List<int> pczt}) =>
+    RustLib.instance.api.crateApiPayPcztFromKeystone(pczt: pczt);
+
 Future<Uint8List> extractTransaction({required PcztPackage package}) =>
     RustLib.instance.api.crateApiPayExtractTransaction(package: package);
 
