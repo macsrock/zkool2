@@ -324,6 +324,8 @@ pub struct Tx {
     pub height: u32,
     pub time: u32,
     pub value: i64,
+    /// Fee paid, in zatoshis. Recorded when the transaction's memos are
+    /// decrypted; zero for transactions whose details have not been fetched.
     pub fee: i64,
     pub tpe: Option<u8>,
     pub category: Option<String>,
