@@ -400,6 +400,7 @@ sealed class Tx with _$Tx {
     required int height,
     required int time,
     required PlatformInt64 value,
+    required PlatformInt64 fee,
     int? tpe,
     String? category,
     required PlatformInt64 zsaValue,

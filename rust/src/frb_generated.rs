@@ -8529,6 +8529,7 @@ impl SseDecode for crate::api::account::Tx {
         let mut var_height = <u32>::sse_decode(deserializer);
         let mut var_time = <u32>::sse_decode(deserializer);
         let mut var_value = <i64>::sse_decode(deserializer);
+        let mut var_fee = <i64>::sse_decode(deserializer);
         let mut var_tpe = <Option<u8>>::sse_decode(deserializer);
         let mut var_category = <Option<String>>::sse_decode(deserializer);
         let mut var_zsaValue = <i64>::sse_decode(deserializer);
@@ -8544,6 +8545,7 @@ impl SseDecode for crate::api::account::Tx {
             height: var_height,
             time: var_time,
             value: var_value,
+            fee: var_fee,
             tpe: var_tpe,
             category: var_category,
             zsa_value: var_zsaValue,
@@ -10230,6 +10232,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::account::Tx {
             self.height.into_into_dart().into_dart(),
             self.time.into_into_dart().into_dart(),
             self.value.into_into_dart().into_dart(),
+            self.fee.into_into_dart().into_dart(),
             self.tpe.into_into_dart().into_dart(),
             self.category.into_into_dart().into_dart(),
             self.zsa_value.into_into_dart().into_dart(),
@@ -11688,6 +11691,7 @@ impl SseEncode for crate::api::account::Tx {
         <u32>::sse_encode(self.height, serializer);
         <u32>::sse_encode(self.time, serializer);
         <i64>::sse_encode(self.value, serializer);
+        <i64>::sse_encode(self.fee, serializer);
         <Option<u8>>::sse_encode(self.tpe, serializer);
         <Option<String>>::sse_encode(self.category, serializer);
         <i64>::sse_encode(self.zsa_value, serializer);

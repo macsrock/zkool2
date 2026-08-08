@@ -1440,7 +1440,7 @@ pub async fn fetch_txs(connection: &mut SqliteConnection, account: u32) -> Resul
     // order by height desc to get latest transactions first
     tracing::debug!("fetch_txs: starting for account {}", account);
     let transactions = sqlx::query(
-        "SELECT t.id_tx, t.txid, t.height, t.time, t.value, t.tpe, c.name, t.zsa_value, t.price, t.asset_id,
+        "SELECT t.id_tx, t.txid, t.height, t.time, t.value, t.fee, t.tpe, c.name, t.zsa_value, t.price, t.asset_id,
             a.asset_name, a.asset_desc_hash,
             um.user_memo as memo,
             (um.user_memo IS NOT NULL AND um.user_memo != '') as is_user_memo,
@@ -1465,18 +1465,20 @@ pub async fn fetch_txs(connection: &mut SqliteConnection, account: u32) -> Resul
         let height: u32 = row.get(2);
         let time: u32 = row.get(3);
         let value: i64 = row.get(4);
-        let tpe: Option<u8> = row.get(5);
-        let category: Option<String> = row.get(6);
-        let zsa_value: i64 = row.get(7);
-        let price: Option<f64> = row.get(8);
-        let asset_id: Option<i32> = row.get(9);
-        let asset_name: Option<String> = row.get(10);
-        let asset_desc_hash: Option<Vec<u8>> = row.get(11);
-        let memo: Option<String> = row.get(12);
-        let is_user_memo: bool = row.get(13);
-        let contact_name: Option<String> = row.get(14);
+        let fee: i64 = row.get(5);
+        let tpe: Option<u8> = row.get(6);
+        let category: Option<String> = row.get(7);
+        let zsa_value: i64 = row.get(8);
+        let price: Option<f64> = row.get(9);
+        let asset_id: Option<i32> = row.get(10);
+        let asset_name: Option<String> = row.get(11);
+        let asset_desc_hash: Option<Vec<u8>> = row.get(12);
+        let memo: Option<String> = row.get(13);
+        let is_user_memo: bool = row.get(14);
+        let contact_name: Option<String> = row.get(15);
         Tx {
             id,
+            fee,
             txid,
             height,
             time,
