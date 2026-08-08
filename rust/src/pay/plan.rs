@@ -1205,6 +1205,27 @@ pub async fn plan_transaction(
                     Ok(())
                 })?;
             }
+
+            // An external signer shows the recipient of every transparent
+            // output for review, and refuses one it cannot name. The address is
+            // recoverable from the script, but the signer will not derive it
+            // itself, so state it here.
+            let recipients = u
+                .bundle()
+                .outputs()
+                .iter()
+                .map(|o| {
+                    TransparentAddress::from_script_pubkey(&o.script_pubkey().clone().into())
+                        .map(|addr| addr.encode(network))
+                })
+                .collect::<Vec<_>>();
+            for (i, recipient) in recipients.into_iter().enumerate() {
+                let Some(recipient) = recipient else { continue };
+                u.update_output_with(i, |mut u| {
+                    u.set_user_address(recipient);
+                    Ok(())
+                })?;
+            }
             Ok(())
         })
         .unwrap();
