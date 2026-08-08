@@ -128,6 +128,15 @@ pub fn pczt_from_keystone(pczt: Vec<u8>) -> Result<Vec<u8>> {
     crate::keystone_wire::from_keystone(&pczt).map_err(|e| anyhow::anyhow!(e))
 }
 
+/// Takes a Keystone's signatures into the PCZT this wallet built.
+///
+/// The device redacts prover-only fields, so its reply cannot be proved on its
+/// own; `original` supplies those, `signed` supplies only the signatures.
+#[cfg_attr(feature = "flutter", frb)]
+pub fn pczt_apply_keystone_signatures(original: Vec<u8>, signed: Vec<u8>) -> Result<Vec<u8>> {
+    crate::keystone_wire::apply_signatures(&original, &signed).map_err(|e| anyhow::anyhow!(e))
+}
+
 #[cfg_attr(feature = "flutter", frb)]
 pub async fn extract_transaction(package: &PcztPackage) -> Result<Vec<u8>> {
     crate::pay::plan::extract_transaction(package).await

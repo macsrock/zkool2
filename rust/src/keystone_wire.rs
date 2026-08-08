@@ -452,6 +452,82 @@ pub fn from_keystone(bytes: &[u8]) -> Result<Vec<u8>, String> {
     with_header(&out, bytes.len())
 }
 
+/// Applies a Keystone's signatures to the PCZT this wallet built.
+///
+/// A signer returns only what it needed to produce: it redacts prover-only
+/// fields such as the full viewing key, so its reply cannot be proved on its
+/// own. Rather than trusting the returned document, keep the original and take
+/// just the signatures out of the reply.
+pub fn apply_signatures(original: &[u8], signed: &[u8]) -> Result<Vec<u8>, String> {
+    let mut orig: src_::Pczt = postcard::from_bytes(split_header(original)?)
+        .map_err(|e| format!("could not read the original PCZT: {e:?}"))?;
+    let from_device: src_::Pczt = postcard::from_bytes(split_header(signed)?)
+        .map_err(|e| format!("could not read the signed PCZT: {e:?}"))?;
+
+    fn merge_orchard(
+        into: &mut Option<src_::OrchardBundle>,
+        from: &Option<src_::OrchardBundle>,
+        pool: &str,
+    ) -> Result<usize, String> {
+        match (into.as_mut(), from.as_ref()) {
+            (Some(a), Some(b)) => {
+                if a.actions.len() != b.actions.len() {
+                    return Err(format!(
+                        "the signed PCZT is not the {pool} transaction that was sent: \
+                         {} actions returned, {} expected",
+                        b.actions.len(),
+                        a.actions.len()
+                    ));
+                }
+                let mut applied = 0;
+                for (x, y) in a.actions.iter_mut().zip(b.actions.iter()) {
+                    // A spend already carrying its own signature keeps it; the
+                    // IO Finalizer signs dummy spends before the device sees them.
+                    if x.spend.spend_auth_sig.is_none() {
+                        if let Some(sig) = y.spend.spend_auth_sig {
+                            x.spend.spend_auth_sig = Some(sig);
+                            applied += 1;
+                        }
+                    }
+                }
+                Ok(applied)
+            }
+            (None, Some(b)) if !b.actions.is_empty() => {
+                Err(format!("the signed PCZT has {pool} actions the original does not"))
+            }
+            _ => Ok(0),
+        }
+    }
+
+    let mut applied = merge_orchard(&mut orig.orchard, &from_device.orchard, "Orchard")?;
+    applied += merge_orchard(&mut orig.ironwood, &from_device.ironwood, "Ironwood")?;
+
+    // Transparent inputs are authorised with script signatures rather than a
+    // spend auth signature.
+    if let (Some(a), Some(b)) = (orig.transparent.as_mut(), from_device.transparent.as_ref()) {
+        if a.inputs.len() != b.inputs.len() {
+            return Err(format!(
+                "the signed PCZT is not the transaction that was sent: {} transparent \
+                 inputs returned, {} expected",
+                b.inputs.len(),
+                a.inputs.len()
+            ));
+        }
+        for (x, y) in a.inputs.iter_mut().zip(b.inputs.iter()) {
+            for (k, v) in &y.partial_signatures {
+                if x.partial_signatures.insert(*k, v.clone()).is_none() {
+                    applied += 1;
+                }
+            }
+        }
+    }
+
+    if applied == 0 {
+        return Err("the device returned no signatures".into());
+    }
+    with_header(&orig, original.len())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -477,6 +553,56 @@ mod tests {
     #[test]
     fn round_trip_is_lossless() {
         assert_eq!(from_keystone(KEYSTONE).expect("transcode back"), CAKE);
+    }
+
+    #[test]
+    fn takes_signatures_and_keeps_prover_fields() {
+        // Stand in for the device: strip the prover-only fields it redacts,
+        // and attach a spend authorising signature.
+        let mut device: src_::Pczt = postcard::from_bytes(&CAKE[8..]).unwrap();
+        let iw = device.ironwood.as_mut().unwrap();
+        for a in iw.actions.iter_mut() {
+            a.spend.fvk = None;
+            a.spend.witness = None;
+            a.spend.spend_auth_sig = Some([7u8; 64]);
+        }
+        let device_bytes = with_header(&device, CAKE.len()).unwrap();
+
+        let merged = apply_signatures(CAKE, &device_bytes).expect("apply");
+        let out: src_::Pczt = postcard::from_bytes(&merged[8..]).unwrap();
+        let actions = &out.ironwood.as_ref().unwrap().actions;
+
+        let orig: src_::Pczt = postcard::from_bytes(&CAKE[8..]).unwrap();
+        let orig_actions = &orig.ironwood.as_ref().unwrap().actions;
+
+        // Every spend ends up authorised, and a spend the wallet had not
+        // already signed takes the device's signature. Dummy spends keep the
+        // one the IO Finalizer produced before the device ever saw them.
+        assert!(actions.iter().all(|a| a.spend.spend_auth_sig.is_some()));
+        let taken = actions
+            .iter()
+            .zip(orig_actions.iter())
+            .filter(|(_, b)| b.spend.spend_auth_sig.is_none())
+            .count();
+        assert!(taken > 0, "the fixture must have a spend for the device to sign");
+        for (a, b) in actions.iter().zip(orig_actions.iter()) {
+            let expected = b.spend.spend_auth_sig.or(Some([7u8; 64]));
+            assert_eq!(a.spend.spend_auth_sig, expected);
+        }
+
+        for (a, b) in actions.iter().zip(orig_actions.iter()) {
+            assert_eq!(a.spend.fvk, b.spend.fvk);
+            assert!(a.spend.fvk.is_some());
+            assert_eq!(a.spend.witness.is_some(), b.spend.witness.is_some());
+        }
+    }
+
+    #[test]
+    fn rejects_a_reply_for_a_different_transaction() {
+        let mut other: src_::Pczt = postcard::from_bytes(&CAKE[8..]).unwrap();
+        other.ironwood.as_mut().unwrap().actions.truncate(1);
+        let bytes = with_header(&other, CAKE.len()).unwrap();
+        assert!(apply_signatures(CAKE, &bytes).is_err());
     }
 
     #[test]

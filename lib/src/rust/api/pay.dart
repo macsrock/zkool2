@@ -55,6 +55,15 @@ Future<Uint8List> pcztToKeystone({required List<int> pczt}) =>
 Future<Uint8List> pcztFromKeystone({required List<int> pczt}) =>
     RustLib.instance.api.crateApiPayPcztFromKeystone(pczt: pczt);
 
+/// Takes a Keystone's signatures into the PCZT this wallet built.
+///
+/// The device redacts prover-only fields, so its reply cannot be proved on its
+/// own; `original` supplies those, `signed` supplies only the signatures.
+Future<Uint8List> pcztApplyKeystoneSignatures(
+        {required List<int> original, required List<int> signed}) =>
+    RustLib.instance.api.crateApiPayPcztApplyKeystoneSignatures(
+        original: original, signed: signed);
+
 Future<Uint8List> extractTransaction({required PcztPackage package}) =>
     RustLib.instance.api.crateApiPayExtractTransaction(package: package);
 
