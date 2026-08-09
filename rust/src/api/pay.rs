@@ -137,6 +137,26 @@ pub fn pczt_apply_keystone_signatures(original: Vec<u8>, signed: Vec<u8>) -> Res
     crate::keystone_wire::apply_signatures(&original, &signed).map_err(|e| anyhow::anyhow!(e))
 }
 
+/// Builds a `zcash-sign-batch` request for a Keystone from one or more PCZTs in
+/// Cake's dialect.
+///
+/// The batch path returns only signatures rather than a whole PCZT, so the reply
+/// is far smaller over animated QR. It carries shielded spends only; a PCZT with
+/// transparent inputs (a shield) must use the single [`pczt_to_keystone`] path.
+#[cfg_attr(feature = "flutter", frb)]
+pub fn pczt_to_batch_request(pczts: Vec<Vec<u8>>) -> Result<Vec<u8>> {
+    crate::keystone_wire::to_batch_request(&pczts).map_err(|e| anyhow::anyhow!(e))
+}
+
+/// Takes a Keystone's `zcash-batch-sig-result` reply into the PCZT this wallet
+/// built. `original` is the single PCZT sent in the batch; `response` carries
+/// only its spend-auth signatures.
+#[cfg_attr(feature = "flutter", frb)]
+pub fn pczt_apply_batch_signatures(original: Vec<u8>, response: Vec<u8>) -> Result<Vec<u8>> {
+    crate::keystone_wire::apply_batch_sig_result(&original, &response)
+        .map_err(|e| anyhow::anyhow!(e))
+}
+
 #[cfg_attr(feature = "flutter", frb)]
 pub async fn extract_transaction(package: &PcztPackage) -> Result<Vec<u8>> {
     crate::pay::plan::extract_transaction(package).await

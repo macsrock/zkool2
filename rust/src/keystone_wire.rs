@@ -399,8 +399,10 @@ fn with_header<T: serde::Serialize>(body: &T, hint: usize) -> Result<Vec<u8>, St
     postcard::to_extend(body, buf).map_err(|e| format!("re-encode failed: {e:?}"))
 }
 
-/// Rewrites a PCZT from Cake's dialect into the one a Keystone reads.
-pub fn to_keystone(bytes: &[u8]) -> Result<Vec<u8>, String> {
+/// Parses a PCZT in Cake's dialect and transcodes it to the one a Keystone
+/// reads, without the framing header. The batch request carries these
+/// headerless; [`to_keystone`] wraps a single one for the legacy path.
+fn to_dst_pczt(bytes: &[u8]) -> Result<dst::Pczt, String> {
     let src: src_::Pczt = postcard::from_bytes(split_header(bytes)?)
         .map_err(|e| format!("could not read this PCZT: {e:?}"))?;
     if src
@@ -410,7 +412,7 @@ pub fn to_keystone(bytes: &[u8]) -> Result<Vec<u8>, String> {
     {
         return Err("Sapling bundles cannot be signed by this device".into());
     }
-    let out = dst::Pczt {
+    Ok(dst::Pczt {
         global: src.global,
         transparent: src.transparent,
         sapling: src.sapling.map(|s| dst::SaplingBundle {
@@ -422,8 +424,12 @@ pub fn to_keystone(bytes: &[u8]) -> Result<Vec<u8>, String> {
         }),
         orchard: src.orchard.map(to_dst_orchard),
         ironwood: src.ironwood.map(to_dst_orchard),
-    };
-    with_header(&out, bytes.len())
+    })
+}
+
+/// Rewrites a PCZT from Cake's dialect into the one a Keystone reads.
+pub fn to_keystone(bytes: &[u8]) -> Result<Vec<u8>, String> {
+    with_header(&to_dst_pczt(bytes)?, bytes.len())
 }
 
 /// Rewrites a signed PCZT from the Keystone's dialect back into Cake's.
@@ -528,6 +534,129 @@ pub fn apply_signatures(original: &[u8], signed: &[u8]) -> Result<Vec<u8>, Strin
     with_header(&orig, original.len())
 }
 
+// ---- batch signing (zcash-sign-batch / zcash-batch-sig-result) ---------
+//
+// The device's batch protocol shrinks the airgapped round trip. The request
+// carries headerless v2 PCZTs under one shared version; the reply is only the
+// Orchard/Ironwood spend-auth signatures, not a whole PCZT -- an order of
+// magnitude fewer QR frames coming back. Firmware 3.0.2 (cypherpunk) speaks
+// batch version 1; see keystone3-firmware docs/protocols/ur_registrys/zcash.md.
+//
+// Only shielded spends are signable this way: the device rejects a batch PCZT
+// with transparent inputs or Sapling. The caller routes only shielded sends
+// here and keeps the transparent shield on the single zcash-pczt path.
+
+const BATCH_REQUEST_MAGIC: [u8; 4] = *b"PCZB";
+const BATCH_RESPONSE_MAGIC: [u8; 4] = *b"PCZS";
+const BATCH_VERSION: u32 = 1;
+
+#[derive(Serialize, Deserialize)]
+struct BatchSignRequest {
+    pczts: Vec<dst::Pczt>,
+}
+
+#[derive(Serialize, Deserialize)]
+struct BatchSignResponse {
+    signatures: Vec<Vec<SpendAuthSignature>>,
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize)]
+enum ValuePool {
+    Orchard,
+    Ironwood,
+}
+
+#[serde_as]
+#[derive(Serialize, Deserialize)]
+struct SpendAuthSignature {
+    value_pool: ValuePool,
+    action_index: u32,
+    #[serde_as(as = "[_; 64]")]
+    signature: [u8; 64],
+}
+
+/// Builds a `zcash-sign-batch` request body from PCZTs in Cake's dialect.
+///
+/// Each is transcoded to the device's v2 dialect and carried headerless; the
+/// shared PCZT version rides in the batch header. The bytes returned are the
+/// opaque `data` the UR layer wraps.
+pub fn to_batch_request(pczts: &[Vec<u8>]) -> Result<Vec<u8>, String> {
+    if pczts.is_empty() {
+        return Err("a batch request needs at least one transaction".into());
+    }
+    let body = BatchSignRequest {
+        pczts: pczts
+            .iter()
+            .map(|b| to_dst_pczt(b))
+            .collect::<Result<_, _>>()?,
+    };
+    let hint: usize = pczts.iter().map(|b| b.len()).sum();
+    let mut buf = Vec::with_capacity(hint + 32);
+    buf.extend_from_slice(&BATCH_REQUEST_MAGIC);
+    buf.extend_from_slice(&BATCH_VERSION.to_le_bytes());
+    buf.extend_from_slice(&V2.to_le_bytes()); // one shared PCZT version for the batch
+    postcard::to_extend(&body, buf).map_err(|e| format!("batch request encode failed: {e:?}"))
+}
+
+/// Applies a `zcash-batch-sig-result` reply to the PCZT this wallet built.
+///
+/// The reply carries only spend-auth signatures, keyed by value pool and action
+/// index; everything the prover needs stays in `original`, which must be the
+/// single PCZT that was sent in the batch.
+pub fn apply_batch_sig_result(original: &[u8], response: &[u8]) -> Result<Vec<u8>, String> {
+    if response.len() < 8 || response[..4] != BATCH_RESPONSE_MAGIC {
+        return Err("not a batch signature response".into());
+    }
+    let version = u32::from_le_bytes(response[4..8].try_into().unwrap());
+    if version != BATCH_VERSION {
+        return Err(format!("expected batch version {BATCH_VERSION}, got {version}"));
+    }
+    let (parsed, rest): (BatchSignResponse, _) = postcard::take_from_bytes(&response[8..])
+        .map_err(|e| format!("could not read the batch response: {e:?}"))?;
+    if !rest.is_empty() {
+        return Err("trailing data after the batch response".into());
+    }
+    // One PCZT was sent, so its signatures are the first (and only) entry.
+    let sigs = parsed
+        .signatures
+        .into_iter()
+        .next()
+        .ok_or("the device returned no signatures")?;
+
+    let mut orig: src_::Pczt = postcard::from_bytes(split_header(original)?)
+        .map_err(|e| format!("could not read the original PCZT: {e:?}"))?;
+
+    let mut applied = 0usize;
+    for sig in sigs {
+        let (bundle, pool) = match sig.value_pool {
+            ValuePool::Orchard => (orig.orchard.as_mut(), "Orchard"),
+            ValuePool::Ironwood => (orig.ironwood.as_mut(), "Ironwood"),
+        };
+        let bundle = bundle.ok_or_else(|| {
+            format!("the response signs a {pool} action but the transaction has no {pool} bundle")
+        })?;
+        let action_count = bundle.actions.len();
+        let action = bundle
+            .actions
+            .get_mut(sig.action_index as usize)
+            .ok_or_else(|| {
+                format!(
+                    "the response signs {pool} action {} but the transaction has {action_count}",
+                    sig.action_index
+                )
+            })?;
+        // A spend the IO Finalizer already signed (a dummy) keeps its signature.
+        if action.spend.spend_auth_sig.is_none() {
+            action.spend.spend_auth_sig = Some(sig.signature);
+            applied += 1;
+        }
+    }
+    if applied == 0 {
+        return Err("the device returned no signatures".into());
+    }
+    with_header(&orig, original.len())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -611,5 +740,96 @@ mod tests {
         let mut v1 = CAKE.to_vec();
         v1[4] = 1;
         assert!(to_keystone(&v1).is_err());
+    }
+
+    #[test]
+    fn batch_request_carries_the_device_pczt() {
+        let req = to_batch_request(&[CAKE.to_vec()]).expect("batch request");
+        // Header: "PCZB" || batch version 1 || pczt version 2, all little-endian.
+        assert_eq!(&req[..4], b"PCZB");
+        assert_eq!(u32::from_le_bytes(req[4..8].try_into().unwrap()), 1);
+        assert_eq!(u32::from_le_bytes(req[8..12].try_into().unwrap()), 2);
+
+        // The body is one PCZT, and its bytes are byte-identical to the body of
+        // the device-verified golden -- i.e. the batch carries exactly what the
+        // legacy zcash-pczt path already proved the firmware parses.
+        let body: BatchSignRequest = postcard::from_bytes(&req[12..]).expect("decode body");
+        assert_eq!(body.pczts.len(), 1);
+        let inner = postcard::to_extend(&body.pczts[0], Vec::new()).expect("re-encode inner");
+        assert_eq!(
+            inner,
+            &KEYSTONE[8..],
+            "batch inner PCZT must match the device-dialect golden body"
+        );
+    }
+
+    #[test]
+    fn batch_request_rejects_an_empty_batch() {
+        assert!(to_batch_request(&[]).is_err());
+    }
+
+    #[test]
+    fn applies_batch_signatures() {
+        // The Ironwood actions the device would sign are those the IO Finalizer
+        // left unsigned.
+        let orig: src_::Pczt = postcard::from_bytes(&CAKE[8..]).unwrap();
+        let to_sign: Vec<u32> = orig
+            .ironwood
+            .as_ref()
+            .unwrap()
+            .actions
+            .iter()
+            .enumerate()
+            .filter(|(_, a)| a.spend.spend_auth_sig.is_none())
+            .map(|(i, _)| i as u32)
+            .collect();
+        assert!(!to_sign.is_empty(), "fixture must have a spend to sign");
+
+        // Stand in for the device: a compact response signing just those.
+        let body = BatchSignResponse {
+            signatures: vec![to_sign
+                .iter()
+                .map(|&i| SpendAuthSignature {
+                    value_pool: ValuePool::Ironwood,
+                    action_index: i,
+                    signature: [9u8; 64],
+                })
+                .collect()],
+        };
+        let mut resp = Vec::new();
+        resp.extend_from_slice(b"PCZS");
+        resp.extend_from_slice(&1u32.to_le_bytes());
+        let resp = postcard::to_extend(&body, resp).unwrap();
+
+        let merged = apply_batch_sig_result(CAKE, &resp).expect("apply");
+        let out: src_::Pczt = postcard::from_bytes(&merged[8..]).unwrap();
+        let out_actions = &out.ironwood.as_ref().unwrap().actions;
+        let orig_actions = &orig.ironwood.as_ref().unwrap().actions;
+
+        // Every spend is now authorised; the ones the device signed took [9; 64],
+        // and any the IO Finalizer had already signed kept theirs.
+        assert!(out_actions.iter().all(|a| a.spend.spend_auth_sig.is_some()));
+        for (a, b) in out_actions.iter().zip(orig_actions.iter()) {
+            let expected = b.spend.spend_auth_sig.or(Some([9u8; 64]));
+            assert_eq!(a.spend.spend_auth_sig, expected);
+        }
+    }
+
+    #[test]
+    fn rejects_a_malformed_batch_response() {
+        // Wrong magic.
+        assert!(apply_batch_sig_result(CAKE, b"nope____").is_err());
+        // Right magic, unsupported version.
+        let mut bad = Vec::new();
+        bad.extend_from_slice(b"PCZS");
+        bad.extend_from_slice(&2u32.to_le_bytes());
+        assert!(apply_batch_sig_result(CAKE, &bad).is_err());
+        // Valid header, no signatures.
+        let empty = BatchSignResponse { signatures: vec![vec![]] };
+        let mut resp = Vec::new();
+        resp.extend_from_slice(b"PCZS");
+        resp.extend_from_slice(&1u32.to_le_bytes());
+        let resp = postcard::to_extend(&empty, resp).unwrap();
+        assert!(apply_batch_sig_result(CAKE, &resp).is_err());
     }
 }
