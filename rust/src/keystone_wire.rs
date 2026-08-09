@@ -584,18 +584,35 @@ pub fn to_batch_request(pczts: &[Vec<u8>]) -> Result<Vec<u8>, String> {
     if pczts.is_empty() {
         return Err("a batch request needs at least one transaction".into());
     }
-    let body = BatchSignRequest {
-        pczts: pczts
-            .iter()
-            .map(|b| to_dst_pczt(b))
-            .collect::<Result<_, _>>()?,
-    };
+    let mut dst_pczts: Vec<dst::Pczt> =
+        pczts.iter().map(|b| to_dst_pczt(b)).collect::<Result<_, _>>()?;
+    // The device rejects a batch request carrying ANY spend-authorization
+    // signature -- including the ones the IO Finalizer puts on preauthorized
+    // padding (dummy) spends before this wallet ever saw the transaction.
+    // Strip them from the request; the wallet-owned base PCZT keeps them, and
+    // apply_batch_sig_result layers the device's real-spend signatures on top.
+    for p in dst_pczts.iter_mut() {
+        clear_batch_spend_auth_sigs(p);
+    }
+    let body = BatchSignRequest { pczts: dst_pczts };
     let hint: usize = pczts.iter().map(|b| b.len()).sum();
     let mut buf = Vec::with_capacity(hint + 32);
     buf.extend_from_slice(&BATCH_REQUEST_MAGIC);
     buf.extend_from_slice(&BATCH_VERSION.to_le_bytes());
     buf.extend_from_slice(&V2.to_le_bytes()); // one shared PCZT version for the batch
     postcard::to_extend(&body, buf).map_err(|e| format!("batch request encode failed: {e:?}"))
+}
+
+/// Removes every Orchard and Ironwood spend-auth signature from a PCZT bound
+/// for a batch request. The device refuses a request that carries any.
+fn clear_batch_spend_auth_sigs(pczt: &mut dst::Pczt) {
+    for bundle in [pczt.orchard.as_mut(), pczt.ironwood.as_mut()] {
+        if let Some(b) = bundle {
+            for a in b.actions.iter_mut() {
+                a.spend.spend_auth_sig = None;
+            }
+        }
+    }
 }
 
 /// Applies a `zcash-batch-sig-result` reply to the PCZT this wallet built.
@@ -743,24 +760,41 @@ mod tests {
     }
 
     #[test]
-    fn batch_request_carries_the_device_pczt() {
+    fn batch_request_strips_spend_auth_sigs() {
         let req = to_batch_request(&[CAKE.to_vec()]).expect("batch request");
         // Header: "PCZB" || batch version 1 || pczt version 2, all little-endian.
         assert_eq!(&req[..4], b"PCZB");
         assert_eq!(u32::from_le_bytes(req[4..8].try_into().unwrap()), 1);
         assert_eq!(u32::from_le_bytes(req[8..12].try_into().unwrap()), 2);
 
-        // The body is one PCZT, and its bytes are byte-identical to the body of
-        // the device-verified golden -- i.e. the batch carries exactly what the
-        // legacy zcash-pczt path already proved the firmware parses.
         let body: BatchSignRequest = postcard::from_bytes(&req[12..]).expect("decode body");
         assert_eq!(body.pczts.len(), 1);
-        let inner = postcard::to_extend(&body.pczts[0], Vec::new()).expect("re-encode inner");
-        assert_eq!(
-            inner,
-            &KEYSTONE[8..],
-            "batch inner PCZT must match the device-dialect golden body"
-        );
+
+        // The device refuses a batch request with any spend-auth signature.
+        let inner = &body.pczts[0];
+        for bundle in [inner.orchard.as_ref(), inner.ironwood.as_ref()] {
+            if let Some(b) = bundle {
+                assert!(
+                    b.actions.iter().all(|a| a.spend.spend_auth_sig.is_none()),
+                    "batch request must not carry any spend-auth signature"
+                );
+            }
+        }
+
+        // The device golden has an IO-Finalizer signature on its padding spend,
+        // so stripping proves both that the fixture exercises the case and that
+        // the batch inner is otherwise the device-dialect PCZT byte for byte.
+        let mut golden: dst::Pczt = postcard::from_bytes(&KEYSTONE[8..]).unwrap();
+        let had_sig = [golden.orchard.as_ref(), golden.ironwood.as_ref()]
+            .iter()
+            .flatten()
+            .flat_map(|b| b.actions.iter())
+            .any(|a| a.spend.spend_auth_sig.is_some());
+        assert!(had_sig, "fixture must carry a spend-auth sig to strip");
+        clear_batch_spend_auth_sigs(&mut golden);
+        let golden_inner = postcard::to_extend(&golden, Vec::new()).unwrap();
+        let inner_bytes = postcard::to_extend(inner, Vec::new()).unwrap();
+        assert_eq!(inner_bytes, golden_inner);
     }
 
     #[test]
