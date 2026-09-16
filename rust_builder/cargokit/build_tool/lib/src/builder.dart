@@ -168,9 +168,7 @@ class RustBuilder {
 
   Future<Map<String, String>> _buildEnvironment() async {
     if (target.android == null) {
-      return {
-        "RUSTFLAGS": '--cfg zcash_unstable="nu7"'
-      };
+      return {};
     } else {
       final sdkPath = environment.androidSdkPath;
       final ndkVersion = environment.androidNdkVersion;
