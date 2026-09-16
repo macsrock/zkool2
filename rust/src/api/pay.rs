@@ -128,6 +128,23 @@ pub fn pczt_from_keystone(pczt: Vec<u8>) -> Result<Vec<u8>> {
     crate::keystone_wire::from_keystone(&pczt).map_err(|e| anyhow::anyhow!(e))
 }
 
+/// Rewrites a PCZT into the encoding the Cupcake signer reads.
+///
+/// Cupcake parses PCZTs with an older `pczt` than this wallet writes; the
+/// layouts share a name but not their fields, so send it this rather than the
+/// wallet's own bytes.
+#[cfg_attr(feature = "flutter", frb)]
+pub fn pczt_to_cupcake(pczt: Vec<u8>) -> Result<Vec<u8>> {
+    crate::keystone_wire::to_cupcake(&pczt).map_err(|e| anyhow::anyhow!(e))
+}
+
+/// Rewrites a PCZT signed by the Cupcake signer back into the encoding this
+/// wallet uses. [`prove_and_finalize`] also accepts one directly.
+#[cfg_attr(feature = "flutter", frb)]
+pub fn pczt_from_cupcake(pczt: Vec<u8>) -> Result<Vec<u8>> {
+    crate::keystone_wire::from_cupcake(&pczt).map_err(|e| anyhow::anyhow!(e))
+}
+
 /// Takes a Keystone's signatures into the PCZT this wallet built.
 ///
 /// The device redacts prover-only fields, so its reply cannot be proved on its

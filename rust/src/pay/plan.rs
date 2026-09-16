@@ -1603,7 +1603,16 @@ pub async fn prove_and_finalize(
         is_issuance,
         ..
     } = package;
-    let pczt = Pczt::parse(pczt).map_err(|e| anyhow!("failed to parse PCZT: {e:?}"))?;
+    // A PCZT signed by the Cupcake signer comes back in the older encoding it
+    // reads; translate it rather than refusing it.
+    let pczt = match Pczt::parse(pczt) {
+        Ok(pczt) => pczt,
+        Err(e) => {
+            let translated = crate::keystone_wire::from_cupcake(pczt)
+                .map_err(|_| anyhow!("failed to parse PCZT: {e:?}"))?;
+            Pczt::parse(&translated).map_err(|e| anyhow!("failed to parse PCZT: {e:?}"))?
+        }
+    };
 
     span.in_scope(|| {
         info!("Adding Proofs to externally signed PCZT");

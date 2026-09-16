@@ -63,6 +63,19 @@ Future<Uint8List> pcztToKeystone({required List<int> pczt}) =>
 Future<Uint8List> pcztFromKeystone({required List<int> pczt}) =>
     RustLib.instance.api.crateApiPayPcztFromKeystone(pczt: pczt);
 
+/// Rewrites a PCZT into the encoding the Cupcake signer reads.
+///
+/// Cupcake parses PCZTs with an older `pczt` than this wallet writes; the
+/// layouts share a name but not their fields, so send it this rather than the
+/// wallet's own bytes.
+Future<Uint8List> pcztToCupcake({required List<int> pczt}) =>
+    RustLib.instance.api.crateApiPayPcztToCupcake(pczt: pczt);
+
+/// Rewrites a PCZT signed by the Cupcake signer back into the encoding this
+/// wallet uses. [`prove_and_finalize`] also accepts one directly.
+Future<Uint8List> pcztFromCupcake({required List<int> pczt}) =>
+    RustLib.instance.api.crateApiPayPcztFromCupcake(pczt: pczt);
+
 /// Takes a Keystone's signatures into the PCZT this wallet built.
 ///
 /// The device redacts prover-only fields, so its reply cannot be proved on its
