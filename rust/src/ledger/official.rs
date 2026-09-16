@@ -119,6 +119,12 @@ pub async fn get_ufvk<D: Device>(ledger: &D, network: &Network, aindex: u32) -> 
         if res.retcode != SW_OK {
             return Err(LedgerError::Execute(res.retcode, INS_GET_VK));
         }
+        // A chunk that adds nothing would loop forever waiting for the rest.
+        if res.data.is_empty() {
+            return Err(LedgerError::Protocol(
+                "the device stopped sending the viewing key before it was complete".into(),
+            ));
+        }
         payload.extend_from_slice(&res.data);
     }
     payload.truncate(len);
@@ -235,6 +241,15 @@ mod tests {
         assert_eq!(&sent[0].data[0..5], &[3, 0x80, 0, 0, 32]);
         assert_eq!(&sent[0].data[13..18], &[3, 0x80, 0, 0, 44]);
         assert!(sent[1..].iter().all(|c| c.p1 == P1_CONTINUE && c.data.is_empty()));
+    }
+
+    #[tokio::test]
+    async fn an_empty_continuation_chunk_is_an_error_not_a_hang() {
+        let mut first = 300u16.to_be_bytes().to_vec();
+        first.extend_from_slice(&[b'u'; 100]);
+        let device = Scripted::new(vec![with_sw(first, SW_OK), vec![0x90, 0x00]]);
+        let err = get_ufvk(&device, &Network::Main, 0).await.unwrap_err();
+        assert!(matches!(err, LedgerError::Protocol(_)));
     }
 
     #[tokio::test]

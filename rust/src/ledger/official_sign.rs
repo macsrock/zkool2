@@ -203,6 +203,31 @@ async fn sign_transparent_input<D: Device>(
     })
 }
 
+// PCZT_HEADER: magic, PCZT version, transaction header, then the PCZT's own
+// fallback lock time, coin type and modifiable flags. A zero fallback lock
+// time is what an absent one means, and is what every transaction this wallet
+// builds carries; it is sent as absent, the encoding the device has been
+// signing with.
+fn frame_header(
+    tx_version: u32,
+    version_group_id: u32,
+    consensus_branch_id: u32,
+    expiry_height: u32,
+    wire: &crate::keystone_wire::Global,
+) -> Result<Vec<u8>> {
+    let mut data = vec![];
+    data.write_all(b"PCZT")?;
+    data.write_u32::<LE>(PCZT_VERSION_V6)?;
+    data.write_u32::<LE>(tx_version)?;
+    data.write_u32::<LE>(version_group_id)?;
+    data.write_u32::<LE>(consensus_branch_id)?;
+    write_optional_u32(&mut data, wire.fallback_lock_time.filter(|t| *t != 0))?;
+    data.write_u32::<LE>(expiry_height)?;
+    data.write_u32::<LE>(wire.coin_type)?;
+    data.write_u8(wire.tx_modifiable)?;
+    Ok(data)
+}
+
 // Per-action spend fields: cv_net, nullifier, rk, recipient, value, rho,
 // rseed, alpha — one packet.
 fn frame_spend_small<D: Domain>(action: &Action<D>) -> Result<Vec<u8>> {
@@ -570,19 +595,25 @@ where
     // ── Send to the device ────────────────────────────────────────────────
     progress("Confirm on your Ledger".to_string()).await;
 
+    // The header carries the PCZT's own lock time, coin type and modifiable
+    // flags. The pinned `pczt` has no getters for them, so read them from the
+    // encoding.
+    let wire = crate::keystone_wire::read_global(&package.pczt).map_err(|e| anyhow!(e))?;
+    if wire.coin_type != coin_type {
+        anyhow::bail!(
+            "this transaction was built for coin type {}, but the account is on coin type {coin_type}",
+            wire.coin_type
+        );
+    }
     let header = {
         let g = pczt.global();
-        let mut data = vec![];
-        data.write_all(b"PCZT")?;
-        data.write_u32::<LE>(PCZT_VERSION_V6)?;
-        data.write_u32::<LE>(*g.tx_version())?;
-        data.write_u32::<LE>(*g.version_group_id())?;
-        data.write_u32::<LE>(*g.consensus_branch_id())?;
-        data.write_u8(0x00)?; // fallback_lock_time: none (builder uses 0)
-        data.write_u32::<LE>(*g.expiry_height())?;
-        data.write_u32::<LE>(coin_type)?;
-        data.write_u8(0x00)?; // tx_modifiable: none
-        vec![data]
+        vec![frame_header(
+            *g.tx_version(),
+            *g.version_group_id(),
+            *g.consensus_branch_id(),
+            *g.expiry_height(),
+            &wire,
+        )?]
     };
 
     send_command(ledger, INS_PCZT_HEADER, header, false).await?;
@@ -697,4 +728,55 @@ where
 {
     let ledger = crate::ledger::transport::connect_ledger().await?;
     sign_transaction(&network, connection, account, &package, Some(sink), &ledger).await
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::BTreeMap;
+
+    fn global(lock: Option<u32>, coin: u32, modifiable: u8) -> crate::keystone_wire::Global {
+        crate::keystone_wire::Global {
+            tx_version: 6,
+            version_group_id: 0xd8a2_ed98,
+            consensus_branch_id: 0x37a5_475b,
+            fallback_lock_time: lock,
+            expiry_height: 3_300_040,
+            coin_type: coin,
+            tx_modifiable: modifiable,
+            proprietary: BTreeMap::new(),
+        }
+    }
+
+    fn header(g: &crate::keystone_wire::Global) -> Vec<u8> {
+        frame_header(g.tx_version, g.version_group_id, g.consensus_branch_id, g.expiry_height, g).unwrap()
+    }
+
+    #[test]
+    fn a_zero_lock_time_keeps_the_header_the_device_signed_with() {
+        // The layout sent before the header read these fields: lock time
+        // absent, coin type from the network, nothing modifiable.
+        let mut before = vec![];
+        before.extend_from_slice(b"PCZT");
+        before.extend_from_slice(&PCZT_VERSION_V6.to_le_bytes());
+        before.extend_from_slice(&6u32.to_le_bytes());
+        before.extend_from_slice(&0xd8a2_ed98u32.to_le_bytes());
+        before.extend_from_slice(&0x37a5_475bu32.to_le_bytes());
+        before.push(0x00);
+        before.extend_from_slice(&3_300_040u32.to_le_bytes());
+        before.extend_from_slice(&133u32.to_le_bytes());
+        before.push(0x00);
+
+        assert_eq!(header(&global(Some(0), 133, 0)), before);
+        assert_eq!(header(&global(None, 133, 0)), before);
+    }
+
+    #[test]
+    fn a_real_lock_time_and_flags_are_carried() {
+        let h = header(&global(Some(900), 133, 0x04));
+        let lock = 4 + 4 * 4;
+        assert_eq!(h[lock], 0x01);
+        assert_eq!(u32::from_le_bytes(h[lock + 1..lock + 5].try_into().unwrap()), 900);
+        assert_eq!(*h.last().unwrap(), 0x04);
+    }
 }
