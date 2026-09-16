@@ -593,7 +593,7 @@ where
     }
 
     // ── Send to the device ────────────────────────────────────────────────
-    progress("Confirm on your Ledger".to_string()).await;
+    progress("Sending to Ledger".to_string()).await;
 
     // The header carries the PCZT's own lock time, coin type and modifiable
     // flags. The pinned `pczt` has no getters for them, so read them from the
@@ -623,6 +623,9 @@ where
     // with 0 actions, and its last packet carries P2_FINISHED.
     send_command(ledger, INS_PCZT_ORCHARD_ACTION, orchard_packets, false).await?;
     send_command(ledger, INS_PCZT_IRONWOOD_ACTION, ironwood_packets, true).await?;
+    // The device draws its review only once that last packet has landed;
+    // this is the first moment there is anything for the user to confirm.
+    progress("Confirm on your Ledger".to_string()).await;
 
     // ── Collect signatures ────────────────────────────────────────────────
     progress("Signing on Ledger".to_string()).await;
