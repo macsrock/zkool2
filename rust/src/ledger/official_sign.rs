@@ -684,6 +684,7 @@ where
     })
 }
 
+#[cfg(feature = "ledger")]
 pub async fn sign_official_transaction<S>(
     network: Network,
     sink: &S,

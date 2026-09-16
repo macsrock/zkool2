@@ -9,8 +9,8 @@ use crate::{
 };
 
 /// Placeholder device for accounts that cannot perform device operations:
-/// software accounts, builds without the `ledger` feature, and the Official
-/// Ledger app whose device protocol is not implemented yet.
+/// software accounts, and builds without the `ledger` feature (on mobile the
+/// device is driven from Flutter through `api::ledger` instead).
 pub struct StubLedger {
     kind: HwKind,
     error: &'static str,
@@ -34,7 +34,8 @@ impl StubLedger {
     pub fn official() -> Self {
         Self {
             kind: HwKind::Official,
-            error: "not implemented yet for the Official Ledger app",
+            error: "this build cannot talk to the Ledger itself; create the account from \
+                    a seed phrase, or from the viewing key exported by the device",
         }
     }
 }
@@ -79,6 +80,10 @@ impl LedgerApp for StubLedger {
         _connection: &mut SqliteConnection,
         _account: u32,
     ) -> Result<String> {
+        anyhow::bail!("{}", self.error)
+    }
+
+    async fn get_ufvk(&self, _network: &Network, _aindex: u32) -> Result<String> {
         anyhow::bail!("{}", self.error)
     }
 }

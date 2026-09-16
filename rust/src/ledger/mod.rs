@@ -34,15 +34,22 @@ impl HwKind {
 
 pub mod mock;
 
+// The Official app protocol and the APDU types build everywhere: on mobile
+// the device is reached through `dart_device` (Flutter owns the connection).
+// The USB HID transport and the Zondax (Sapling) app are desktop-only.
+pub mod official;
+pub mod official_sign;
+pub mod transport;
+
+#[cfg(feature = "flutter")]
+pub mod dart_device;
+
 cfg_if::cfg_if! {
     if #[cfg(feature="ledger")] {
-        pub mod transport;
         pub mod builder;
         pub mod fvk;
         pub mod hashers;
         pub mod nano;
-        pub mod official;
-        pub mod official_sign;
 
         #[cfg(test)]
         mod tests;

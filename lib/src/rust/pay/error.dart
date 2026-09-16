@@ -13,14 +13,8 @@ sealed class Error with _$Error {
   const Error._();
 
   const factory Error.invalidPoolMask() = Error_InvalidPoolMask;
-  const factory Error.notEnoughFunds(
-    String field0,
-  ) = Error_NotEnoughFunds;
+  const factory Error.notEnoughFunds(String field0) = Error_NotEnoughFunds;
   const factory Error.noSigningKey() = Error_NoSigningKey;
-  const factory Error.sqlx(
-    Error field0,
-  ) = Error_Sqlx;
-  const factory Error.other(
-    Error field0,
-  ) = Error_Other;
+  const factory Error.sqlx(Error field0) = Error_Sqlx;
+  const factory Error.other(Error field0) = Error_Other;
 }

@@ -1587,7 +1587,7 @@ pub async fn sign_transaction(
 /// Prover and Spend Finalizer so the result can be extracted and broadcast.
 /// No spending keys are touched, so it is safe for watch-only accounts.
 pub async fn prove_and_finalize(
-    network: &crate::api::coin::Network,
+    _network: &crate::api::coin::Network,
     package: &PcztPackage,
 ) -> Result<PcztPackage> {
     let span = span!(Level::INFO, "transaction");
@@ -1605,17 +1605,14 @@ pub async fn prove_and_finalize(
     } = package;
     let pczt = Pczt::parse(pczt).map_err(|e| anyhow!("failed to parse PCZT: {e:?}"))?;
 
-    let ironwood_active = network.is_nu_active(
-        NetworkUpgrade::Nu6_3,
-        BlockHeight::from_u32(*pczt.global().expiry_height()),
-    );
-
     span.in_scope(|| {
         info!("Adding Proofs to externally signed PCZT");
     });
 
     let sapling_prover = get_sapling_prover().await?;
-    let orchard_pk = get_orchard_pk(network, ironwood_active);
+    // The proving key follows the branch the PCZT was built for (vanilla
+    // Orchard, ZSA or Ironwood circuits), not the current network state.
+    let orchard_pk = get_orchard_pk(*pczt.global().consensus_branch_id())?;
     let pczt = Prover::new(pczt)
         .create_sapling_proofs(sapling_prover, sapling_prover)
         .map_err(|e| anyhow!("sapling proving failed: {e:?}"))?

@@ -6,6 +6,7 @@ pub mod frost;
 pub mod init;
 pub mod issuance;
 pub mod key;
+pub mod ledger;
 pub mod mempool;
 pub mod migrate;
 pub mod network;

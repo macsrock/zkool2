@@ -11,6 +11,7 @@ import 'api/frost.dart';
 import 'api/init.dart';
 import 'api/issuance.dart';
 import 'api/key.dart';
+import 'api/ledger.dart';
 import 'api/mempool.dart';
 import 'api/migrate.dart';
 import 'api/network.dart';
@@ -59,12 +60,8 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
   /// Initialize flutter_rust_bridge in mock mode.
   /// No libraries for FFI are loaded.
-  static void initMock({
-    required RustLibApi api,
-  }) {
-    instance.initMockImpl(
-      api: api,
-    );
+  static void initMock({required RustLibApi api}) {
+    instance.initMockImpl(api: api);
   }
 
   /// Dispose flutter_rust_bridge
@@ -95,51 +92,56 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -353494689;
+  int get rustContentHash => 1355211904;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
-    stem: 'rlz',
-    ioDirectory: 'rust/target/release/',
-    webPrefix: 'pkg/',
-    wasmBindgenName: 'wasm_bindgen',
-  );
+        stem: 'rlz',
+        ioDirectory: 'rust/target/release/',
+        webPrefix: 'pkg/',
+        wasmBindgenName: 'wasm_bindgen',
+      );
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<List<RestoredAccount>> crateApiVaultDartVaultRecover(
-      {required DartVault that,
-      required List<int> vaultBytes,
-      required String masterPassword});
+  Future<List<RestoredAccount>> crateApiVaultDartVaultRecover({
+    required DartVault that,
+    required List<int> vaultBytes,
+    required String masterPassword,
+  });
 
-  Future<List<RestoredAccount>> crateApiVaultDartVaultRecoverWithPrf(
-      {required DartVault that,
-      required List<int> vaultBytes,
-      required String deviceIdStr,
-      required List<int> prfOutput});
+  Future<List<RestoredAccount>> crateApiVaultDartVaultRecoverWithPrf({
+    required DartVault that,
+    required List<int> vaultBytes,
+    required String deviceIdStr,
+    required List<int> prfOutput,
+  });
 
-  Future<void> crateApiVaultDartVaultRegisterDevice(
-      {required DartVault that,
-      required List<int> initBytes,
-      required String masterPassword,
-      required String deviceIdStr,
-      required List<int> prfOutput});
+  Future<void> crateApiVaultDartVaultRegisterDevice({
+    required DartVault that,
+    required List<int> initBytes,
+    required String masterPassword,
+    required String deviceIdStr,
+    required List<int> prfOutput,
+  });
 
-  Future<Uint8List> crateApiVaultDartVaultSetMasterPassword(
-      {required DartVault that,
-      String? oldPassword,
-      required String newPassword,
-      Uint8List? oldBytes});
+  Future<Uint8List> crateApiVaultDartVaultSetMasterPassword({
+    required DartVault that,
+    String? oldPassword,
+    required String newPassword,
+    Uint8List? oldBytes,
+  });
 
-  Future<void> crateApiVaultDartVaultStoreAccount(
-      {required DartVault that,
-      required int timestamp,
-      required String name,
-      required String seed,
-      required int aindex,
-      required bool useInternal,
-      required int birthHeight,
-      required List<int> pk});
+  Future<void> crateApiVaultDartVaultStoreAccount({
+    required DartVault that,
+    required int timestamp,
+    required String name,
+    required String seed,
+    required int aindex,
+    required bool useInternal,
+    required int birthHeight,
+    required List<int> pk,
+  });
 
   Future<void> crateApiVaultDartVaultTest({required DartVault that});
 
@@ -147,52 +149,66 @@ abstract class RustLibApi extends BaseApi {
 
   Mempool crateApiMempoolMempoolNew();
 
-  Stream<MempoolMsg> crateApiMempoolMempoolRun(
-      {required Mempool that, required Coin c});
+  Stream<MempoolMsg> crateApiMempoolMempoolRun({
+    required Mempool that,
+    required Coin c,
+  });
 
-  Future<void> crateApiMigrateNoteMigrationCancel(
-      {required NoteMigration that});
+  Future<void> crateApiMigrateNoteMigrationCancel({
+    required NoteMigration that,
+  });
 
   NoteMigration crateApiMigrateNoteMigrationNew();
 
-  Stream<MigrationStatus> crateApiMigrateNoteMigrationRun(
-      {required NoteMigration that,
-      required Coin c,
-      required BigInt meanDelayMs});
+  Stream<MigrationStatus> crateApiMigrateNoteMigrationRun({
+    required NoteMigration that,
+    required Coin c,
+    required BigInt meanDelayMs,
+  });
 
-  void crateApiMigrateNoteMigrationUpdateHeight(
-      {required NoteMigration that, required int height});
+  void crateApiMigrateNoteMigrationUpdateHeight({
+    required NoteMigration that,
+    required int height,
+  });
 
-  Future<void> crateApiSweepTransparentScannerCancel(
-      {required TransparentScanner that});
+  Future<void> crateApiSweepTransparentScannerCancel({
+    required TransparentScanner that,
+  });
 
   Future<TransparentScanner> crateApiSweepTransparentScannerNew();
 
-  Stream<String> crateApiSweepTransparentScannerRun(
-      {required TransparentScanner that,
-      required int endHeight,
-      required int gapLimit,
-      required Coin c});
+  Stream<String> crateApiSweepTransparentScannerRun({
+    required TransparentScanner that,
+    required int endHeight,
+    required int gapLimit,
+    required Coin c,
+  });
 
   Future<PoolBalance> crateApiSyncBalance({required Coin c});
 
-  Future<String> crateApiPayBroadcastTransaction(
-      {required int height, required List<int> txBytes, required Coin c});
+  Future<String> crateApiPayBroadcastTransaction({
+    required int height,
+    required List<int> txBytes,
+    required Coin c,
+  });
 
   Future<String> crateApiPayBuildPuri({required List<Recipient> recipients});
 
-  Future<void> crateApiSyncCacheBlockTime(
-      {required int height, required Coin c});
+  Future<void> crateApiSyncCacheBlockTime({
+    required int height,
+    required Coin c,
+  });
 
   Future<void> crateApiFrostCancelDkg({required Coin c});
 
   Future<void> crateApiSyncCancelSync();
 
-  Future<void> crateApiDbChangeDbPassword(
-      {required String dbFilepath,
-      required String tmpDir,
-      required String oldPassword,
-      required String newPassword});
+  Future<void> crateApiDbChangeDbPassword({
+    required String dbFilepath,
+    required String tmpDir,
+    required String oldPassword,
+    required String newPassword,
+  });
 
   SaplingParamsStatus crateApiSaplingCheckSaplingParams();
 
@@ -202,99 +218,137 @@ abstract class RustLibApi extends BaseApi {
 
   Coin crateApiCoinCoinNew({int? defaultCoin});
 
-  Future<Coin> crateApiCoinCoinOpenDatabase(
-      {required Coin that, required String dbFilepath, String? password});
+  Future<Coin> crateApiCoinCoinOpenDatabase({
+    required Coin that,
+    required String dbFilepath,
+    String? password,
+  });
 
-  Future<Coin> crateApiCoinCoinSetAccount(
-      {required Coin that, required int account});
+  Future<Coin> crateApiCoinCoinSetAccount({
+    required Coin that,
+    required int account,
+  });
 
-  Coin crateApiCoinCoinSetLwd(
-      {required Coin that, required int serverType, required String url});
+  Coin crateApiCoinCoinSetLwd({
+    required Coin that,
+    required int serverType,
+    required String url,
+  });
 
   Coin crateApiCoinCoinSetProxy({required Coin that, required String proxy});
 
-  Coin crateApiCoinCoinSetTransport(
-      {required Coin that, required int transport});
+  Coin crateApiCoinCoinSetTransport({
+    required Coin that,
+    required int transport,
+  });
 
-  Future<Contact> crateApiContactsCreateContact(
-      {required String name,
-      required List<String> addresses,
-      required String notes,
-      required Coin c});
+  Future<Contact> crateApiContactsCreateContact({
+    required String name,
+    required List<String> addresses,
+    required String notes,
+    required Coin c,
+  });
 
-  Future<int> crateApiAccountCreateNewCategory(
-      {required Category category, required Coin c});
+  Future<int> crateApiAccountCreateNewCategory({
+    required Category category,
+    required Coin c,
+  });
 
-  Future<Folder> crateApiAccountCreateNewFolder(
-      {required String name, required Coin c});
+  Future<Folder> crateApiAccountCreateNewFolder({
+    required String name,
+    required Coin c,
+  });
 
   Future<Uint8List?> crateApiRaptorDecode({required List<int> packet});
 
-  Stream<VotingDelegationProgress> crateApiVotingDelegationBuildSubmission(
-      {required String roundId,
-      required int bundleIndex,
-      required List<int> pcztBytes,
-      VotingPirLayout? pirLayout,
-      required String pirServerUrl,
-      required Coin c});
+  Stream<VotingDelegationProgress> crateApiVotingDelegationBuildSubmission({
+    required String roundId,
+    required int bundleIndex,
+    required List<int> pcztBytes,
+    VotingPirLayout? pirLayout,
+    required String pirServerUrl,
+    required Coin c,
+  });
 
-  Future<VotingDelegationConfirmation> crateApiVotingDelegationConfirm(
-      {required String roundId,
-      required int bundleIndex,
-      required String txHash,
-      required String eventsJson,
-      required Coin c});
+  Future<VotingDelegationConfirmation> crateApiVotingDelegationConfirm({
+    required String roundId,
+    required int bundleIndex,
+    required String txHash,
+    required String eventsJson,
+    required Coin c,
+  });
 
-  Future<void> crateApiVotingDelegationMarkSubmitted(
-      {required String roundId,
-      required int bundleIndex,
-      required String txHash,
-      required Coin c});
+  Future<void> crateApiVotingDelegationMarkSubmitted({
+    required String roundId,
+    required int bundleIndex,
+    required String txHash,
+    required Coin c,
+  });
 
-  Future<VotingPreparedInfo> crateApiVotingDelegationPrepare(
-      {required String roundParamsJson,
-      required String roundName,
-      String? sessionJson,
-      required int bundleIndex,
-      int? maxRealNotesPerBundle,
-      required String lightwalletdUrl,
-      required Coin c});
+  Future<VotingPreparedInfo> crateApiVotingDelegationPrepare({
+    required String roundParamsJson,
+    required String roundName,
+    String? sessionJson,
+    required int bundleIndex,
+    int? maxRealNotesPerBundle,
+    required String lightwalletdUrl,
+    required Coin c,
+  });
 
-  Future<VotingPreparedInfo> crateApiVotingDelegationPrepareResume(
-      {required String roundId,
-      required int bundleIndex,
-      int? maxRealNotesPerBundle,
-      String? lightwalletdUrl,
-      required Coin c});
+  Future<VotingPreparedInfo> crateApiVotingDelegationPrepareResume({
+    required String roundId,
+    required int bundleIndex,
+    int? maxRealNotesPerBundle,
+    String? lightwalletdUrl,
+    required Coin c,
+  });
 
-  Future<VotingDelegationSetup> crateApiVotingDelegationSetup(
-      {required String roundId, required int bundleIndex, required Coin c});
+  Future<VotingDelegationSetup> crateApiVotingDelegationSetup({
+    required String roundId,
+    required int bundleIndex,
+    required Coin c,
+  });
 
-  Future<VotingDelegationSubmission> crateApiVotingDelegationSignAndSubmit(
-      {required String roundId,
-      required int bundleIndex,
-      required List<int> pcztBytes,
-      required VotingPirLayout pirLayout,
-      required String pirServerUrl,
-      required Coin c});
+  Future<VotingDelegationSubmission> crateApiVotingDelegationSignAndSubmit({
+    required String roundId,
+    required int bundleIndex,
+    required List<int> pcztBytes,
+    required VotingPirLayout pirLayout,
+    required String pirServerUrl,
+    required Coin c,
+  });
 
-  Future<String?> crateApiVotingDelegationTxHash(
-      {required String roundId, required int bundleIndex, required Coin c});
+  Future<String?> crateApiVotingDelegationTxHash({
+    required String roundId,
+    required int bundleIndex,
+    required Coin c,
+  });
 
-  Future<String?> crateApiVotingDelegationWireJson(
-      {required String roundId, required int bundleIndex, required Coin c});
+  Future<String?> crateApiVotingDelegationWireJson({
+    required String roundId,
+    required int bundleIndex,
+    required Coin c,
+  });
 
-  Future<void> crateApiAccountDeleteAccount(
-      {required int account, required Coin c});
+  Future<void> crateApiAccountDeleteAccount({
+    required int account,
+    required Coin c,
+  });
 
-  Future<void> crateApiAccountDeleteCategories(
-      {required List<int> ids, required Coin c});
+  Future<void> crateApiAccountDeleteCategories({
+    required List<int> ids,
+    required Coin c,
+  });
 
-  Future<void> crateApiContactsDeleteContacts(
-      {required List<int> ids, required Coin c});
+  Future<void> crateApiContactsDeleteContacts({
+    required List<int> ids,
+    required Coin c,
+  });
 
-  Future<void> crateApiAccountDeleteFolders(
-      {required List<int> ids, required Coin c});
+  Future<void> crateApiAccountDeleteFolders({
+    required List<int> ids,
+    required Coin c,
+  });
 
   Stream<DKGStatus> crateApiFrostDoDkg({required Coin c});
 
@@ -304,39 +358,63 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiAccountDummyExport({required SigningEvent a});
 
-  Future<List<Uint8List>> crateApiRaptorEncode(
-      {required String path, required RaptorQParams params});
+  Future<List<Uint8List>> crateApiRaptorEncode({
+    required String path,
+    required RaptorQParams params,
+  });
 
   Future<void> crateApiRaptorEndDecode();
 
-  Future<Uint8List> crateApiAccountExportAccount(
-      {required int id, required String passphrase, required Coin c});
+  Future<Uint8List> crateApiAccountExportAccount({
+    required int id,
+    required String passphrase,
+    required Coin c,
+  });
 
   Future<String> crateApiContactsExportContactsVcard({required Coin c});
 
-  Future<Uint8List> crateApiPayExtractTransaction(
-      {required PcztPackage package});
+  Future<Uint8List> crateApiPayExtractTransaction({
+    required PcztPackage package,
+  });
 
-  Future<List<TAddressTxCount>> crateApiAccountFetchAddressTxCount(
-      {required Coin c, required bool aggregate, required int poolFilter});
+  Future<List<TAddressTxCount>> crateApiAccountFetchAddressTxCount({
+    required Coin c,
+    required bool aggregate,
+    required int poolFilter,
+  });
 
-  Future<List<(int, double)>> crateApiTransactionFetchAmounts(
-      {int? from, int? to, required int category, required Coin c});
+  Future<List<(int, double)>> crateApiTransactionFetchAmounts({
+    int? from,
+    int? to,
+    required int category,
+    required Coin c,
+  });
 
-  Future<List<(String, double, bool)>> crateApiTransactionFetchCategoryAmounts(
-      {int? from, int? to, required Coin c});
+  Future<List<(String, double, bool)>> crateApiTransactionFetchCategoryAmounts({
+    int? from,
+    int? to,
+    required Coin c,
+  });
 
-  Future<List<TAddressTxCount>> crateApiAccountFetchTransparentAddressTxCount(
-      {required Coin c});
+  Future<List<TAddressTxCount>> crateApiAccountFetchTransparentAddressTxCount({
+    required Coin c,
+  });
 
-  Future<void> crateApiSyncFetchTxDetails(
-      {required int account, required Coin c});
+  Future<void> crateApiSyncFetchTxDetails({
+    required int account,
+    required Coin c,
+  });
 
-  Future<int> crateApiTransactionFillMissingTxPrices(
-      {required String api, required String currency, required Coin c});
+  Future<int> crateApiTransactionFillMissingTxPrices({
+    required String api,
+    required String currency,
+    required Coin c,
+  });
 
-  Future<List<ContactMatch>> crateApiContactsFindContactsForAddress(
-      {required String address, required Coin c});
+  Future<List<ContactMatch>> crateApiContactsFindContactsForAddress({
+    required String address,
+    required Coin c,
+  });
 
   Future<FrostSignParams> crateApiFrostFrostSignParamsDefault();
 
@@ -346,28 +424,44 @@ abstract class RustLibApi extends BaseApi {
 
   String crateApiKeyGenerateSeed();
 
-  Future<Addresses> crateApiAccountGetAccountAddresses(
-      {required int account, required int uaPools, required Coin c});
+  Future<Addresses> crateApiAccountGetAccountAddresses({
+    required int account,
+    required int uaPools,
+    required Coin c,
+  });
 
-  Future<String?> crateApiAccountGetAccountFingerprint(
-      {required int account, required Coin c});
+  Future<String?> crateApiAccountGetAccountFingerprint({
+    required int account,
+    required Coin c,
+  });
 
   Future<FrostParams?> crateApiAccountGetAccountFrostParams({required Coin c});
 
-  Future<int> crateApiAccountGetAccountPools(
-      {required int account, required Coin c});
+  Future<int> crateApiAccountGetAccountPools({
+    required int account,
+    required Coin c,
+  });
 
-  Future<Seed?> crateApiAccountGetAccountSeed(
-      {required int account, required Coin c});
+  Future<Seed?> crateApiAccountGetAccountSeed({
+    required int account,
+    required Coin c,
+  });
 
-  Future<String> crateApiAccountGetAccountUfvk(
-      {required int account, required int pools, required Coin c});
+  Future<String> crateApiAccountGetAccountUfvk({
+    required int account,
+    required int pools,
+    required Coin c,
+  });
 
-  Future<Addresses> crateApiAccountGetAddresses(
-      {required int uaPools, required Coin c});
+  Future<Addresses> crateApiAccountGetAddresses({
+    required int uaPools,
+    required Coin c,
+  });
 
-  Future<double> crateApiNetworkGetCoingeckoPrice(
-      {required String api, required String currency});
+  Future<double> crateApiNetworkGetCoingeckoPrice({
+    required String api,
+    required String currency,
+  });
 
   Future<int> crateApiNetworkGetCurrentHeight({required Coin c});
 
@@ -375,18 +469,23 @@ abstract class RustLibApi extends BaseApi {
 
   Future<List<String>> crateApiFrostGetDkgAddresses({required Coin c});
 
-  Future<ExchangeRate> crateApiNetworkGetExchangeRate(
-      {required String api,
-      required String fromCurrency,
-      required String toCurrency});
+  Future<ExchangeRate> crateApiNetworkGetExchangeRate({
+    required String api,
+    required String fromCurrency,
+    required String toCurrency,
+  });
 
-  Future<String> crateApiAccountGetExportedData(
-      {required int type, required Coin c});
+  Future<String> crateApiAccountGetExportedData({
+    required int type,
+    required Coin c,
+  });
 
   int crateApiKeyGetKeyPools({required String key, required Coin c});
 
-  Future<Uint8List> crateApiMempoolGetMempoolTx(
-      {required String txId, required Coin c});
+  Future<Uint8List> crateApiMempoolGetMempoolTx({
+    required String txId,
+    required Coin c,
+  });
 
   Future<MigrationStatus> crateApiMigrateGetMigrationStatus({required Coin c});
 
@@ -396,13 +495,16 @@ abstract class RustLibApi extends BaseApi {
 
   Uint8List crateApiRaptorGetQrBytes({required List<int> data});
 
-  Future<List<String>> crateApiNetworkGetSupportedVsCurrencies(
-      {required String api});
+  Future<List<String>> crateApiNetworkGetSupportedVsCurrencies({
+    required String api,
+  });
 
   Future<void> crateApiCoinGetTorClient();
 
-  Future<TxAccount> crateApiAccountGetTxDetails(
-      {required int idTx, required Coin c});
+  Future<TxAccount> crateApiAccountGetTxDetails({
+    required int idTx,
+    required Coin c,
+  });
 
   Future<bool> crateApiFrostHasDkgAddresses({required Coin c});
 
@@ -410,11 +512,16 @@ abstract class RustLibApi extends BaseApi {
 
   Future<bool> crateApiAccountHasTransparentPubKey({required Coin c});
 
-  Future<void> crateApiAccountImportAccount(
-      {required String passphrase, required List<int> data, required Coin c});
+  Future<void> crateApiAccountImportAccount({
+    required String passphrase,
+    required List<int> data,
+    required Coin c,
+  });
 
-  Future<List<Contact>> crateApiContactsImportContactsVcard(
-      {required String vcardData, required Coin c});
+  Future<List<Contact>> crateApiContactsImportContactsVcard({
+    required String vcardData,
+    required Coin c,
+  });
 
   Future<void> crateApiInitInitApp();
 
@@ -428,17 +535,21 @@ abstract class RustLibApi extends BaseApi {
 
   void crateApiPluginInitPlugins();
 
-  Future<void> crateApiFrostInitSign(
-      {required int coordinator,
-      required int fundingAccount,
-      required PcztPackage pczt,
-      required Coin c});
+  Future<void> crateApiFrostInitSign({
+    required int coordinator,
+    required int fundingAccount,
+    required PcztPackage pczt,
+    required Coin c,
+  });
 
-  Future<DartVault> crateApiVaultInitVault(
-      {required FutureOr<void> Function(Uint8List) append});
+  Future<DartVault> crateApiVaultInitVault({
+    required FutureOr<void> Function(Uint8List) append,
+  });
 
-  Future<PluginInfo> crateApiPluginInstallPlugin(
-      {required String url, required Coin c});
+  Future<PluginInfo> crateApiPluginInstallPlugin({
+    required String url,
+    required Coin c,
+  });
 
   Future<bool> crateApiNetworkIsIronwoodActive({required Coin c});
 
@@ -456,19 +567,38 @@ abstract class RustLibApi extends BaseApi {
 
   bool crateApiKeyIsValidPhrase({required String phrase});
 
-  bool crateApiKeyIsValidTransparentAddress(
-      {required String address, required Coin c});
+  bool crateApiKeyIsValidTransparentAddress({
+    required String address,
+    required Coin c,
+  });
 
   Future<bool> crateApiZsaIsZsaAvailable({required Coin c});
 
-  Future<Uint8List> crateApiIssuanceIssueAsset(
-      {required String assetName,
-      required BigInt amount,
-      required bool firstIssuance,
-      required bool finalize,
-      Uint8List? descHash,
-      required int idAccount,
-      required Coin c});
+  Future<Uint8List> crateApiIssuanceIssueAsset({
+    required String assetName,
+    required BigInt amount,
+    required bool firstIssuance,
+    required bool finalize,
+    Uint8List? descHash,
+    required int idAccount,
+    required Coin c,
+  });
+
+  Future<String> crateApiLedgerLedgerAppVersion({
+    required FutureOr<Uint8List> Function(Uint8List) exchange,
+  });
+
+  Future<String> crateApiLedgerLedgerGetUfvk({
+    required int aindex,
+    required Coin c,
+    required FutureOr<Uint8List> Function(Uint8List) exchange,
+  });
+
+  Stream<SigningEvent> crateApiLedgerLedgerSignTransaction({
+    required PcztPackage package,
+    required Coin c,
+    required FutureOr<Uint8List> Function(Uint8List) exchange,
+  });
 
   Future<List<Account>> crateApiAccountListAccounts({required Coin c});
 
@@ -476,8 +606,9 @@ abstract class RustLibApi extends BaseApi {
 
   Future<List<Contact>> crateApiContactsListContacts({required Coin c});
 
-  Future<List<DbAccountPreview>> crateApiDbListDbAccounts(
-      {required String dbFilepath});
+  Future<List<DbAccountPreview>> crateApiDbListDbAccounts({
+    required String dbFilepath,
+  });
 
   Future<List<String>> crateApiDbListDbNames({required String dir});
 
@@ -487,150 +618,241 @@ abstract class RustLibApi extends BaseApi {
 
   Future<List<TxNote>> crateApiAccountListNotes({required Coin c});
 
+  Future<List<String>> crateApiAccountListOwnedAddresses({required Coin c});
+
   Future<List<PluginInfo>> crateApiPluginListPlugins({required Coin c});
 
   Future<List<Tx>> crateApiAccountListTxHistory({required Coin c});
 
   Future<List<ZsaHolding>> crateApiZsaListZsaHoldings({required Coin c});
 
-  Future<void> crateApiAccountLockNote(
-      {required int id, required bool locked, required Coin c});
+  Future<void> crateApiAccountLockNote({
+    required int id,
+    required bool locked,
+    required Coin c,
+  });
 
-  Future<void> crateApiAccountLockRecentNotes(
-      {required int height, required int threshold, required Coin c});
+  Future<void> crateApiAccountLockRecentNotes({
+    required int height,
+    required int threshold,
+    required Coin c,
+  });
 
   Future<BigInt> crateApiAccountMaxSpendable({required Coin c});
 
-  Future<int> crateApiAccountNewAccount(
-      {required NewAccount na, required Coin c});
+  Future<int> crateApiAccountNewAccount({
+    required NewAccount na,
+    required Coin c,
+  });
 
   Future<Uint8List> crateApiPayPackTransaction({required PcztPackage pczt});
 
-  Future<List<MemoSection>> crateApiPluginParseMemoWithPlugins(
-      {required List<int> memoBytes, required Coin c});
+  Future<List<MemoSection>> crateApiPluginParseMemoWithPlugins({
+    required List<int> memoBytes,
+    required Coin c,
+  });
 
   List<Recipient>? crateApiPayParsePaymentUri({required String uri});
 
-  Future<PcztPackage> crateApiPayPrepare(
-      {required List<Recipient> recipients,
-      required PaymentOptions options,
-      required Coin c});
+  Future<Uint8List> crateApiPayPcztApplyBatchSignatures({
+    required List<int> original,
+    required List<int> response,
+  });
 
-  Future<PcztPackage> crateApiPayPrepareMigration(
-      {required List<Recipient> recipients,
-      required int srcPools,
-      required Coin c});
+  Future<Uint8List> crateApiPayPcztApplyKeystoneSignatures({
+    required List<int> original,
+    required List<int> signed,
+  });
+
+  Future<Uint8List> crateApiPayPcztFromKeystone({required List<int> pczt});
+
+  Future<Uint8List> crateApiPayPcztToBatchRequest({
+    required List<Uint8List> pczts,
+  });
+
+  Future<Uint8List> crateApiPayPcztToKeystone({required List<int> pczt});
+
+  Future<PcztPackage> crateApiPayPrepare({
+    required List<Recipient> recipients,
+    required PaymentOptions options,
+    required Coin c,
+  });
+
+  Future<PcztPackage> crateApiPayPrepareMigration({
+    required List<Recipient> recipients,
+    required int srcPools,
+    required Coin c,
+  });
 
   Future<void> crateApiAccountPrintKeys({required int id, required Coin c});
 
-  Future<void> crateApiDbPutProp(
-      {required String key, required String value, required Coin c});
+  Future<PcztPackage> crateApiPayProveAndFinalize({
+    required PcztPackage pczt,
+    required Coin c,
+  });
+
+  Future<void> crateApiDbPutProp({
+    required String key,
+    required String value,
+    required Coin c,
+  });
 
   Future<List<LWDInfo>> crateApiNetworkQueryLwdList({required int coin});
 
   Future<Receivers> crateApiAccountReceiversDefault();
 
-  Receivers crateApiAccountReceiversFromUa(
-      {required String ua, required Coin c});
+  Receivers crateApiAccountReceiversFromUa({
+    required String ua,
+    required Coin c,
+  });
 
-  Future<void> crateApiAccountRemoveAccount(
-      {required int accountId, required Coin c});
+  Future<void> crateApiAccountRemoveAccount({
+    required int accountId,
+    required Coin c,
+  });
 
-  Future<void> crateApiPluginRemovePlugin(
-      {required String id, required Coin c});
+  Future<void> crateApiPluginRemovePlugin({
+    required String id,
+    required Coin c,
+  });
 
-  Future<void> crateApiAccountRenameCategory(
-      {required Category category, required Coin c});
+  Future<void> crateApiAccountRenameCategory({
+    required Category category,
+    required Coin c,
+  });
 
-  Future<void> crateApiAccountRenameFolder(
-      {required int id, required String name, required Coin c});
+  Future<void> crateApiAccountRenameFolder({
+    required int id,
+    required String name,
+    required Coin c,
+  });
 
-  Future<void> crateApiAccountReorderAccount(
-      {required int oldPosition, required int newPosition, required Coin c});
+  Future<void> crateApiAccountReorderAccount({
+    required int oldPosition,
+    required int newPosition,
+    required Coin c,
+  });
 
   Future<void> crateApiFrostResetSign({required Coin c});
 
   Future<void> crateApiAccountResetSync({required int id, required Coin c});
 
-  Future<OpenAliasResolution> crateApiOpenaliasResolveOpenalias(
-      {required String alias, required Coin c});
+  Future<OpenAliasResolution> crateApiOpenaliasResolveOpenalias({
+    required String alias,
+    required Coin c,
+  });
 
-  Future<OpenAliasResolution> crateApiOpenaliasResolveOpenaliasAll(
-      {required String alias});
+  Future<OpenAliasResolution> crateApiOpenaliasResolveOpenaliasAll({
+    required String alias,
+  });
 
-  Future<RawOpenAliasResolution> crateApiOpenaliasResolveOpenaliasRaw(
-      {required String alias});
+  Future<RawOpenAliasResolution> crateApiOpenaliasResolveOpenaliasRaw({
+    required String alias,
+  });
 
-  Future<void> crateApiSyncRewindSync(
-      {required int height, required int account, required Coin c});
+  Future<void> crateApiSyncRewindSync({
+    required int height,
+    required int account,
+    required Coin c,
+  });
 
-  Future<String> crateApiPaySend(
-      {required int height, required List<int> data, required Coin c});
+  Future<String> crateApiPaySend({
+    required int height,
+    required List<int> data,
+    required Coin c,
+  });
 
-  Future<void> crateApiZsaSetAssetName(
-      {required PlatformInt64 idAsset, required String name, required Coin c});
+  Future<void> crateApiZsaSetAssetName({
+    required PlatformInt64 idAsset,
+    required String name,
+    required Coin c,
+  });
 
-  Future<void> crateApiFrostSetDkgAddress(
-      {required int id, required String address, required Coin c});
+  Future<void> crateApiFrostSetDkgAddress({
+    required int id,
+    required String address,
+    required Coin c,
+  });
 
-  Future<void> crateApiFrostSetDkgParams(
-      {required String name,
-      required int id,
-      required int n,
-      required int t,
-      required int fundingAccount,
-      required Coin c});
+  Future<void> crateApiFrostSetDkgParams({
+    required String name,
+    required int id,
+    required int n,
+    required int t,
+    required int fundingAccount,
+    required Coin c,
+  });
 
   void crateApiInitSetExpertMode({required bool enabled});
 
   Stream<LogMessage> crateApiInitSetLogStream();
 
-  Future<void> crateApiPluginSetPluginEnabled(
-      {required String id, required bool enabled, required Coin c});
+  Future<void> crateApiPluginSetPluginEnabled({
+    required String id,
+    required bool enabled,
+    required Coin c,
+  });
 
-  Future<void> crateApiTransactionSetTxCategory(
-      {required int id, int? category, required Coin c});
+  Future<void> crateApiTransactionSetTxCategory({
+    required int id,
+    int? category,
+    required Coin c,
+  });
 
-  Future<void> crateApiTransactionSetTxPrice(
-      {required int id, double? price, required Coin c});
+  Future<void> crateApiTransactionSetTxPrice({
+    required int id,
+    double? price,
+    required Coin c,
+  });
 
-  Future<void> crateApiTransactionSetUserMemo(
-      {required int idTx, String? memo, required Coin c});
+  Future<void> crateApiTransactionSetUserMemo({
+    required int idTx,
+    String? memo,
+    required Coin c,
+  });
 
   Future<String> crateApiAccountShowLedgerSaplingAddress({required Coin c});
 
   Future<String> crateApiAccountShowLedgerTransparentAddress({required Coin c});
 
-  Stream<SigningEvent> crateApiAccountSignLedgerTransaction(
-      {required PcztPackage package, required Coin c});
+  Stream<SigningEvent> crateApiAccountSignLedgerTransaction({
+    required PcztPackage package,
+    required Coin c,
+  });
 
-  Future<PcztPackage> crateApiPaySignTransaction(
-      {required PcztPackage pczt, required Coin c});
+  Future<PcztPackage> crateApiPaySignTransaction({
+    required PcztPackage pczt,
+    required Coin c,
+  });
 
   Future<MigrationEvent> crateApiMigrateStepMigration({required Coin c});
 
-  Future<void> crateApiPayStorePendingTx(
-      {required int height,
-      required List<int> txid,
-      double? price,
-      int? category,
-      required Coin c});
+  Future<void> crateApiPayStorePendingTx({
+    required int height,
+    required List<int> txid,
+    double? price,
+    int? category,
+    required Coin c,
+  });
 
-  Stream<SyncProgress> crateApiSyncSynchronize(
-      {required List<int> accounts,
-      required int currentHeight,
-      required int actionsPerSync,
-      required int transparentLimit,
-      required int checkpointAge,
-      required bool fast,
-      required Coin c});
+  Stream<SyncProgress> crateApiSyncSynchronize({
+    required List<int> accounts,
+    required int currentHeight,
+    required int actionsPerSync,
+    required int transparentLimit,
+    required int checkpointAge,
+    required bool fast,
+    required Coin c,
+  });
 
   TxPlan crateApiPayToPlan({required PcztPackage package, required Coin c});
 
   Future<void> crateApiAccountToggleAllNotes({required Coin c});
 
-  void crateApiOpenaliasTryValidateZcashAddress(
-      {required String address, required Coin c});
+  void crateApiOpenaliasTryValidateZcashAddress({
+    required String address,
+    required Coin c,
+  });
 
   Future<TxAccount> crateApiAccountTxAccountDefault();
 
@@ -642,287 +864,370 @@ abstract class RustLibApi extends BaseApi {
 
   Future<TxSpend> crateApiAccountTxSpendDefault();
 
-  String crateApiAccountUaFromUfvk(
-      {required String ufvk, int? di, required Coin c});
+  String crateApiAccountUaFromUfvk({
+    required String ufvk,
+    int? di,
+    required Coin c,
+  });
+
+  String crateApiLedgerUfvkDefaultAddress({
+    required String ufvk,
+    required Coin c,
+  });
 
   Future<void> crateApiAccountUnlockAllNotes({required Coin c});
 
   Future<PcztPackage> crateApiPayUnpackTransaction({required List<int> bytes});
 
-  Future<void> crateApiAccountUpdateAccount(
-      {required AccountUpdate update, required Coin c});
+  Future<void> crateApiAccountUpdateAccount({
+    required AccountUpdate update,
+    required Coin c,
+  });
 
-  Future<void> crateApiContactsUpdateContact(
-      {required int id,
-      String? name,
-      List<String>? addresses,
-      String? notes,
-      required Coin c});
+  Future<void> crateApiContactsUpdateContact({
+    required int id,
+    String? name,
+    List<String>? addresses,
+    String? notes,
+    required Coin c,
+  });
 
-  Future<void> crateApiTransactionUpdateHistoricalPrices(
-      {required String currency,
-      required double exchangeRate,
-      required Coin c});
+  Future<void> crateApiTransactionUpdateHistoricalPrices({
+    required String currency,
+    required double exchangeRate,
+    required Coin c,
+  });
 
   bool crateApiOpenaliasValidateOpenaliasName({required String alias});
 
-  bool crateApiOpenaliasValidateZcashAddress(
-      {required String address, required Coin c});
+  bool crateApiOpenaliasValidateZcashAddress({
+    required String address,
+    required Coin c,
+  });
 
-  Future<VotingChainResponse> crateApiVotingVotechainListRounds(
-      {required String baseUrl, required Coin c});
+  Future<VotingChainResponse> crateApiVotingVotechainListRounds({
+    required String baseUrl,
+    required Coin c,
+  });
 
-  Future<VotingChainResponse> crateApiVotingVotechainResubmitShare(
-      {required String serverUrl,
-      required String payloadJson,
-      required Coin c});
+  Future<VotingChainResponse> crateApiVotingVotechainResubmitShare({
+    required String serverUrl,
+    required String payloadJson,
+    required Coin c,
+  });
 
-  Future<VotingChainResponse> crateApiVotingVotechainRoundStatus(
-      {required String baseUrl, required String roundId, required Coin c});
+  Future<VotingChainResponse> crateApiVotingVotechainRoundStatus({
+    required String baseUrl,
+    required String roundId,
+    required Coin c,
+  });
 
-  Future<VotingChainResponse> crateApiVotingVotechainRoundTally(
-      {required String baseUrl, required String roundId, required Coin c});
+  Future<VotingChainResponse> crateApiVotingVotechainRoundTally({
+    required String baseUrl,
+    required String roundId,
+    required Coin c,
+  });
 
-  Future<VotingChainResponse> crateApiVotingVotechainShareStatus(
-      {required String serverUrl,
-      required String roundId,
-      required String shareId,
-      required Coin c});
+  Future<VotingChainResponse> crateApiVotingVotechainShareStatus({
+    required String serverUrl,
+    required String roundId,
+    required String shareId,
+    required Coin c,
+  });
 
-  Future<VotingChainResponse> crateApiVotingVotechainSubmitDelegation(
-      {required String baseUrl,
-      required String submissionJson,
-      required Coin c});
+  Future<VotingChainResponse> crateApiVotingVotechainSubmitDelegation({
+    required String baseUrl,
+    required String submissionJson,
+    required Coin c,
+  });
 
-  Future<VotingChainResponse> crateApiVotingVotechainSubmitShare(
-      {required String serverUrl,
-      required String payloadJson,
-      required Coin c});
+  Future<VotingChainResponse> crateApiVotingVotechainSubmitShare({
+    required String serverUrl,
+    required String payloadJson,
+    required Coin c,
+  });
 
-  Future<VotingChainResponse> crateApiVotingVotechainSubmitVote(
-      {required String baseUrl,
-      required String submissionJson,
-      required Coin c});
+  Future<VotingChainResponse> crateApiVotingVotechainSubmitVote({
+    required String baseUrl,
+    required String submissionJson,
+    required Coin c,
+  });
 
-  Future<VotingChainResponse> crateApiVotingVotechainTxConfirmation(
-      {required String baseUrl, required String txHash, required Coin c});
+  Future<VotingChainResponse> crateApiVotingVotechainTxConfirmation({
+    required String baseUrl,
+    required String txHash,
+    required Coin c,
+  });
 
-  Future<List<VotingBallotIntent>> crateApiVotingVotingBallotIntents(
-      {required String roundId, required Coin c});
+  Future<List<VotingBallotIntent>> crateApiVotingVotingBallotIntents({
+    required String roundId,
+    required Coin c,
+  });
 
-  Future<VotingVoteCommitments> crateApiVotingVotingCommit(
-      {required String roundId,
-      required int bundleIndex,
-      required String draftsJson,
-      required String voteNodeUrl,
-      required Coin c});
+  Future<VotingVoteCommitments> crateApiVotingVotingCommit({
+    required String roundId,
+    required int bundleIndex,
+    required String draftsJson,
+    required String voteNodeUrl,
+    required Coin c,
+  });
 
-  Stream<VotingVoteCommitStage> crateApiVotingVotingCommitWithProgress(
-      {required String roundId,
-      required int bundleIndex,
-      required String draftsJson,
-      required String voteNodeUrl,
-      required Coin c});
+  Stream<VotingVoteCommitStage> crateApiVotingVotingCommitWithProgress({
+    required String roundId,
+    required int bundleIndex,
+    required String draftsJson,
+    required String voteNodeUrl,
+    required Coin c,
+  });
 
-  Future<VotingConfig?> crateApiVotingVotingConfigCached(
-      {required String source, required Coin c});
+  Future<VotingConfig?> crateApiVotingVotingConfigCached({
+    required String source,
+    required Coin c,
+  });
 
   Future<void> crateApiVotingVotingConfigClearCache({required Coin c});
 
-  Future<VotingConfig> crateApiVotingVotingConfigResolve(
-      {required String source, required Coin c});
+  Future<VotingConfig> crateApiVotingVotingConfigResolve({
+    required String source,
+    required Coin c,
+  });
 
-  Future<VotingVoteConfirmation> crateApiVotingVotingConfirm(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required String txHash,
-      required String eventsJson,
-      required Coin c});
+  Future<VotingVoteConfirmation> crateApiVotingVotingConfirm({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required String txHash,
+    required String eventsJson,
+    required Coin c,
+  });
 
-  Future<String?> crateApiVotingVotingDelegationVanCommitmentHex(
-      {required String roundId, required int bundleIndex, required Coin c});
+  Future<String?> crateApiVotingVotingDelegationVanCommitmentHex({
+    required String roundId,
+    required int bundleIndex,
+    required Coin c,
+  });
 
-  Future<String?> crateApiVotingVotingDraftsLoad(
-      {required String roundId, required Coin c});
+  Future<String?> crateApiVotingVotingDraftsLoad({
+    required String roundId,
+    required Coin c,
+  });
 
-  Future<void> crateApiVotingVotingDraftsSave(
-      {required String roundId, required String draftsJson, required Coin c});
+  Future<void> crateApiVotingVotingDraftsSave({
+    required String roundId,
+    required String draftsJson,
+    required Coin c,
+  });
 
-  Future<BigInt> crateApiVotingVotingEligibleWeight(
-      {required int snapshotHeight, required Coin c});
+  Future<BigInt> crateApiVotingVotingEligibleWeight({
+    required int snapshotHeight,
+    required Coin c,
+  });
 
   Future<String> crateApiVotingVotingHotkeyCreate({required Coin c});
 
   Future<String> crateApiVotingVotingHotkeyGet({required Coin c});
 
-  Future<void> crateApiVotingVotingMarkVoteSubmitted(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required String txHash,
-      required Coin c});
+  Future<void> crateApiVotingVotingMarkVoteSubmitted({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required String txHash,
+    required Coin c,
+  });
 
-  Future<VotingVotePayloads> crateApiVotingVotingPayloads(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required Coin c});
+  Future<VotingVotePayloads> crateApiVotingVotingPayloads({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required Coin c,
+  });
 
-  Future<VotingRoundPlan> crateApiVotingVotingPlan(
-      {required String roundId,
-      required List<int> proposalIds,
-      required Coin c});
+  Future<VotingRoundPlan> crateApiVotingVotingPlan({
+    required String roundId,
+    required List<int> proposalIds,
+    required Coin c,
+  });
 
-  Future<void> crateApiVotingVotingRecordExecution(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required String voteTxHash,
-      required BigInt vcTreePosition,
-      required String shareDeliveriesJson,
-      required Coin c});
+  Future<void> crateApiVotingVotingRecordExecution({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required String voteTxHash,
+    required BigInt vcTreePosition,
+    required String shareDeliveriesJson,
+    required Coin c,
+  });
 
-  Future<void> crateApiVotingVotingRecoverConfirmDelegationFromTree(
-      {required String roundId,
-      required int bundleIndex,
-      required int vanLeafPosition,
-      required Coin c});
+  Future<void> crateApiVotingVotingRecoverConfirmDelegationFromTree({
+    required String roundId,
+    required int bundleIndex,
+    required int vanLeafPosition,
+    required Coin c,
+  });
 
   Future<VotingTreeVoteConfirmation>
-      crateApiVotingVotingRecoverConfirmVoteFromTree(
-          {required String roundId,
-          required int bundleIndex,
-          required int proposalId,
-          required BigInt vcTreePosition,
-          int? vanLeafPosition,
-          required Coin c});
+  crateApiVotingVotingRecoverConfirmVoteFromTree({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required BigInt vcTreePosition,
+    int? vanLeafPosition,
+    required Coin c,
+  });
 
-  Future<VotingRoundRecovery> crateApiVotingVotingRecovery(
-      {required String roundId, required Coin c});
+  Future<VotingRoundRecovery> crateApiVotingVotingRecovery({
+    required String roundId,
+    required Coin c,
+  });
 
-  Future<void> crateApiVotingVotingRecoveryClear(
-      {required String roundId, required Coin c});
+  Future<void> crateApiVotingVotingRecoveryClear({
+    required String roundId,
+    required Coin c,
+  });
 
-  Future<void> crateApiVotingVotingResetSessionState(
-      {required String roundId, required Coin c});
+  Future<void> crateApiVotingVotingResetSessionState({
+    required String roundId,
+    required Coin c,
+  });
 
-  Future<String> crateApiVotingVotingRoundParamsJson(
-      {required String source,
-      required String roundId,
-      required BigInt snapshotHeight,
-      required List<int> ncRoot,
-      required List<int> nullifierImtRoot,
-      required Coin c});
+  Future<String> crateApiVotingVotingRoundParamsJson({
+    required String source,
+    required String roundId,
+    required BigInt snapshotHeight,
+    required List<int> ncRoot,
+    required List<int> nullifierImtRoot,
+    required Coin c,
+  });
 
   Future<List<VotingRoundInfo>> crateApiVotingVotingRounds({required Coin c});
 
-  Future<List<VotingRoundSession>> crateApiVotingVotingSessions(
-      {required List<String> roundIds, required Coin c});
+  Future<List<VotingRoundSession>> crateApiVotingVotingSessions({
+    required List<String> roundIds,
+    required Coin c,
+  });
 
-  Future<void> crateApiVotingVotingSetBallotIntent(
-      {required String roundId,
-      required int proposalId,
-      required bool skipped,
-      required int choice,
-      required int numOptions,
-      required Coin c});
+  Future<void> crateApiVotingVotingSetBallotIntent({
+    required String roundId,
+    required int proposalId,
+    required bool skipped,
+    required int choice,
+    required int numOptions,
+    required Coin c,
+  });
 
-  Future<void> crateApiVotingVotingShareAddServers(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required int shareIndex,
-      required List<String> newUrls,
-      required Coin c});
+  Future<void> crateApiVotingVotingShareAddServers({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required int shareIndex,
+    required List<String> newUrls,
+    required Coin c,
+  });
 
-  Future<void> crateApiVotingVotingShareConfirm(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required int shareIndex,
-      required Coin c});
+  Future<void> crateApiVotingVotingShareConfirm({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required int shareIndex,
+    required Coin c,
+  });
 
-  Future<List<VotingShareSubmissionPayload>> crateApiVotingVotingSharePayloads(
-      {required String roundId, required Coin c});
+  Future<List<VotingShareSubmissionPayload>> crateApiVotingVotingSharePayloads({
+    required String roundId,
+    required Coin c,
+  });
 
-  Future<VotingSharePlan> crateApiVotingVotingSharePlan(
-      {required String roundId,
-      required BigInt now,
-      required BigInt ceremonyStart,
-      BigInt? voteEnd,
-      required List<String> serverUrls,
-      required bool singleShare,
-      required Coin c});
+  Future<VotingSharePlan> crateApiVotingVotingSharePlan({
+    required String roundId,
+    required BigInt now,
+    required BigInt ceremonyStart,
+    BigInt? voteEnd,
+    required List<String> serverUrls,
+    required bool singleShare,
+    required Coin c,
+  });
 
-  Future<List<VotingSharePlanItem>> crateApiVotingVotingSharePlans(
-      {required int shareCount,
-      required List<String> serverUrls,
-      required BigInt now,
-      required BigInt voteEnd,
-      required BigInt ceremonyStart,
-      required bool singleShare,
-      required Coin c});
+  Future<List<VotingSharePlanItem>> crateApiVotingVotingSharePlans({
+    required int shareCount,
+    required List<String> serverUrls,
+    required BigInt now,
+    required BigInt voteEnd,
+    required BigInt ceremonyStart,
+    required bool singleShare,
+    required Coin c,
+  });
 
-  Future<void> crateApiVotingVotingShareRecord(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required int shareIndex,
-      required List<String> sentToUrls,
-      required BigInt submitAt,
-      required Coin c});
+  Future<void> crateApiVotingVotingShareRecord({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required int shareIndex,
+    required List<String> sentToUrls,
+    required BigInt submitAt,
+    required Coin c,
+  });
 
   Future<List<VotingShareDelegationRecord>>
-      crateApiVotingVotingShareUnconfirmed(
-          {required String roundId, required Coin c});
+  crateApiVotingVotingShareUnconfirmed({
+    required String roundId,
+    required Coin c,
+  });
 
-  Future<String> crateApiVotingVotingShareWireJson(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required int shareIndex,
-      BigInt? vcTreePosition,
-      required BigInt submitAt,
-      required Coin c});
+  Future<String> crateApiVotingVotingShareWireJson({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required int shareIndex,
+    BigInt? vcTreePosition,
+    required BigInt submitAt,
+    required Coin c,
+  });
 
-  Future<int> crateApiVotingVotingSyncTree(
-      {required String roundId, required String voteNodeUrl, required Coin c});
+  Future<int> crateApiVotingVotingSyncTree({
+    required String roundId,
+    required String voteNodeUrl,
+    required Coin c,
+  });
 
-  Future<BigInt?> crateApiVotingVotingTreeFindLeaf(
-      {required String roundId,
-      required String nodeUrl,
-      required String targetHex});
+  Future<BigInt?> crateApiVotingVotingTreeFindLeaf({
+    required String roundId,
+    required String nodeUrl,
+    required String targetHex,
+  });
 
-  Future<VotingVanWitness> crateApiVotingVotingVanWitness(
-      {required String roundId,
-      required int bundleIndex,
-      required String voteNodeUrl,
-      required Coin c});
+  Future<VotingVanWitness> crateApiVotingVotingVanWitness({
+    required String roundId,
+    required int bundleIndex,
+    required String voteNodeUrl,
+    required Coin c,
+  });
 
-  Future<String> crateApiVotingVotingVoteCommitmentHex(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required Coin c});
+  Future<String> crateApiVotingVotingVoteCommitmentHex({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required Coin c,
+  });
 
-  Future<String> crateApiVotingVotingVoteVanCommitmentHex(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required Coin c});
+  Future<String> crateApiVotingVotingVoteVanCommitmentHex({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required Coin c,
+  });
 
-  Future<String> crateApiVotingVotingVoteWireJson(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required Coin c});
+  Future<String> crateApiVotingVotingVoteWireJson({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required Coin c,
+  });
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_DartVault;
+  get rust_arc_increment_strong_count_DartVault;
 
   RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_DartVault;
+  get rust_arc_decrement_strong_count_DartVault;
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_DartVaultPtr;
 
@@ -933,22 +1238,22 @@ abstract class RustLibApi extends BaseApi {
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_MempoolPtr;
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_NoteMigration;
+  get rust_arc_increment_strong_count_NoteMigration;
 
   RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_NoteMigration;
+  get rust_arc_decrement_strong_count_NoteMigration;
 
   CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_NoteMigrationPtr;
+  get rust_arc_decrement_strong_count_NoteMigrationPtr;
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_TransparentScanner;
+  get rust_arc_increment_strong_count_TransparentScanner;
 
   RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_TransparentScanner;
+  get rust_arc_decrement_strong_count_TransparentScanner;
 
   CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_TransparentScannerPtr;
+  get rust_arc_decrement_strong_count_TransparentScannerPtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -960,20 +1265,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<List<RestoredAccount>> crateApiVaultDartVaultRecover(
-      {required DartVault that,
-      required List<int> vaultBytes,
-      required String masterPassword}) {
+  Future<List<RestoredAccount>> crateApiVaultDartVaultRecover({
+    required DartVault that,
+    required List<int> vaultBytes,
+    required String masterPassword,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-              that, serializer);
+            that,
+            serializer,
+          );
           sse_encode_list_prim_u_8_loose(vaultBytes, serializer);
           sse_encode_String(masterPassword, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 1, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 1,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_restored_account,
@@ -993,22 +1305,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<RestoredAccount>> crateApiVaultDartVaultRecoverWithPrf(
-      {required DartVault that,
-      required List<int> vaultBytes,
-      required String deviceIdStr,
-      required List<int> prfOutput}) {
+  Future<List<RestoredAccount>> crateApiVaultDartVaultRecoverWithPrf({
+    required DartVault that,
+    required List<int> vaultBytes,
+    required String deviceIdStr,
+    required List<int> prfOutput,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-              that, serializer);
+            that,
+            serializer,
+          );
           sse_encode_list_prim_u_8_loose(vaultBytes, serializer);
           sse_encode_String(deviceIdStr, serializer);
           sse_encode_list_prim_u_8_loose(prfOutput, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 2, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_restored_account,
@@ -1028,24 +1347,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiVaultDartVaultRegisterDevice(
-      {required DartVault that,
-      required List<int> initBytes,
-      required String masterPassword,
-      required String deviceIdStr,
-      required List<int> prfOutput}) {
+  Future<void> crateApiVaultDartVaultRegisterDevice({
+    required DartVault that,
+    required List<int> initBytes,
+    required String masterPassword,
+    required String deviceIdStr,
+    required List<int> prfOutput,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-              that, serializer);
+            that,
+            serializer,
+          );
           sse_encode_list_prim_u_8_loose(initBytes, serializer);
           sse_encode_String(masterPassword, serializer);
           sse_encode_String(deviceIdStr, serializer);
           sse_encode_list_prim_u_8_loose(prfOutput, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 3, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1066,27 +1392,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "initBytes",
           "masterPassword",
           "deviceIdStr",
-          "prfOutput"
+          "prfOutput",
         ],
       );
 
   @override
-  Future<Uint8List> crateApiVaultDartVaultSetMasterPassword(
-      {required DartVault that,
-      String? oldPassword,
-      required String newPassword,
-      Uint8List? oldBytes}) {
+  Future<Uint8List> crateApiVaultDartVaultSetMasterPassword({
+    required DartVault that,
+    String? oldPassword,
+    required String newPassword,
+    Uint8List? oldBytes,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-              that, serializer);
+            that,
+            serializer,
+          );
           sse_encode_opt_String(oldPassword, serializer);
           sse_encode_String(newPassword, serializer);
           sse_encode_opt_list_prim_u_8_strict(oldBytes, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 4, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 4,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -1106,21 +1439,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiVaultDartVaultStoreAccount(
-      {required DartVault that,
-      required int timestamp,
-      required String name,
-      required String seed,
-      required int aindex,
-      required bool useInternal,
-      required int birthHeight,
-      required List<int> pk}) {
+  Future<void> crateApiVaultDartVaultStoreAccount({
+    required DartVault that,
+    required int timestamp,
+    required String name,
+    required String seed,
+    required int aindex,
+    required bool useInternal,
+    required int birthHeight,
+    required List<int> pk,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-              that, serializer);
+            that,
+            serializer,
+          );
           sse_encode_u_32(timestamp, serializer);
           sse_encode_String(name, serializer);
           sse_encode_String(seed, serializer);
@@ -1128,8 +1464,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_bool(useInternal, serializer);
           sse_encode_u_32(birthHeight, serializer);
           sse_encode_list_prim_u_8_loose(pk, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 5, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 5,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1144,7 +1484,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           aindex,
           useInternal,
           birthHeight,
-          pk
+          pk,
         ],
         apiImpl: this,
       ),
@@ -1162,7 +1502,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "aindex",
           "useInternal",
           "birthHeight",
-          "pk"
+          "pk",
         ],
       );
 
@@ -1173,9 +1513,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-              that, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 6, port: port_);
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1188,10 +1534,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiVaultDartVaultTestConstMeta => const TaskConstMeta(
-        debugName: "DartVault_test",
-        argNames: ["that"],
-      );
+  TaskConstMeta get kCrateApiVaultDartVaultTestConstMeta =>
+      const TaskConstMeta(debugName: "DartVault_test", argNames: ["that"]);
 
   @override
   Future<void> crateApiMempoolMempoolCancel({required Mempool that}) {
@@ -1200,9 +1544,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
-              that, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 7, port: port_);
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 7,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1216,10 +1566,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiMempoolMempoolCancelConstMeta =>
-      const TaskConstMeta(
-        debugName: "Mempool_cancel",
-        argNames: ["that"],
-      );
+      const TaskConstMeta(debugName: "Mempool_cancel", argNames: ["that"]);
 
   @override
   Mempool crateApiMempoolMempoolNew() {
@@ -1241,14 +1588,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiMempoolMempoolNewConstMeta => const TaskConstMeta(
-        debugName: "Mempool_new",
-        argNames: [],
-      );
+  TaskConstMeta get kCrateApiMempoolMempoolNewConstMeta =>
+      const TaskConstMeta(debugName: "Mempool_new", argNames: []);
 
   @override
-  Stream<MempoolMsg> crateApiMempoolMempoolRun(
-      {required Mempool that, required Coin c}) {
+  Stream<MempoolMsg> crateApiMempoolMempoolRun({
+    required Mempool that,
+    required Coin c,
+  }) {
     final mempoolSink = RustStreamSink<MempoolMsg>();
     unawaited(
       handler.executeNormal(
@@ -1256,11 +1603,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           callFfi: (port_) {
             final serializer = SseSerializer(generalizedFrbRustBinding);
             sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
-                that, serializer);
+              that,
+              serializer,
+            );
             sse_encode_StreamSink_mempool_msg_Sse(mempoolSink, serializer);
             sse_encode_box_autoadd_coin(c, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer,
-                funcId: 9, port: port_);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 9,
+              port: port_,
+            );
           },
           codec: SseCodec(
             decodeSuccessData: sse_decode_unit,
@@ -1276,21 +1629,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiMempoolMempoolRunConstMeta => const TaskConstMeta(
-        debugName: "Mempool_run",
-        argNames: ["that", "mempoolSink", "c"],
-      );
+    debugName: "Mempool_run",
+    argNames: ["that", "mempoolSink", "c"],
+  );
 
   @override
-  Future<void> crateApiMigrateNoteMigrationCancel(
-      {required NoteMigration that}) {
+  Future<void> crateApiMigrateNoteMigrationCancel({
+    required NoteMigration that,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
-              that, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 10, port: port_);
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 10,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1330,16 +1690,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiMigrateNoteMigrationNewConstMeta =>
-      const TaskConstMeta(
-        debugName: "NoteMigration_new",
-        argNames: [],
-      );
+      const TaskConstMeta(debugName: "NoteMigration_new", argNames: []);
 
   @override
-  Stream<MigrationStatus> crateApiMigrateNoteMigrationRun(
-      {required NoteMigration that,
-      required Coin c,
-      required BigInt meanDelayMs}) {
+  Stream<MigrationStatus> crateApiMigrateNoteMigrationRun({
+    required NoteMigration that,
+    required Coin c,
+    required BigInt meanDelayMs,
+  }) {
     final sink = RustStreamSink<MigrationStatus>();
     unawaited(
       handler.executeNormal(
@@ -1347,12 +1705,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           callFfi: (port_) {
             final serializer = SseSerializer(generalizedFrbRustBinding);
             sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
-                that, serializer);
+              that,
+              serializer,
+            );
             sse_encode_StreamSink_migration_status_Sse(sink, serializer);
             sse_encode_box_autoadd_coin(c, serializer);
             sse_encode_u_64(meanDelayMs, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer,
-                funcId: 12, port: port_);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 12,
+              port: port_,
+            );
           },
           codec: SseCodec(
             decodeSuccessData: sse_decode_unit,
@@ -1374,14 +1738,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiMigrateNoteMigrationUpdateHeight(
-      {required NoteMigration that, required int height}) {
+  void crateApiMigrateNoteMigrationUpdateHeight({
+    required NoteMigration that,
+    required int height,
+  }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
-              that, serializer);
+            that,
+            serializer,
+          );
           sse_encode_u_32(height, serializer);
           return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
         },
@@ -1403,16 +1771,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiSweepTransparentScannerCancel(
-      {required TransparentScanner that}) {
+  Future<void> crateApiSweepTransparentScannerCancel({
+    required TransparentScanner that,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-              that, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 14, port: port_);
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 14,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1437,8 +1812,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 15, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 15,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1453,17 +1832,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiSweepTransparentScannerNewConstMeta =>
-      const TaskConstMeta(
-        debugName: "TransparentScanner_new",
-        argNames: [],
-      );
+      const TaskConstMeta(debugName: "TransparentScanner_new", argNames: []);
 
   @override
-  Stream<String> crateApiSweepTransparentScannerRun(
-      {required TransparentScanner that,
-      required int endHeight,
-      required int gapLimit,
-      required Coin c}) {
+  Stream<String> crateApiSweepTransparentScannerRun({
+    required TransparentScanner that,
+    required int endHeight,
+    required int gapLimit,
+    required Coin c,
+  }) {
     final addressStream = RustStreamSink<String>();
     unawaited(
       handler.executeNormal(
@@ -1471,13 +1848,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           callFfi: (port_) {
             final serializer = SseSerializer(generalizedFrbRustBinding);
             sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-                that, serializer);
+              that,
+              serializer,
+            );
             sse_encode_StreamSink_String_Sse(addressStream, serializer);
             sse_encode_u_32(endHeight, serializer);
             sse_encode_u_32(gapLimit, serializer);
             sse_encode_box_autoadd_coin(c, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer,
-                funcId: 16, port: port_);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 16,
+              port: port_,
+            );
           },
           codec: SseCodec(
             decodeSuccessData: sse_decode_unit,
@@ -1505,8 +1888,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 17, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 17,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_pool_balance,
@@ -1519,14 +1906,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiSyncBalanceConstMeta => const TaskConstMeta(
-        debugName: "balance",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiSyncBalanceConstMeta =>
+      const TaskConstMeta(debugName: "balance", argNames: ["c"]);
 
   @override
-  Future<String> crateApiPayBroadcastTransaction(
-      {required int height, required List<int> txBytes, required Coin c}) {
+  Future<String> crateApiPayBroadcastTransaction({
+    required int height,
+    required List<int> txBytes,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -1534,8 +1922,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(height, serializer);
           sse_encode_list_prim_u_8_loose(txBytes, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 18, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 18,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -1561,8 +1953,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_recipient(recipients, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 19, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 19,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -1575,22 +1971,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiPayBuildPuriConstMeta => const TaskConstMeta(
-        debugName: "build_puri",
-        argNames: ["recipients"],
-      );
+  TaskConstMeta get kCrateApiPayBuildPuriConstMeta =>
+      const TaskConstMeta(debugName: "build_puri", argNames: ["recipients"]);
 
   @override
-  Future<void> crateApiSyncCacheBlockTime(
-      {required int height, required Coin c}) {
+  Future<void> crateApiSyncCacheBlockTime({
+    required int height,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(height, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 20, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 20,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1604,9 +2004,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiSyncCacheBlockTimeConstMeta => const TaskConstMeta(
-        debugName: "cache_block_time",
-        argNames: ["height", "c"],
-      );
+    debugName: "cache_block_time",
+    argNames: ["height", "c"],
+  );
 
   @override
   Future<void> crateApiFrostCancelDkg({required Coin c}) {
@@ -1615,8 +2015,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 21, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 21,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1629,10 +2033,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiFrostCancelDkgConstMeta => const TaskConstMeta(
-        debugName: "cancel_dkg",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiFrostCancelDkgConstMeta =>
+      const TaskConstMeta(debugName: "cancel_dkg", argNames: ["c"]);
 
   @override
   Future<void> crateApiSyncCancelSync() {
@@ -1640,8 +2042,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 22, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 22,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1654,17 +2060,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiSyncCancelSyncConstMeta => const TaskConstMeta(
-        debugName: "cancel_sync",
-        argNames: [],
-      );
+  TaskConstMeta get kCrateApiSyncCancelSyncConstMeta =>
+      const TaskConstMeta(debugName: "cancel_sync", argNames: []);
 
   @override
-  Future<void> crateApiDbChangeDbPassword(
-      {required String dbFilepath,
-      required String tmpDir,
-      required String oldPassword,
-      required String newPassword}) {
+  Future<void> crateApiDbChangeDbPassword({
+    required String dbFilepath,
+    required String tmpDir,
+    required String oldPassword,
+    required String newPassword,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -1673,8 +2078,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(tmpDir, serializer);
           sse_encode_String(oldPassword, serializer);
           sse_encode_String(newPassword, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 23, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 23,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1688,9 +2097,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiDbChangeDbPasswordConstMeta => const TaskConstMeta(
-        debugName: "change_db_password",
-        argNames: ["dbFilepath", "tmpDir", "oldPassword", "newPassword"],
-      );
+    debugName: "change_db_password",
+    argNames: ["dbFilepath", "tmpDir", "oldPassword", "newPassword"],
+  );
 
   @override
   SaplingParamsStatus crateApiSaplingCheckSaplingParams() {
@@ -1712,10 +2121,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiSaplingCheckSaplingParamsConstMeta =>
-      const TaskConstMeta(
-        debugName: "check_sapling_params",
-        argNames: [],
-      );
+      const TaskConstMeta(debugName: "check_sapling_params", argNames: []);
 
   @override
   Future<void> crateApiCoinClosePool({required String dbFilepath}) {
@@ -1724,8 +2130,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(dbFilepath, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 25, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 25,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1738,10 +2148,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiCoinClosePoolConstMeta => const TaskConstMeta(
-        debugName: "close_pool",
-        argNames: ["dbFilepath"],
-      );
+  TaskConstMeta get kCrateApiCoinClosePoolConstMeta =>
+      const TaskConstMeta(debugName: "close_pool", argNames: ["dbFilepath"]);
 
   @override
   Future<void> crateApiCoinCoinGetName({required Coin that}) {
@@ -1750,8 +2158,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(that, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 26, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 26,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1764,10 +2176,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiCoinCoinGetNameConstMeta => const TaskConstMeta(
-        debugName: "coin_get_name",
-        argNames: ["that"],
-      );
+  TaskConstMeta get kCrateApiCoinCoinGetNameConstMeta =>
+      const TaskConstMeta(debugName: "coin_get_name", argNames: ["that"]);
 
   @override
   Coin crateApiCoinCoinNew({int? defaultCoin}) {
@@ -1789,14 +2199,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiCoinCoinNewConstMeta => const TaskConstMeta(
-        debugName: "coin_new",
-        argNames: ["defaultCoin"],
-      );
+  TaskConstMeta get kCrateApiCoinCoinNewConstMeta =>
+      const TaskConstMeta(debugName: "coin_new", argNames: ["defaultCoin"]);
 
   @override
-  Future<Coin> crateApiCoinCoinOpenDatabase(
-      {required Coin that, required String dbFilepath, String? password}) {
+  Future<Coin> crateApiCoinCoinOpenDatabase({
+    required Coin that,
+    required String dbFilepath,
+    String? password,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -1804,8 +2215,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_box_autoadd_coin(that, serializer);
           sse_encode_String(dbFilepath, serializer);
           sse_encode_opt_String(password, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 28, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 28,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_coin,
@@ -1825,16 +2240,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Coin> crateApiCoinCoinSetAccount(
-      {required Coin that, required int account}) {
+  Future<Coin> crateApiCoinCoinSetAccount({
+    required Coin that,
+    required int account,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(that, serializer);
           sse_encode_u_32(account, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 29, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 29,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_coin,
@@ -1848,13 +2269,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiCoinCoinSetAccountConstMeta => const TaskConstMeta(
-        debugName: "coin_set_account",
-        argNames: ["that", "account"],
-      );
+    debugName: "coin_set_account",
+    argNames: ["that", "account"],
+  );
 
   @override
-  Coin crateApiCoinCoinSetLwd(
-      {required Coin that, required int serverType, required String url}) {
+  Coin crateApiCoinCoinSetLwd({
+    required Coin that,
+    required int serverType,
+    required String url,
+  }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
@@ -1876,9 +2300,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiCoinCoinSetLwdConstMeta => const TaskConstMeta(
-        debugName: "coin_set_lwd",
-        argNames: ["that", "serverType", "url"],
-      );
+    debugName: "coin_set_lwd",
+    argNames: ["that", "serverType", "url"],
+  );
 
   @override
   Coin crateApiCoinCoinSetProxy({required Coin that, required String proxy}) {
@@ -1902,13 +2326,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiCoinCoinSetProxyConstMeta => const TaskConstMeta(
-        debugName: "coin_set_proxy",
-        argNames: ["that", "proxy"],
-      );
+    debugName: "coin_set_proxy",
+    argNames: ["that", "proxy"],
+  );
 
   @override
-  Coin crateApiCoinCoinSetTransport(
-      {required Coin that, required int transport}) {
+  Coin crateApiCoinCoinSetTransport({
+    required Coin that,
+    required int transport,
+  }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
@@ -1935,11 +2361,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Contact> crateApiContactsCreateContact(
-      {required String name,
-      required List<String> addresses,
-      required String notes,
-      required Coin c}) {
+  Future<Contact> crateApiContactsCreateContact({
+    required String name,
+    required List<String> addresses,
+    required String notes,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -1948,8 +2375,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_String(addresses, serializer);
           sse_encode_String(notes, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 33, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 33,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_contact,
@@ -1969,16 +2400,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<int> crateApiAccountCreateNewCategory(
-      {required Category category, required Coin c}) {
+  Future<int> crateApiAccountCreateNewCategory({
+    required Category category,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_category(category, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 34, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 34,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_u_32,
@@ -1998,16 +2435,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Folder> crateApiAccountCreateNewFolder(
-      {required String name, required Coin c}) {
+  Future<Folder> crateApiAccountCreateNewFolder({
+    required String name,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 35, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 35,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_folder,
@@ -2033,8 +2476,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_8_loose(packet, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 36, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 36,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_list_prim_u_8_strict,
@@ -2047,19 +2494,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiRaptorDecodeConstMeta => const TaskConstMeta(
-        debugName: "decode",
-        argNames: ["packet"],
-      );
+  TaskConstMeta get kCrateApiRaptorDecodeConstMeta =>
+      const TaskConstMeta(debugName: "decode", argNames: ["packet"]);
 
   @override
-  Stream<VotingDelegationProgress> crateApiVotingDelegationBuildSubmission(
-      {required String roundId,
-      required int bundleIndex,
-      required List<int> pcztBytes,
-      VotingPirLayout? pirLayout,
-      required String pirServerUrl,
-      required Coin c}) {
+  Stream<VotingDelegationProgress> crateApiVotingDelegationBuildSubmission({
+    required String roundId,
+    required int bundleIndex,
+    required List<int> pcztBytes,
+    VotingPirLayout? pirLayout,
+    required String pirServerUrl,
+    required Coin c,
+  }) {
     final sink = RustStreamSink<VotingDelegationProgress>();
     unawaited(
       handler.executeNormal(
@@ -2067,15 +2513,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           callFfi: (port_) {
             final serializer = SseSerializer(generalizedFrbRustBinding);
             sse_encode_StreamSink_voting_delegation_progress_Sse(
-                sink, serializer);
+              sink,
+              serializer,
+            );
             sse_encode_String(roundId, serializer);
             sse_encode_u_32(bundleIndex, serializer);
             sse_encode_list_prim_u_8_loose(pcztBytes, serializer);
             sse_encode_opt_box_autoadd_voting_pir_layout(pirLayout, serializer);
             sse_encode_String(pirServerUrl, serializer);
             sse_encode_box_autoadd_coin(c, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer,
-                funcId: 37, port: port_);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 37,
+              port: port_,
+            );
           },
           codec: SseCodec(
             decodeSuccessData: sse_decode_voting_delegation_build,
@@ -2089,7 +2541,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pcztBytes,
             pirLayout,
             pirServerUrl,
-            c
+            c,
           ],
           apiImpl: this,
         ),
@@ -2108,17 +2560,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "pcztBytes",
           "pirLayout",
           "pirServerUrl",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<VotingDelegationConfirmation> crateApiVotingDelegationConfirm(
-      {required String roundId,
-      required int bundleIndex,
-      required String txHash,
-      required String eventsJson,
-      required Coin c}) {
+  Future<VotingDelegationConfirmation> crateApiVotingDelegationConfirm({
+    required String roundId,
+    required int bundleIndex,
+    required String txHash,
+    required String eventsJson,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2128,8 +2581,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(txHash, serializer);
           sse_encode_String(eventsJson, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 38, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 38,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_delegation_confirmation,
@@ -2149,11 +2606,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiVotingDelegationMarkSubmitted(
-      {required String roundId,
-      required int bundleIndex,
-      required String txHash,
-      required Coin c}) {
+  Future<void> crateApiVotingDelegationMarkSubmitted({
+    required String roundId,
+    required int bundleIndex,
+    required String txHash,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2162,8 +2620,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(bundleIndex, serializer);
           sse_encode_String(txHash, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 39, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 39,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2183,14 +2645,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingPreparedInfo> crateApiVotingDelegationPrepare(
-      {required String roundParamsJson,
-      required String roundName,
-      String? sessionJson,
-      required int bundleIndex,
-      int? maxRealNotesPerBundle,
-      required String lightwalletdUrl,
-      required Coin c}) {
+  Future<VotingPreparedInfo> crateApiVotingDelegationPrepare({
+    required String roundParamsJson,
+    required String roundName,
+    String? sessionJson,
+    required int bundleIndex,
+    int? maxRealNotesPerBundle,
+    required String lightwalletdUrl,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2202,8 +2665,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_opt_box_autoadd_u_32(maxRealNotesPerBundle, serializer);
           sse_encode_String(lightwalletdUrl, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 40, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 40,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_prepared_info,
@@ -2217,7 +2684,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           bundleIndex,
           maxRealNotesPerBundle,
           lightwalletdUrl,
-          c
+          c,
         ],
         apiImpl: this,
       ),
@@ -2234,17 +2701,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "bundleIndex",
           "maxRealNotesPerBundle",
           "lightwalletdUrl",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<VotingPreparedInfo> crateApiVotingDelegationPrepareResume(
-      {required String roundId,
-      required int bundleIndex,
-      int? maxRealNotesPerBundle,
-      String? lightwalletdUrl,
-      required Coin c}) {
+  Future<VotingPreparedInfo> crateApiVotingDelegationPrepareResume({
+    required String roundId,
+    required int bundleIndex,
+    int? maxRealNotesPerBundle,
+    String? lightwalletdUrl,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2254,8 +2722,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_opt_box_autoadd_u_32(maxRealNotesPerBundle, serializer);
           sse_encode_opt_String(lightwalletdUrl, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 41, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 41,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_prepared_info,
@@ -2267,7 +2739,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           bundleIndex,
           maxRealNotesPerBundle,
           lightwalletdUrl,
-          c
+          c,
         ],
         apiImpl: this,
       ),
@@ -2282,13 +2754,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "bundleIndex",
           "maxRealNotesPerBundle",
           "lightwalletdUrl",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<VotingDelegationSetup> crateApiVotingDelegationSetup(
-      {required String roundId, required int bundleIndex, required Coin c}) {
+  Future<VotingDelegationSetup> crateApiVotingDelegationSetup({
+    required String roundId,
+    required int bundleIndex,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2296,8 +2771,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(roundId, serializer);
           sse_encode_u_32(bundleIndex, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 42, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 42,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_delegation_setup,
@@ -2317,13 +2796,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingDelegationSubmission> crateApiVotingDelegationSignAndSubmit(
-      {required String roundId,
-      required int bundleIndex,
-      required List<int> pcztBytes,
-      required VotingPirLayout pirLayout,
-      required String pirServerUrl,
-      required Coin c}) {
+  Future<VotingDelegationSubmission> crateApiVotingDelegationSignAndSubmit({
+    required String roundId,
+    required int bundleIndex,
+    required List<int> pcztBytes,
+    required VotingPirLayout pirLayout,
+    required String pirServerUrl,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2334,8 +2814,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_box_autoadd_voting_pir_layout(pirLayout, serializer);
           sse_encode_String(pirServerUrl, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 43, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 43,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_delegation_submission,
@@ -2348,7 +2832,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pcztBytes,
           pirLayout,
           pirServerUrl,
-          c
+          c,
         ],
         apiImpl: this,
       ),
@@ -2364,13 +2848,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "pcztBytes",
           "pirLayout",
           "pirServerUrl",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<String?> crateApiVotingDelegationTxHash(
-      {required String roundId, required int bundleIndex, required Coin c}) {
+  Future<String?> crateApiVotingDelegationTxHash({
+    required String roundId,
+    required int bundleIndex,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2378,8 +2865,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(roundId, serializer);
           sse_encode_u_32(bundleIndex, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 44, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 44,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_String,
@@ -2399,8 +2890,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String?> crateApiVotingDelegationWireJson(
-      {required String roundId, required int bundleIndex, required Coin c}) {
+  Future<String?> crateApiVotingDelegationWireJson({
+    required String roundId,
+    required int bundleIndex,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2408,8 +2902,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(roundId, serializer);
           sse_encode_u_32(bundleIndex, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 45, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 45,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_String,
@@ -2429,16 +2927,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiAccountDeleteAccount(
-      {required int account, required Coin c}) {
+  Future<void> crateApiAccountDeleteAccount({
+    required int account,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(account, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 46, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 46,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2458,16 +2962,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiAccountDeleteCategories(
-      {required List<int> ids, required Coin c}) {
+  Future<void> crateApiAccountDeleteCategories({
+    required List<int> ids,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_32_loose(ids, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 47, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 47,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2487,16 +2997,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiContactsDeleteContacts(
-      {required List<int> ids, required Coin c}) {
+  Future<void> crateApiContactsDeleteContacts({
+    required List<int> ids,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_32_loose(ids, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 48, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 48,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2510,22 +3026,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiContactsDeleteContactsConstMeta =>
-      const TaskConstMeta(
-        debugName: "delete_contacts",
-        argNames: ["ids", "c"],
-      );
+      const TaskConstMeta(debugName: "delete_contacts", argNames: ["ids", "c"]);
 
   @override
-  Future<void> crateApiAccountDeleteFolders(
-      {required List<int> ids, required Coin c}) {
+  Future<void> crateApiAccountDeleteFolders({
+    required List<int> ids,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_32_loose(ids, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 49, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 49,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2539,10 +3058,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountDeleteFoldersConstMeta =>
-      const TaskConstMeta(
-        debugName: "delete_folders",
-        argNames: ["ids", "c"],
-      );
+      const TaskConstMeta(debugName: "delete_folders", argNames: ["ids", "c"]);
 
   @override
   Stream<DKGStatus> crateApiFrostDoDkg({required Coin c}) {
@@ -2554,8 +3070,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             final serializer = SseSerializer(generalizedFrbRustBinding);
             sse_encode_StreamSink_dkg_status_Sse(status, serializer);
             sse_encode_box_autoadd_coin(c, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer,
-                funcId: 50, port: port_);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 50,
+              port: port_,
+            );
           },
           codec: SseCodec(
             decodeSuccessData: sse_decode_unit,
@@ -2570,10 +3090,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return status.stream;
   }
 
-  TaskConstMeta get kCrateApiFrostDoDkgConstMeta => const TaskConstMeta(
-        debugName: "do_dkg",
-        argNames: ["status", "c"],
-      );
+  TaskConstMeta get kCrateApiFrostDoDkgConstMeta =>
+      const TaskConstMeta(debugName: "do_dkg", argNames: ["status", "c"]);
 
   @override
   Stream<SigningStatus> crateApiFrostDoSign({required Coin c}) {
@@ -2585,8 +3103,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             final serializer = SseSerializer(generalizedFrbRustBinding);
             sse_encode_StreamSink_signing_status_Sse(status, serializer);
             sse_encode_box_autoadd_coin(c, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer,
-                funcId: 51, port: port_);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 51,
+              port: port_,
+            );
           },
           codec: SseCodec(
             decodeSuccessData: sse_decode_unit,
@@ -2601,10 +3123,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return status.stream;
   }
 
-  TaskConstMeta get kCrateApiFrostDoSignConstMeta => const TaskConstMeta(
-        debugName: "do_sign",
-        argNames: ["status", "c"],
-      );
+  TaskConstMeta get kCrateApiFrostDoSignConstMeta =>
+      const TaskConstMeta(debugName: "do_sign", argNames: ["status", "c"]);
 
   @override
   Future<void> crateApiSaplingDownloadSaplingParams() {
@@ -2612,8 +3132,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 52, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 52,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2627,10 +3151,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiSaplingDownloadSaplingParamsConstMeta =>
-      const TaskConstMeta(
-        debugName: "download_sapling_params",
-        argNames: [],
-      );
+      const TaskConstMeta(debugName: "download_sapling_params", argNames: []);
 
   @override
   Future<void> crateApiAccountDummyExport({required SigningEvent a}) {
@@ -2639,8 +3160,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_signing_event(a, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 53, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 53,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2653,22 +3178,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiAccountDummyExportConstMeta => const TaskConstMeta(
-        debugName: "dummy_export",
-        argNames: ["a"],
-      );
+  TaskConstMeta get kCrateApiAccountDummyExportConstMeta =>
+      const TaskConstMeta(debugName: "dummy_export", argNames: ["a"]);
 
   @override
-  Future<List<Uint8List>> crateApiRaptorEncode(
-      {required String path, required RaptorQParams params}) {
+  Future<List<Uint8List>> crateApiRaptorEncode({
+    required String path,
+    required RaptorQParams params,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(path, serializer);
           sse_encode_box_autoadd_raptor_q_params(params, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 54, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 54,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_list_prim_u_8_strict,
@@ -2681,10 +3210,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiRaptorEncodeConstMeta => const TaskConstMeta(
-        debugName: "encode",
-        argNames: ["path", "params"],
-      );
+  TaskConstMeta get kCrateApiRaptorEncodeConstMeta =>
+      const TaskConstMeta(debugName: "encode", argNames: ["path", "params"]);
 
   @override
   Future<void> crateApiRaptorEndDecode() {
@@ -2692,8 +3219,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 55, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 55,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2706,14 +3237,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiRaptorEndDecodeConstMeta => const TaskConstMeta(
-        debugName: "end_decode",
-        argNames: [],
-      );
+  TaskConstMeta get kCrateApiRaptorEndDecodeConstMeta =>
+      const TaskConstMeta(debugName: "end_decode", argNames: []);
 
   @override
-  Future<Uint8List> crateApiAccountExportAccount(
-      {required int id, required String passphrase, required Coin c}) {
+  Future<Uint8List> crateApiAccountExportAccount({
+    required int id,
+    required String passphrase,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2721,8 +3253,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(id, serializer);
           sse_encode_String(passphrase, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 56, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 56,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -2748,8 +3284,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 57, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 57,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -2763,21 +3303,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiContactsExportContactsVcardConstMeta =>
-      const TaskConstMeta(
-        debugName: "export_contacts_vcard",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "export_contacts_vcard", argNames: ["c"]);
 
   @override
-  Future<Uint8List> crateApiPayExtractTransaction(
-      {required PcztPackage package}) {
+  Future<Uint8List> crateApiPayExtractTransaction({
+    required PcztPackage package,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_pczt_package(package, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 58, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 58,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -2797,8 +3339,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<TAddressTxCount>> crateApiAccountFetchAddressTxCount(
-      {required Coin c, required bool aggregate, required int poolFilter}) {
+  Future<List<TAddressTxCount>> crateApiAccountFetchAddressTxCount({
+    required Coin c,
+    required bool aggregate,
+    required int poolFilter,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2806,8 +3351,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_box_autoadd_coin(c, serializer);
           sse_encode_bool(aggregate, serializer);
           sse_encode_u_8(poolFilter, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 59, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 59,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_t_address_tx_count,
@@ -2827,8 +3376,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<(int, double)>> crateApiTransactionFetchAmounts(
-      {int? from, int? to, required int category, required Coin c}) {
+  Future<List<(int, double)>> crateApiTransactionFetchAmounts({
+    int? from,
+    int? to,
+    required int category,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2837,8 +3390,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_opt_box_autoadd_u_32(to, serializer);
           sse_encode_u_32(category, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 60, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 60,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_record_u_32_f_64,
@@ -2858,8 +3415,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<(String, double, bool)>> crateApiTransactionFetchCategoryAmounts(
-      {int? from, int? to, required Coin c}) {
+  Future<List<(String, double, bool)>> crateApiTransactionFetchCategoryAmounts({
+    int? from,
+    int? to,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2867,8 +3427,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_opt_box_autoadd_u_32(from, serializer);
           sse_encode_opt_box_autoadd_u_32(to, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 61, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 61,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_record_string_f_64_bool,
@@ -2888,15 +3452,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<TAddressTxCount>> crateApiAccountFetchTransparentAddressTxCount(
-      {required Coin c}) {
+  Future<List<TAddressTxCount>> crateApiAccountFetchTransparentAddressTxCount({
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 62, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 62,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_t_address_tx_count,
@@ -2916,16 +3485,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiSyncFetchTxDetails(
-      {required int account, required Coin c}) {
+  Future<void> crateApiSyncFetchTxDetails({
+    required int account,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(account, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 63, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 63,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2939,13 +3514,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiSyncFetchTxDetailsConstMeta => const TaskConstMeta(
-        debugName: "fetch_tx_details",
-        argNames: ["account", "c"],
-      );
+    debugName: "fetch_tx_details",
+    argNames: ["account", "c"],
+  );
 
   @override
-  Future<int> crateApiTransactionFillMissingTxPrices(
-      {required String api, required String currency, required Coin c}) {
+  Future<int> crateApiTransactionFillMissingTxPrices({
+    required String api,
+    required String currency,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2953,8 +3531,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(api, serializer);
           sse_encode_String(currency, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 64, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 64,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_u_32,
@@ -2974,16 +3556,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<ContactMatch>> crateApiContactsFindContactsForAddress(
-      {required String address, required Coin c}) {
+  Future<List<ContactMatch>> crateApiContactsFindContactsForAddress({
+    required String address,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(address, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 65, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 65,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_contact_match,
@@ -3008,8 +3596,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 66, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 66,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_frost_sign_params,
@@ -3023,10 +3615,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiFrostFrostSignParamsDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "frost_sign_params_default",
-        argNames: [],
-      );
+      const TaskConstMeta(debugName: "frost_sign_params_default", argNames: []);
 
   @override
   Future<String?> crateApiAccountGenerateNextChangeAddress({required Coin c}) {
@@ -3035,8 +3624,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 67, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 67,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_String,
@@ -3062,8 +3655,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 68, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 68,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_u_32,
@@ -3077,10 +3674,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountGenerateNextDindexConstMeta =>
-      const TaskConstMeta(
-        debugName: "generate_next_dindex",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "generate_next_dindex", argNames: ["c"]);
 
   @override
   String crateApiKeyGenerateSeed() {
@@ -3101,14 +3695,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiKeyGenerateSeedConstMeta => const TaskConstMeta(
-        debugName: "generate_seed",
-        argNames: [],
-      );
+  TaskConstMeta get kCrateApiKeyGenerateSeedConstMeta =>
+      const TaskConstMeta(debugName: "generate_seed", argNames: []);
 
   @override
-  Future<Addresses> crateApiAccountGetAccountAddresses(
-      {required int account, required int uaPools, required Coin c}) {
+  Future<Addresses> crateApiAccountGetAccountAddresses({
+    required int account,
+    required int uaPools,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -3116,8 +3711,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(account, serializer);
           sse_encode_u_8(uaPools, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 70, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 70,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_addresses,
@@ -3137,16 +3736,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String?> crateApiAccountGetAccountFingerprint(
-      {required int account, required Coin c}) {
+  Future<String?> crateApiAccountGetAccountFingerprint({
+    required int account,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(account, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 71, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 71,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_String,
@@ -3172,8 +3777,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 72, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 72,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_frost_params,
@@ -3193,16 +3802,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<int> crateApiAccountGetAccountPools(
-      {required int account, required Coin c}) {
+  Future<int> crateApiAccountGetAccountPools({
+    required int account,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(account, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 73, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 73,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_u_8,
@@ -3222,16 +3837,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Seed?> crateApiAccountGetAccountSeed(
-      {required int account, required Coin c}) {
+  Future<Seed?> crateApiAccountGetAccountSeed({
+    required int account,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(account, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 74, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 74,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_seed,
@@ -3251,8 +3872,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String> crateApiAccountGetAccountUfvk(
-      {required int account, required int pools, required Coin c}) {
+  Future<String> crateApiAccountGetAccountUfvk({
+    required int account,
+    required int pools,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -3260,8 +3884,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(account, serializer);
           sse_encode_u_8(pools, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 75, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 75,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -3281,16 +3909,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Addresses> crateApiAccountGetAddresses(
-      {required int uaPools, required Coin c}) {
+  Future<Addresses> crateApiAccountGetAddresses({
+    required int uaPools,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_8(uaPools, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 76, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 76,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_addresses,
@@ -3310,16 +3944,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<double> crateApiNetworkGetCoingeckoPrice(
-      {required String api, required String currency}) {
+  Future<double> crateApiNetworkGetCoingeckoPrice({
+    required String api,
+    required String currency,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(api, serializer);
           sse_encode_String(currency, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 77, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 77,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_f_64,
@@ -3345,8 +3985,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 78, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 78,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_u_32,
@@ -3360,10 +4004,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiNetworkGetCurrentHeightConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_current_height",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "get_current_height", argNames: ["c"]);
 
   @override
   Future<SyncHeight> crateApiSyncGetDbHeight({required Coin c}) {
@@ -3372,8 +4013,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 79, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 79,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_sync_height,
@@ -3386,10 +4031,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiSyncGetDbHeightConstMeta => const TaskConstMeta(
-        debugName: "get_db_height",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiSyncGetDbHeightConstMeta =>
+      const TaskConstMeta(debugName: "get_db_height", argNames: ["c"]);
 
   @override
   Future<List<String>> crateApiFrostGetDkgAddresses({required Coin c}) {
@@ -3398,8 +4041,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 80, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 80,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_String,
@@ -3413,16 +4060,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiFrostGetDkgAddressesConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_dkg_addresses",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "get_dkg_addresses", argNames: ["c"]);
 
   @override
-  Future<ExchangeRate> crateApiNetworkGetExchangeRate(
-      {required String api,
-      required String fromCurrency,
-      required String toCurrency}) {
+  Future<ExchangeRate> crateApiNetworkGetExchangeRate({
+    required String api,
+    required String fromCurrency,
+    required String toCurrency,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -3430,8 +4075,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(api, serializer);
           sse_encode_String(fromCurrency, serializer);
           sse_encode_String(toCurrency, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 81, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 81,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_exchange_rate,
@@ -3451,16 +4100,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String> crateApiAccountGetExportedData(
-      {required int type, required Coin c}) {
+  Future<String> crateApiAccountGetExportedData({
+    required int type,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_8(type, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 82, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 82,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -3500,22 +4155,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiKeyGetKeyPoolsConstMeta => const TaskConstMeta(
-        debugName: "get_key_pools",
-        argNames: ["key", "c"],
-      );
+  TaskConstMeta get kCrateApiKeyGetKeyPoolsConstMeta =>
+      const TaskConstMeta(debugName: "get_key_pools", argNames: ["key", "c"]);
 
   @override
-  Future<Uint8List> crateApiMempoolGetMempoolTx(
-      {required String txId, required Coin c}) {
+  Future<Uint8List> crateApiMempoolGetMempoolTx({
+    required String txId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(txId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 84, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 84,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -3529,10 +4188,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiMempoolGetMempoolTxConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_mempool_tx",
-        argNames: ["txId", "c"],
-      );
+      const TaskConstMeta(debugName: "get_mempool_tx", argNames: ["txId", "c"]);
 
   @override
   Future<MigrationStatus> crateApiMigrateGetMigrationStatus({required Coin c}) {
@@ -3541,8 +4197,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 85, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 85,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_migration_status,
@@ -3556,10 +4216,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiMigrateGetMigrationStatusConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_migration_status",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "get_migration_status", argNames: ["c"]);
 
   @override
   Future<String> crateApiNetworkGetNetworkName({required Coin c}) {
@@ -3568,8 +4225,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 86, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 86,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -3583,10 +4244,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiNetworkGetNetworkNameConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_network_name",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "get_network_name", argNames: ["c"]);
 
   @override
   Future<String?> crateApiDbGetProp({required String key, required Coin c}) {
@@ -3596,8 +4254,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(key, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 87, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 87,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_String,
@@ -3610,10 +4272,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiDbGetPropConstMeta => const TaskConstMeta(
-        debugName: "get_prop",
-        argNames: ["key", "c"],
-      );
+  TaskConstMeta get kCrateApiDbGetPropConstMeta =>
+      const TaskConstMeta(debugName: "get_prop", argNames: ["key", "c"]);
 
   @override
   Uint8List crateApiRaptorGetQrBytes({required List<int> data}) {
@@ -3635,21 +4295,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiRaptorGetQrBytesConstMeta => const TaskConstMeta(
-        debugName: "get_qr_bytes",
-        argNames: ["data"],
-      );
+  TaskConstMeta get kCrateApiRaptorGetQrBytesConstMeta =>
+      const TaskConstMeta(debugName: "get_qr_bytes", argNames: ["data"]);
 
   @override
-  Future<List<String>> crateApiNetworkGetSupportedVsCurrencies(
-      {required String api}) {
+  Future<List<String>> crateApiNetworkGetSupportedVsCurrencies({
+    required String api,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(api, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 89, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 89,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_String,
@@ -3674,8 +4337,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 90, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 90,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -3688,22 +4355,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiCoinGetTorClientConstMeta => const TaskConstMeta(
-        debugName: "get_tor_client",
-        argNames: [],
-      );
+  TaskConstMeta get kCrateApiCoinGetTorClientConstMeta =>
+      const TaskConstMeta(debugName: "get_tor_client", argNames: []);
 
   @override
-  Future<TxAccount> crateApiAccountGetTxDetails(
-      {required int idTx, required Coin c}) {
+  Future<TxAccount> crateApiAccountGetTxDetails({
+    required int idTx,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(idTx, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 91, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 91,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_tx_account,
@@ -3717,10 +4388,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountGetTxDetailsConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_tx_details",
-        argNames: ["idTx", "c"],
-      );
+      const TaskConstMeta(debugName: "get_tx_details", argNames: ["idTx", "c"]);
 
   @override
   Future<bool> crateApiFrostHasDkgAddresses({required Coin c}) {
@@ -3729,8 +4397,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 92, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 92,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -3744,10 +4416,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiFrostHasDkgAddressesConstMeta =>
-      const TaskConstMeta(
-        debugName: "has_dkg_addresses",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "has_dkg_addresses", argNames: ["c"]);
 
   @override
   Future<bool> crateApiFrostHasDkgParams({required Coin c}) {
@@ -3756,8 +4425,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 93, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 93,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -3770,10 +4443,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiFrostHasDkgParamsConstMeta => const TaskConstMeta(
-        debugName: "has_dkg_params",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiFrostHasDkgParamsConstMeta =>
+      const TaskConstMeta(debugName: "has_dkg_params", argNames: ["c"]);
 
   @override
   Future<bool> crateApiAccountHasTransparentPubKey({required Coin c}) {
@@ -3782,8 +4453,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 94, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 94,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -3803,8 +4478,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiAccountImportAccount(
-      {required String passphrase, required List<int> data, required Coin c}) {
+  Future<void> crateApiAccountImportAccount({
+    required String passphrase,
+    required List<int> data,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -3812,8 +4490,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(passphrase, serializer);
           sse_encode_list_prim_u_8_loose(data, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 95, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 95,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -3833,16 +4515,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<Contact>> crateApiContactsImportContactsVcard(
-      {required String vcardData, required Coin c}) {
+  Future<List<Contact>> crateApiContactsImportContactsVcard({
+    required String vcardData,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(vcardData, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 96, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 96,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_contact,
@@ -3867,8 +4555,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 97, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 97,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -3881,10 +4573,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiInitInitAppConstMeta => const TaskConstMeta(
-        debugName: "init_app",
-        argNames: [],
-      );
+  TaskConstMeta get kCrateApiInitInitAppConstMeta =>
+      const TaskConstMeta(debugName: "init_app", argNames: []);
 
   @override
   Future<void> crateApiRaptorInitApp() {
@@ -3892,8 +4582,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 98, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 98,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -3906,10 +4600,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiRaptorInitAppConstMeta => const TaskConstMeta(
-        debugName: "init_app",
-        argNames: [],
-      );
+  TaskConstMeta get kCrateApiRaptorInitAppConstMeta =>
+      const TaskConstMeta(debugName: "init_app", argNames: []);
 
   @override
   Future<void> crateApiCoinInitDatadir({required String directory}) {
@@ -3918,8 +4610,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(directory, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 99, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 99,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -3932,10 +4628,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiCoinInitDatadirConstMeta => const TaskConstMeta(
-        debugName: "init_datadir",
-        argNames: ["directory"],
-      );
+  TaskConstMeta get kCrateApiCoinInitDatadirConstMeta =>
+      const TaskConstMeta(debugName: "init_datadir", argNames: ["directory"]);
 
   @override
   Future<void> crateApiNetworkInitDatadir({required String directory}) {
@@ -3944,8 +4638,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(directory, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 100, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 100,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -3958,10 +4656,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiNetworkInitDatadirConstMeta => const TaskConstMeta(
-        debugName: "init_datadir",
-        argNames: ["directory"],
-      );
+  TaskConstMeta get kCrateApiNetworkInitDatadirConstMeta =>
+      const TaskConstMeta(debugName: "init_datadir", argNames: ["directory"]);
 
   @override
   Future<void> crateApiFrostInitDkg({required Coin c}) {
@@ -3970,8 +4666,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 101, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 101,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -3984,10 +4684,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiFrostInitDkgConstMeta => const TaskConstMeta(
-        debugName: "init_dkg",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiFrostInitDkgConstMeta =>
+      const TaskConstMeta(debugName: "init_dkg", argNames: ["c"]);
 
   @override
   void crateApiPluginInitPlugins() {
@@ -3995,8 +4693,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 102)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 102,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -4009,17 +4710,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiPluginInitPluginsConstMeta => const TaskConstMeta(
-        debugName: "init_plugins",
-        argNames: [],
-      );
+  TaskConstMeta get kCrateApiPluginInitPluginsConstMeta =>
+      const TaskConstMeta(debugName: "init_plugins", argNames: []);
 
   @override
-  Future<void> crateApiFrostInitSign(
-      {required int coordinator,
-      required int fundingAccount,
-      required PcztPackage pczt,
-      required Coin c}) {
+  Future<void> crateApiFrostInitSign({
+    required int coordinator,
+    required int fundingAccount,
+    required PcztPackage pczt,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -4028,8 +4728,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(fundingAccount, serializer);
           sse_encode_box_autoadd_pczt_package(pczt, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 103, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 103,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -4043,21 +4747,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiFrostInitSignConstMeta => const TaskConstMeta(
-        debugName: "init_sign",
-        argNames: ["coordinator", "fundingAccount", "pczt", "c"],
-      );
+    debugName: "init_sign",
+    argNames: ["coordinator", "fundingAccount", "pczt", "c"],
+  );
 
   @override
-  Future<DartVault> crateApiVaultInitVault(
-      {required FutureOr<void> Function(Uint8List) append}) {
+  Future<DartVault> crateApiVaultInitVault({
+    required FutureOr<void> Function(Uint8List) append,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_DartFn_Inputs_list_prim_u_8_strict_Output_unit_AnyhowException(
-              append, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 104, port: port_);
+            append,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 104,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -4071,22 +4782,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiVaultInitVaultConstMeta => const TaskConstMeta(
-        debugName: "init_vault",
-        argNames: ["append"],
-      );
+  TaskConstMeta get kCrateApiVaultInitVaultConstMeta =>
+      const TaskConstMeta(debugName: "init_vault", argNames: ["append"]);
 
   @override
-  Future<PluginInfo> crateApiPluginInstallPlugin(
-      {required String url, required Coin c}) {
+  Future<PluginInfo> crateApiPluginInstallPlugin({
+    required String url,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(url, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 105, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 105,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_plugin_info,
@@ -4100,10 +4815,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiPluginInstallPluginConstMeta =>
-      const TaskConstMeta(
-        debugName: "install_plugin",
-        argNames: ["url", "c"],
-      );
+      const TaskConstMeta(debugName: "install_plugin", argNames: ["url", "c"]);
 
   @override
   Future<bool> crateApiNetworkIsIronwoodActive({required Coin c}) {
@@ -4112,8 +4824,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 106, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 106,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -4127,10 +4843,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiNetworkIsIronwoodActiveConstMeta =>
-      const TaskConstMeta(
-        debugName: "is_ironwood_active",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "is_ironwood_active", argNames: ["c"]);
 
   @override
   Future<bool> crateApiFrostIsSigningInProgress({required Coin c}) {
@@ -4139,8 +4852,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 107, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 107,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -4154,10 +4871,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiFrostIsSigningInProgressConstMeta =>
-      const TaskConstMeta(
-        debugName: "is_signing_in_progress",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "is_signing_in_progress", argNames: ["c"]);
 
   @override
   bool crateApiKeyIsTexAddress({required String address, required Coin c}) {
@@ -4167,8 +4881,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(address, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 108)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 108,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -4182,9 +4899,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiKeyIsTexAddressConstMeta => const TaskConstMeta(
-        debugName: "is_tex_address",
-        argNames: ["address", "c"],
-      );
+    debugName: "is_tex_address",
+    argNames: ["address", "c"],
+  );
 
   @override
   bool crateApiKeyIsValidAddress({required String address}) {
@@ -4193,8 +4910,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(address, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 109)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 109,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -4207,10 +4927,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiKeyIsValidAddressConstMeta => const TaskConstMeta(
-        debugName: "is_valid_address",
-        argNames: ["address"],
-      );
+  TaskConstMeta get kCrateApiKeyIsValidAddressConstMeta =>
+      const TaskConstMeta(debugName: "is_valid_address", argNames: ["address"]);
 
   @override
   bool crateApiKeyIsValidFvk({required String fvk, required Coin c}) {
@@ -4220,8 +4938,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(fvk, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 110)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 110,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -4234,10 +4955,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiKeyIsValidFvkConstMeta => const TaskConstMeta(
-        debugName: "is_valid_fvk",
-        argNames: ["fvk", "c"],
-      );
+  TaskConstMeta get kCrateApiKeyIsValidFvkConstMeta =>
+      const TaskConstMeta(debugName: "is_valid_fvk", argNames: ["fvk", "c"]);
 
   @override
   bool crateApiKeyIsValidKey({required String key, required Coin c}) {
@@ -4247,8 +4966,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(key, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 111)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 111,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -4261,10 +4983,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiKeyIsValidKeyConstMeta => const TaskConstMeta(
-        debugName: "is_valid_key",
-        argNames: ["key", "c"],
-      );
+  TaskConstMeta get kCrateApiKeyIsValidKeyConstMeta =>
+      const TaskConstMeta(debugName: "is_valid_key", argNames: ["key", "c"]);
 
   @override
   bool crateApiNetworkIsValidNymUrl({required String url}) {
@@ -4273,8 +4993,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(url, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 112)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 112,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -4288,10 +5011,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiNetworkIsValidNymUrlConstMeta =>
-      const TaskConstMeta(
-        debugName: "is_valid_nym_url",
-        argNames: ["url"],
-      );
+      const TaskConstMeta(debugName: "is_valid_nym_url", argNames: ["url"]);
 
   @override
   bool crateApiKeyIsValidPhrase({required String phrase}) {
@@ -4300,8 +5020,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(phrase, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 113)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 113,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -4314,22 +5037,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiKeyIsValidPhraseConstMeta => const TaskConstMeta(
-        debugName: "is_valid_phrase",
-        argNames: ["phrase"],
-      );
+  TaskConstMeta get kCrateApiKeyIsValidPhraseConstMeta =>
+      const TaskConstMeta(debugName: "is_valid_phrase", argNames: ["phrase"]);
 
   @override
-  bool crateApiKeyIsValidTransparentAddress(
-      {required String address, required Coin c}) {
+  bool crateApiKeyIsValidTransparentAddress({
+    required String address,
+    required Coin c,
+  }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(address, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 114)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 114,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -4355,8 +5081,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 115, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 115,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -4369,20 +5099,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiZsaIsZsaAvailableConstMeta => const TaskConstMeta(
-        debugName: "is_zsa_available",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiZsaIsZsaAvailableConstMeta =>
+      const TaskConstMeta(debugName: "is_zsa_available", argNames: ["c"]);
 
   @override
-  Future<Uint8List> crateApiIssuanceIssueAsset(
-      {required String assetName,
-      required BigInt amount,
-      required bool firstIssuance,
-      required bool finalize,
-      Uint8List? descHash,
-      required int idAccount,
-      required Coin c}) {
+  Future<Uint8List> crateApiIssuanceIssueAsset({
+    required String assetName,
+    required BigInt amount,
+    required bool firstIssuance,
+    required bool finalize,
+    Uint8List? descHash,
+    required int idAccount,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -4394,8 +5123,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_opt_list_prim_u_8_strict(descHash, serializer);
           sse_encode_u_32(idAccount, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 116, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 116,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -4409,7 +5142,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           finalize,
           descHash,
           idAccount,
-          c
+          c,
         ],
         apiImpl: this,
       ),
@@ -4417,16 +5150,137 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiIssuanceIssueAssetConstMeta => const TaskConstMeta(
-        debugName: "issue_asset",
-        argNames: [
-          "assetName",
-          "amount",
-          "firstIssuance",
-          "finalize",
-          "descHash",
-          "idAccount",
-          "c"
-        ],
+    debugName: "issue_asset",
+    argNames: [
+      "assetName",
+      "amount",
+      "firstIssuance",
+      "finalize",
+      "descHash",
+      "idAccount",
+      "c",
+    ],
+  );
+
+  @override
+  Future<String> crateApiLedgerLedgerAppVersion({
+    required FutureOr<Uint8List> Function(Uint8List) exchange,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_DartFn_Inputs_list_prim_u_8_strict_Output_list_prim_u_8_strict_AnyhowException(
+            exchange,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 117,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiLedgerLedgerAppVersionConstMeta,
+        argValues: [exchange],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLedgerLedgerAppVersionConstMeta =>
+      const TaskConstMeta(
+        debugName: "ledger_app_version",
+        argNames: ["exchange"],
+      );
+
+  @override
+  Future<String> crateApiLedgerLedgerGetUfvk({
+    required int aindex,
+    required Coin c,
+    required FutureOr<Uint8List> Function(Uint8List) exchange,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_32(aindex, serializer);
+          sse_encode_box_autoadd_coin(c, serializer);
+          sse_encode_DartFn_Inputs_list_prim_u_8_strict_Output_list_prim_u_8_strict_AnyhowException(
+            exchange,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 118,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiLedgerLedgerGetUfvkConstMeta,
+        argValues: [aindex, c, exchange],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLedgerLedgerGetUfvkConstMeta =>
+      const TaskConstMeta(
+        debugName: "ledger_get_ufvk",
+        argNames: ["aindex", "c", "exchange"],
+      );
+
+  @override
+  Stream<SigningEvent> crateApiLedgerLedgerSignTransaction({
+    required PcztPackage package,
+    required Coin c,
+    required FutureOr<Uint8List> Function(Uint8List) exchange,
+  }) {
+    final sink = RustStreamSink<SigningEvent>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_StreamSink_signing_event_Sse(sink, serializer);
+            sse_encode_box_autoadd_pczt_package(package, serializer);
+            sse_encode_box_autoadd_coin(c, serializer);
+            sse_encode_DartFn_Inputs_list_prim_u_8_strict_Output_list_prim_u_8_strict_AnyhowException(
+              exchange,
+              serializer,
+            );
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 119,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: sse_decode_AnyhowException,
+          ),
+          constMeta: kCrateApiLedgerLedgerSignTransactionConstMeta,
+          argValues: [sink, package, c, exchange],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiLedgerLedgerSignTransactionConstMeta =>
+      const TaskConstMeta(
+        debugName: "ledger_sign_transaction",
+        argNames: ["sink", "package", "c", "exchange"],
       );
 
   @override
@@ -4436,8 +5290,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 117, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 120,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_account,
@@ -4451,10 +5309,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountListAccountsConstMeta =>
-      const TaskConstMeta(
-        debugName: "list_accounts",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "list_accounts", argNames: ["c"]);
 
   @override
   Future<List<Category>> crateApiAccountListCategories({required Coin c}) {
@@ -4463,8 +5318,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 118, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 121,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_category,
@@ -4478,10 +5337,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountListCategoriesConstMeta =>
-      const TaskConstMeta(
-        debugName: "list_categories",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "list_categories", argNames: ["c"]);
 
   @override
   Future<List<Contact>> crateApiContactsListContacts({required Coin c}) {
@@ -4490,8 +5346,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 119, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 122,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_contact,
@@ -4505,21 +5365,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiContactsListContactsConstMeta =>
-      const TaskConstMeta(
-        debugName: "list_contacts",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "list_contacts", argNames: ["c"]);
 
   @override
-  Future<List<DbAccountPreview>> crateApiDbListDbAccounts(
-      {required String dbFilepath}) {
+  Future<List<DbAccountPreview>> crateApiDbListDbAccounts({
+    required String dbFilepath,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(dbFilepath, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 120, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 123,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_db_account_preview,
@@ -4533,9 +5395,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiDbListDbAccountsConstMeta => const TaskConstMeta(
-        debugName: "list_db_accounts",
-        argNames: ["dbFilepath"],
-      );
+    debugName: "list_db_accounts",
+    argNames: ["dbFilepath"],
+  );
 
   @override
   Future<List<String>> crateApiDbListDbNames({required String dir}) {
@@ -4544,8 +5406,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(dir, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 121, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 124,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_String,
@@ -4558,10 +5424,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiDbListDbNamesConstMeta => const TaskConstMeta(
-        debugName: "list_db_names",
-        argNames: ["dir"],
-      );
+  TaskConstMeta get kCrateApiDbListDbNamesConstMeta =>
+      const TaskConstMeta(debugName: "list_db_names", argNames: ["dir"]);
 
   @override
   Future<List<Folder>> crateApiAccountListFolders({required Coin c}) {
@@ -4570,8 +5434,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 122, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 125,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_folder,
@@ -4584,10 +5452,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiAccountListFoldersConstMeta => const TaskConstMeta(
-        debugName: "list_folders",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiAccountListFoldersConstMeta =>
+      const TaskConstMeta(debugName: "list_folders", argNames: ["c"]);
 
   @override
   Future<List<Memo>> crateApiAccountListMemos({required Coin c}) {
@@ -4596,8 +5462,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 123, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 126,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_memo,
@@ -4610,10 +5480,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiAccountListMemosConstMeta => const TaskConstMeta(
-        debugName: "list_memos",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiAccountListMemosConstMeta =>
+      const TaskConstMeta(debugName: "list_memos", argNames: ["c"]);
 
   @override
   Future<List<TxNote>> crateApiAccountListNotes({required Coin c}) {
@@ -4622,8 +5490,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 124, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 127,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_tx_note,
@@ -4636,10 +5508,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiAccountListNotesConstMeta => const TaskConstMeta(
-        debugName: "list_notes",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiAccountListNotesConstMeta =>
+      const TaskConstMeta(debugName: "list_notes", argNames: ["c"]);
+
+  @override
+  Future<List<String>> crateApiAccountListOwnedAddresses({required Coin c}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_coin(c, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 128,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_String,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiAccountListOwnedAddressesConstMeta,
+        argValues: [c],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAccountListOwnedAddressesConstMeta =>
+      const TaskConstMeta(debugName: "list_owned_addresses", argNames: ["c"]);
 
   @override
   Future<List<PluginInfo>> crateApiPluginListPlugins({required Coin c}) {
@@ -4648,8 +5546,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 125, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 129,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_plugin_info,
@@ -4662,10 +5564,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiPluginListPluginsConstMeta => const TaskConstMeta(
-        debugName: "list_plugins",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiPluginListPluginsConstMeta =>
+      const TaskConstMeta(debugName: "list_plugins", argNames: ["c"]);
 
   @override
   Future<List<Tx>> crateApiAccountListTxHistory({required Coin c}) {
@@ -4674,8 +5574,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 126, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 130,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_tx,
@@ -4689,10 +5593,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountListTxHistoryConstMeta =>
-      const TaskConstMeta(
-        debugName: "list_tx_history",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "list_tx_history", argNames: ["c"]);
 
   @override
   Future<List<ZsaHolding>> crateApiZsaListZsaHoldings({required Coin c}) {
@@ -4701,8 +5602,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 127, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 131,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_zsa_holding,
@@ -4715,14 +5620,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiZsaListZsaHoldingsConstMeta => const TaskConstMeta(
-        debugName: "list_zsa_holdings",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiZsaListZsaHoldingsConstMeta =>
+      const TaskConstMeta(debugName: "list_zsa_holdings", argNames: ["c"]);
 
   @override
-  Future<void> crateApiAccountLockNote(
-      {required int id, required bool locked, required Coin c}) {
+  Future<void> crateApiAccountLockNote({
+    required int id,
+    required bool locked,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -4730,8 +5636,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(id, serializer);
           sse_encode_bool(locked, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 128, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 132,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -4745,13 +5655,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountLockNoteConstMeta => const TaskConstMeta(
-        debugName: "lock_note",
-        argNames: ["id", "locked", "c"],
-      );
+    debugName: "lock_note",
+    argNames: ["id", "locked", "c"],
+  );
 
   @override
-  Future<void> crateApiAccountLockRecentNotes(
-      {required int height, required int threshold, required Coin c}) {
+  Future<void> crateApiAccountLockRecentNotes({
+    required int height,
+    required int threshold,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -4759,8 +5672,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(height, serializer);
           sse_encode_u_32(threshold, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 129, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 133,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -4786,8 +5703,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 130, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 134,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_u_64,
@@ -4801,22 +5722,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountMaxSpendableConstMeta =>
-      const TaskConstMeta(
-        debugName: "max_spendable",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "max_spendable", argNames: ["c"]);
 
   @override
-  Future<int> crateApiAccountNewAccount(
-      {required NewAccount na, required Coin c}) {
+  Future<int> crateApiAccountNewAccount({
+    required NewAccount na,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_new_account(na, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 131, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 135,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_u_32,
@@ -4829,10 +5753,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiAccountNewAccountConstMeta => const TaskConstMeta(
-        debugName: "new_account",
-        argNames: ["na", "c"],
-      );
+  TaskConstMeta get kCrateApiAccountNewAccountConstMeta =>
+      const TaskConstMeta(debugName: "new_account", argNames: ["na", "c"]);
 
   @override
   Future<Uint8List> crateApiPayPackTransaction({required PcztPackage pczt}) {
@@ -4841,8 +5763,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_pczt_package(pczt, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 132, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 136,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -4855,22 +5781,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiPayPackTransactionConstMeta => const TaskConstMeta(
-        debugName: "pack_transaction",
-        argNames: ["pczt"],
-      );
+  TaskConstMeta get kCrateApiPayPackTransactionConstMeta =>
+      const TaskConstMeta(debugName: "pack_transaction", argNames: ["pczt"]);
 
   @override
-  Future<List<MemoSection>> crateApiPluginParseMemoWithPlugins(
-      {required List<int> memoBytes, required Coin c}) {
+  Future<List<MemoSection>> crateApiPluginParseMemoWithPlugins({
+    required List<int> memoBytes,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_8_loose(memoBytes, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 133, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 137,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_memo_section,
@@ -4896,8 +5826,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(uri, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 134)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 138,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_list_recipient,
@@ -4910,16 +5843,174 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiPayParsePaymentUriConstMeta => const TaskConstMeta(
-        debugName: "parse_payment_uri",
-        argNames: ["uri"],
+  TaskConstMeta get kCrateApiPayParsePaymentUriConstMeta =>
+      const TaskConstMeta(debugName: "parse_payment_uri", argNames: ["uri"]);
+
+  @override
+  Future<Uint8List> crateApiPayPcztApplyBatchSignatures({
+    required List<int> original,
+    required List<int> response,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_8_loose(original, serializer);
+          sse_encode_list_prim_u_8_loose(response, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 139,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiPayPcztApplyBatchSignaturesConstMeta,
+        argValues: [original, response],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPayPcztApplyBatchSignaturesConstMeta =>
+      const TaskConstMeta(
+        debugName: "pczt_apply_batch_signatures",
+        argNames: ["original", "response"],
       );
 
   @override
-  Future<PcztPackage> crateApiPayPrepare(
-      {required List<Recipient> recipients,
-      required PaymentOptions options,
-      required Coin c}) {
+  Future<Uint8List> crateApiPayPcztApplyKeystoneSignatures({
+    required List<int> original,
+    required List<int> signed,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_8_loose(original, serializer);
+          sse_encode_list_prim_u_8_loose(signed, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 140,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiPayPcztApplyKeystoneSignaturesConstMeta,
+        argValues: [original, signed],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPayPcztApplyKeystoneSignaturesConstMeta =>
+      const TaskConstMeta(
+        debugName: "pczt_apply_keystone_signatures",
+        argNames: ["original", "signed"],
+      );
+
+  @override
+  Future<Uint8List> crateApiPayPcztFromKeystone({required List<int> pczt}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_8_loose(pczt, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 141,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiPayPcztFromKeystoneConstMeta,
+        argValues: [pczt],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPayPcztFromKeystoneConstMeta =>
+      const TaskConstMeta(debugName: "pczt_from_keystone", argNames: ["pczt"]);
+
+  @override
+  Future<Uint8List> crateApiPayPcztToBatchRequest({
+    required List<Uint8List> pczts,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_list_prim_u_8_strict(pczts, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 142,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiPayPcztToBatchRequestConstMeta,
+        argValues: [pczts],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPayPcztToBatchRequestConstMeta =>
+      const TaskConstMeta(
+        debugName: "pczt_to_batch_request",
+        argNames: ["pczts"],
+      );
+
+  @override
+  Future<Uint8List> crateApiPayPcztToKeystone({required List<int> pczt}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_8_loose(pczt, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 143,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiPayPcztToKeystoneConstMeta,
+        argValues: [pczt],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPayPcztToKeystoneConstMeta =>
+      const TaskConstMeta(debugName: "pczt_to_keystone", argNames: ["pczt"]);
+
+  @override
+  Future<PcztPackage> crateApiPayPrepare({
+    required List<Recipient> recipients,
+    required PaymentOptions options,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -4927,8 +6018,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_recipient(recipients, serializer);
           sse_encode_box_autoadd_payment_options(options, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 135, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 144,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_pczt_package,
@@ -4942,15 +6037,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiPayPrepareConstMeta => const TaskConstMeta(
-        debugName: "prepare",
-        argNames: ["recipients", "options", "c"],
-      );
+    debugName: "prepare",
+    argNames: ["recipients", "options", "c"],
+  );
 
   @override
-  Future<PcztPackage> crateApiPayPrepareMigration(
-      {required List<Recipient> recipients,
-      required int srcPools,
-      required Coin c}) {
+  Future<PcztPackage> crateApiPayPrepareMigration({
+    required List<Recipient> recipients,
+    required int srcPools,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -4958,8 +6054,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_recipient(recipients, serializer);
           sse_encode_u_8(srcPools, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 136, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 145,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_pczt_package,
@@ -4986,8 +6086,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(id, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 137, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 146,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5000,14 +6104,50 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiAccountPrintKeysConstMeta => const TaskConstMeta(
-        debugName: "print_keys",
-        argNames: ["id", "c"],
+  TaskConstMeta get kCrateApiAccountPrintKeysConstMeta =>
+      const TaskConstMeta(debugName: "print_keys", argNames: ["id", "c"]);
+
+  @override
+  Future<PcztPackage> crateApiPayProveAndFinalize({
+    required PcztPackage pczt,
+    required Coin c,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_pczt_package(pczt, serializer);
+          sse_encode_box_autoadd_coin(c, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 147,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_pczt_package,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiPayProveAndFinalizeConstMeta,
+        argValues: [pczt, c],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPayProveAndFinalizeConstMeta =>
+      const TaskConstMeta(
+        debugName: "prove_and_finalize",
+        argNames: ["pczt", "c"],
       );
 
   @override
-  Future<void> crateApiDbPutProp(
-      {required String key, required String value, required Coin c}) {
+  Future<void> crateApiDbPutProp({
+    required String key,
+    required String value,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5015,8 +6155,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(key, serializer);
           sse_encode_String(value, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 138, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 148,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5030,9 +6174,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiDbPutPropConstMeta => const TaskConstMeta(
-        debugName: "put_prop",
-        argNames: ["key", "value", "c"],
-      );
+    debugName: "put_prop",
+    argNames: ["key", "value", "c"],
+  );
 
   @override
   Future<List<LWDInfo>> crateApiNetworkQueryLwdList({required int coin}) {
@@ -5041,8 +6185,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_8(coin, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 139, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 149,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_lwd_info,
@@ -5056,10 +6204,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiNetworkQueryLwdListConstMeta =>
-      const TaskConstMeta(
-        debugName: "query_lwd_list",
-        argNames: ["coin"],
-      );
+      const TaskConstMeta(debugName: "query_lwd_list", argNames: ["coin"]);
 
   @override
   Future<Receivers> crateApiAccountReceiversDefault() {
@@ -5067,8 +6212,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 140, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 150,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_receivers,
@@ -5082,22 +6231,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountReceiversDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "receivers_default",
-        argNames: [],
-      );
+      const TaskConstMeta(debugName: "receivers_default", argNames: []);
 
   @override
-  Receivers crateApiAccountReceiversFromUa(
-      {required String ua, required Coin c}) {
+  Receivers crateApiAccountReceiversFromUa({
+    required String ua,
+    required Coin c,
+  }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(ua, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 141)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 151,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_receivers,
@@ -5117,16 +6268,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiAccountRemoveAccount(
-      {required int accountId, required Coin c}) {
+  Future<void> crateApiAccountRemoveAccount({
+    required int accountId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(accountId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 142, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 152,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5146,16 +6303,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiPluginRemovePlugin(
-      {required String id, required Coin c}) {
+  Future<void> crateApiPluginRemovePlugin({
+    required String id,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(id, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 143, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 153,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5168,22 +6331,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiPluginRemovePluginConstMeta => const TaskConstMeta(
-        debugName: "remove_plugin",
-        argNames: ["id", "c"],
-      );
+  TaskConstMeta get kCrateApiPluginRemovePluginConstMeta =>
+      const TaskConstMeta(debugName: "remove_plugin", argNames: ["id", "c"]);
 
   @override
-  Future<void> crateApiAccountRenameCategory(
-      {required Category category, required Coin c}) {
+  Future<void> crateApiAccountRenameCategory({
+    required Category category,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_category(category, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 144, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 154,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5203,8 +6370,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiAccountRenameFolder(
-      {required int id, required String name, required Coin c}) {
+  Future<void> crateApiAccountRenameFolder({
+    required int id,
+    required String name,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5212,8 +6382,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(id, serializer);
           sse_encode_String(name, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 145, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 155,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5233,8 +6407,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiAccountReorderAccount(
-      {required int oldPosition, required int newPosition, required Coin c}) {
+  Future<void> crateApiAccountReorderAccount({
+    required int oldPosition,
+    required int newPosition,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5242,8 +6419,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(oldPosition, serializer);
           sse_encode_u_32(newPosition, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 146, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 156,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5269,8 +6450,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 147, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 157,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5283,10 +6468,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiFrostResetSignConstMeta => const TaskConstMeta(
-        debugName: "reset_sign",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiFrostResetSignConstMeta =>
+      const TaskConstMeta(debugName: "reset_sign", argNames: ["c"]);
 
   @override
   Future<void> crateApiAccountResetSync({required int id, required Coin c}) {
@@ -5296,8 +6479,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(id, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 148, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 158,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5310,22 +6497,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiAccountResetSyncConstMeta => const TaskConstMeta(
-        debugName: "reset_sync",
-        argNames: ["id", "c"],
-      );
+  TaskConstMeta get kCrateApiAccountResetSyncConstMeta =>
+      const TaskConstMeta(debugName: "reset_sync", argNames: ["id", "c"]);
 
   @override
-  Future<OpenAliasResolution> crateApiOpenaliasResolveOpenalias(
-      {required String alias, required Coin c}) {
+  Future<OpenAliasResolution> crateApiOpenaliasResolveOpenalias({
+    required String alias,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(alias, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 149, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 159,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_open_alias_resolution,
@@ -5345,15 +6536,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<OpenAliasResolution> crateApiOpenaliasResolveOpenaliasAll(
-      {required String alias}) {
+  Future<OpenAliasResolution> crateApiOpenaliasResolveOpenaliasAll({
+    required String alias,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(alias, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 150, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 160,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_open_alias_resolution,
@@ -5373,15 +6569,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<RawOpenAliasResolution> crateApiOpenaliasResolveOpenaliasRaw(
-      {required String alias}) {
+  Future<RawOpenAliasResolution> crateApiOpenaliasResolveOpenaliasRaw({
+    required String alias,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(alias, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 151, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 161,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_raw_open_alias_resolution,
@@ -5401,8 +6602,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiSyncRewindSync(
-      {required int height, required int account, required Coin c}) {
+  Future<void> crateApiSyncRewindSync({
+    required int height,
+    required int account,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5410,8 +6614,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(height, serializer);
           sse_encode_u_32(account, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 152, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 162,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5425,13 +6633,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiSyncRewindSyncConstMeta => const TaskConstMeta(
-        debugName: "rewind_sync",
-        argNames: ["height", "account", "c"],
-      );
+    debugName: "rewind_sync",
+    argNames: ["height", "account", "c"],
+  );
 
   @override
-  Future<String> crateApiPaySend(
-      {required int height, required List<int> data, required Coin c}) {
+  Future<String> crateApiPaySend({
+    required int height,
+    required List<int> data,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5439,8 +6650,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(height, serializer);
           sse_encode_list_prim_u_8_loose(data, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 153, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 163,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -5453,14 +6668,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiPaySendConstMeta => const TaskConstMeta(
-        debugName: "send",
-        argNames: ["height", "data", "c"],
-      );
+  TaskConstMeta get kCrateApiPaySendConstMeta =>
+      const TaskConstMeta(debugName: "send", argNames: ["height", "data", "c"]);
 
   @override
-  Future<void> crateApiZsaSetAssetName(
-      {required PlatformInt64 idAsset, required String name, required Coin c}) {
+  Future<void> crateApiZsaSetAssetName({
+    required PlatformInt64 idAsset,
+    required String name,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5468,8 +6684,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_i_64(idAsset, serializer);
           sse_encode_String(name, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 154, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 164,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5483,13 +6703,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiZsaSetAssetNameConstMeta => const TaskConstMeta(
-        debugName: "set_asset_name",
-        argNames: ["idAsset", "name", "c"],
-      );
+    debugName: "set_asset_name",
+    argNames: ["idAsset", "name", "c"],
+  );
 
   @override
-  Future<void> crateApiFrostSetDkgAddress(
-      {required int id, required String address, required Coin c}) {
+  Future<void> crateApiFrostSetDkgAddress({
+    required int id,
+    required String address,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5497,8 +6720,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_8(id, serializer);
           sse_encode_String(address, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 155, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 165,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5512,18 +6739,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiFrostSetDkgAddressConstMeta => const TaskConstMeta(
-        debugName: "set_dkg_address",
-        argNames: ["id", "address", "c"],
-      );
+    debugName: "set_dkg_address",
+    argNames: ["id", "address", "c"],
+  );
 
   @override
-  Future<void> crateApiFrostSetDkgParams(
-      {required String name,
-      required int id,
-      required int n,
-      required int t,
-      required int fundingAccount,
-      required Coin c}) {
+  Future<void> crateApiFrostSetDkgParams({
+    required String name,
+    required int id,
+    required int n,
+    required int t,
+    required int fundingAccount,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5534,8 +6762,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_8(t, serializer);
           sse_encode_u_32(fundingAccount, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 156, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 166,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5549,9 +6781,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiFrostSetDkgParamsConstMeta => const TaskConstMeta(
-        debugName: "set_dkg_params",
-        argNames: ["name", "id", "n", "t", "fundingAccount", "c"],
-      );
+    debugName: "set_dkg_params",
+    argNames: ["name", "id", "n", "t", "fundingAccount", "c"],
+  );
 
   @override
   void crateApiInitSetExpertMode({required bool enabled}) {
@@ -5560,8 +6792,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_bool(enabled, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 157)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 167,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5574,10 +6809,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiInitSetExpertModeConstMeta => const TaskConstMeta(
-        debugName: "set_expert_mode",
-        argNames: ["enabled"],
-      );
+  TaskConstMeta get kCrateApiInitSetExpertModeConstMeta =>
+      const TaskConstMeta(debugName: "set_expert_mode", argNames: ["enabled"]);
 
   @override
   Stream<LogMessage> crateApiInitSetLogStream() {
@@ -5587,8 +6820,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_StreamSink_log_message_Sse(s, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 158)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 168,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5602,14 +6838,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return s.stream;
   }
 
-  TaskConstMeta get kCrateApiInitSetLogStreamConstMeta => const TaskConstMeta(
-        debugName: "set_log_stream",
-        argNames: ["s"],
-      );
+  TaskConstMeta get kCrateApiInitSetLogStreamConstMeta =>
+      const TaskConstMeta(debugName: "set_log_stream", argNames: ["s"]);
 
   @override
-  Future<void> crateApiPluginSetPluginEnabled(
-      {required String id, required bool enabled, required Coin c}) {
+  Future<void> crateApiPluginSetPluginEnabled({
+    required String id,
+    required bool enabled,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5617,8 +6854,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(id, serializer);
           sse_encode_bool(enabled, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 159, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 169,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5638,8 +6879,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiTransactionSetTxCategory(
-      {required int id, int? category, required Coin c}) {
+  Future<void> crateApiTransactionSetTxCategory({
+    required int id,
+    int? category,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5647,8 +6891,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(id, serializer);
           sse_encode_opt_box_autoadd_u_32(category, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 160, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 170,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5668,8 +6916,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiTransactionSetTxPrice(
-      {required int id, double? price, required Coin c}) {
+  Future<void> crateApiTransactionSetTxPrice({
+    required int id,
+    double? price,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5677,8 +6928,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(id, serializer);
           sse_encode_opt_box_autoadd_f_64(price, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 161, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 171,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5698,8 +6953,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiTransactionSetUserMemo(
-      {required int idTx, String? memo, required Coin c}) {
+  Future<void> crateApiTransactionSetUserMemo({
+    required int idTx,
+    String? memo,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5707,8 +6965,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(idTx, serializer);
           sse_encode_opt_String(memo, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 162, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 172,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5734,8 +6996,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 163, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 173,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -5755,15 +7021,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String> crateApiAccountShowLedgerTransparentAddress(
-      {required Coin c}) {
+  Future<String> crateApiAccountShowLedgerTransparentAddress({
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 164, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 174,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -5783,8 +7054,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Stream<SigningEvent> crateApiAccountSignLedgerTransaction(
-      {required PcztPackage package, required Coin c}) {
+  Stream<SigningEvent> crateApiAccountSignLedgerTransaction({
+    required PcztPackage package,
+    required Coin c,
+  }) {
     final sink = RustStreamSink<SigningEvent>();
     unawaited(
       handler.executeNormal(
@@ -5794,8 +7067,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             sse_encode_StreamSink_signing_event_Sse(sink, serializer);
             sse_encode_box_autoadd_pczt_package(package, serializer);
             sse_encode_box_autoadd_coin(c, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer,
-                funcId: 165, port: port_);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 175,
+              port: port_,
+            );
           },
           codec: SseCodec(
             decodeSuccessData: sse_decode_unit,
@@ -5817,16 +7094,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<PcztPackage> crateApiPaySignTransaction(
-      {required PcztPackage pczt, required Coin c}) {
+  Future<PcztPackage> crateApiPaySignTransaction({
+    required PcztPackage pczt,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_pczt_package(pczt, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 166, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 176,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_pczt_package,
@@ -5840,9 +7123,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiPaySignTransactionConstMeta => const TaskConstMeta(
-        debugName: "sign_transaction",
-        argNames: ["pczt", "c"],
-      );
+    debugName: "sign_transaction",
+    argNames: ["pczt", "c"],
+  );
 
   @override
   Future<MigrationEvent> crateApiMigrateStepMigration({required Coin c}) {
@@ -5851,8 +7134,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 167, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 177,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_migration_event,
@@ -5866,18 +7153,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiMigrateStepMigrationConstMeta =>
-      const TaskConstMeta(
-        debugName: "step_migration",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "step_migration", argNames: ["c"]);
 
   @override
-  Future<void> crateApiPayStorePendingTx(
-      {required int height,
-      required List<int> txid,
-      double? price,
-      int? category,
-      required Coin c}) {
+  Future<void> crateApiPayStorePendingTx({
+    required int height,
+    required List<int> txid,
+    double? price,
+    int? category,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -5887,8 +7172,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_opt_box_autoadd_f_64(price, serializer);
           sse_encode_opt_box_autoadd_u_32(category, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 168, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 178,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -5902,19 +7191,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiPayStorePendingTxConstMeta => const TaskConstMeta(
-        debugName: "store_pending_tx",
-        argNames: ["height", "txid", "price", "category", "c"],
-      );
+    debugName: "store_pending_tx",
+    argNames: ["height", "txid", "price", "category", "c"],
+  );
 
   @override
-  Stream<SyncProgress> crateApiSyncSynchronize(
-      {required List<int> accounts,
-      required int currentHeight,
-      required int actionsPerSync,
-      required int transparentLimit,
-      required int checkpointAge,
-      required bool fast,
-      required Coin c}) {
+  Stream<SyncProgress> crateApiSyncSynchronize({
+    required List<int> accounts,
+    required int currentHeight,
+    required int actionsPerSync,
+    required int transparentLimit,
+    required int checkpointAge,
+    required bool fast,
+    required Coin c,
+  }) {
     final progress = RustStreamSink<SyncProgress>();
     unawaited(
       handler.executeNormal(
@@ -5929,8 +7219,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             sse_encode_u_32(checkpointAge, serializer);
             sse_encode_bool(fast, serializer);
             sse_encode_box_autoadd_coin(c, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer,
-                funcId: 169, port: port_);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 179,
+              port: port_,
+            );
           },
           codec: SseCodec(
             decodeSuccessData: sse_decode_u_32,
@@ -5945,7 +7239,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             transparentLimit,
             checkpointAge,
             fast,
-            c
+            c,
           ],
           apiImpl: this,
         ),
@@ -5955,18 +7249,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiSyncSynchronizeConstMeta => const TaskConstMeta(
-        debugName: "synchronize",
-        argNames: [
-          "progress",
-          "accounts",
-          "currentHeight",
-          "actionsPerSync",
-          "transparentLimit",
-          "checkpointAge",
-          "fast",
-          "c"
-        ],
-      );
+    debugName: "synchronize",
+    argNames: [
+      "progress",
+      "accounts",
+      "currentHeight",
+      "actionsPerSync",
+      "transparentLimit",
+      "checkpointAge",
+      "fast",
+      "c",
+    ],
+  );
 
   @override
   TxPlan crateApiPayToPlan({required PcztPackage package, required Coin c}) {
@@ -5976,8 +7270,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_pczt_package(package, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 170)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 180,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_tx_plan,
@@ -5990,10 +7287,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiPayToPlanConstMeta => const TaskConstMeta(
-        debugName: "to_plan",
-        argNames: ["package", "c"],
-      );
+  TaskConstMeta get kCrateApiPayToPlanConstMeta =>
+      const TaskConstMeta(debugName: "to_plan", argNames: ["package", "c"]);
 
   @override
   Future<void> crateApiAccountToggleAllNotes({required Coin c}) {
@@ -6002,8 +7297,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 171, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 181,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -6017,22 +7316,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountToggleAllNotesConstMeta =>
-      const TaskConstMeta(
-        debugName: "toggle_all_notes",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "toggle_all_notes", argNames: ["c"]);
 
   @override
-  void crateApiOpenaliasTryValidateZcashAddress(
-      {required String address, required Coin c}) {
+  void crateApiOpenaliasTryValidateZcashAddress({
+    required String address,
+    required Coin c,
+  }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(address, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 172)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 182,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -6057,8 +7358,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 173, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 183,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_tx_account,
@@ -6072,10 +7377,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountTxAccountDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "tx_account_default",
-        argNames: [],
-      );
+      const TaskConstMeta(debugName: "tx_account_default", argNames: []);
 
   @override
   Future<TxMemo> crateApiAccountTxMemoDefault() {
@@ -6083,8 +7385,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 174, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 184,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_tx_memo,
@@ -6098,10 +7404,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountTxMemoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "tx_memo_default",
-        argNames: [],
-      );
+      const TaskConstMeta(debugName: "tx_memo_default", argNames: []);
 
   @override
   Future<TxNote> crateApiAccountTxNoteDefault() {
@@ -6109,8 +7412,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 175, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 185,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_tx_note,
@@ -6124,10 +7431,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountTxNoteDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "tx_note_default",
-        argNames: [],
-      );
+      const TaskConstMeta(debugName: "tx_note_default", argNames: []);
 
   @override
   Future<TxOutput> crateApiAccountTxOutputDefault() {
@@ -6135,8 +7439,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 176, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 186,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_tx_output,
@@ -6150,10 +7458,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountTxOutputDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "tx_output_default",
-        argNames: [],
-      );
+      const TaskConstMeta(debugName: "tx_output_default", argNames: []);
 
   @override
   Future<TxSpend> crateApiAccountTxSpendDefault() {
@@ -6161,8 +7466,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 177, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 187,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_tx_spend,
@@ -6176,14 +7485,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountTxSpendDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "tx_spend_default",
-        argNames: [],
-      );
+      const TaskConstMeta(debugName: "tx_spend_default", argNames: []);
 
   @override
-  String crateApiAccountUaFromUfvk(
-      {required String ufvk, int? di, required Coin c}) {
+  String crateApiAccountUaFromUfvk({
+    required String ufvk,
+    int? di,
+    required Coin c,
+  }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
@@ -6191,8 +7500,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(ufvk, serializer);
           sse_encode_opt_box_autoadd_u_32(di, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 178)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 188,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -6206,8 +7518,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountUaFromUfvkConstMeta => const TaskConstMeta(
-        debugName: "ua_from_ufvk",
-        argNames: ["ufvk", "di", "c"],
+    debugName: "ua_from_ufvk",
+    argNames: ["ufvk", "di", "c"],
+  );
+
+  @override
+  String crateApiLedgerUfvkDefaultAddress({
+    required String ufvk,
+    required Coin c,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(ufvk, serializer);
+          sse_encode_box_autoadd_coin(c, serializer);
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 189,
+          )!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiLedgerUfvkDefaultAddressConstMeta,
+        argValues: [ufvk, c],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLedgerUfvkDefaultAddressConstMeta =>
+      const TaskConstMeta(
+        debugName: "ufvk_default_address",
+        argNames: ["ufvk", "c"],
       );
 
   @override
@@ -6217,8 +7563,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 179, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 190,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -6232,10 +7582,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiAccountUnlockAllNotesConstMeta =>
-      const TaskConstMeta(
-        debugName: "unlock_all_notes",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "unlock_all_notes", argNames: ["c"]);
 
   @override
   Future<PcztPackage> crateApiPayUnpackTransaction({required List<int> bytes}) {
@@ -6244,8 +7591,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_8_loose(bytes, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 180, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 191,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_pczt_package,
@@ -6259,22 +7610,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiPayUnpackTransactionConstMeta =>
-      const TaskConstMeta(
-        debugName: "unpack_transaction",
-        argNames: ["bytes"],
-      );
+      const TaskConstMeta(debugName: "unpack_transaction", argNames: ["bytes"]);
 
   @override
-  Future<void> crateApiAccountUpdateAccount(
-      {required AccountUpdate update, required Coin c}) {
+  Future<void> crateApiAccountUpdateAccount({
+    required AccountUpdate update,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_account_update(update, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 181, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 192,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -6294,12 +7648,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiContactsUpdateContact(
-      {required int id,
-      String? name,
-      List<String>? addresses,
-      String? notes,
-      required Coin c}) {
+  Future<void> crateApiContactsUpdateContact({
+    required int id,
+    String? name,
+    List<String>? addresses,
+    String? notes,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6309,8 +7664,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_opt_list_String(addresses, serializer);
           sse_encode_opt_String(notes, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 182, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 193,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -6330,10 +7689,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiTransactionUpdateHistoricalPrices(
-      {required String currency,
-      required double exchangeRate,
-      required Coin c}) {
+  Future<void> crateApiTransactionUpdateHistoricalPrices({
+    required String currency,
+    required double exchangeRate,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6341,8 +7701,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(currency, serializer);
           sse_encode_f_64(exchangeRate, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 183, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 194,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -6368,8 +7732,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(alias, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 184)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 195,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -6389,16 +7756,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  bool crateApiOpenaliasValidateZcashAddress(
-      {required String address, required Coin c}) {
+  bool crateApiOpenaliasValidateZcashAddress({
+    required String address,
+    required Coin c,
+  }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(address, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 185)!;
+          return pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 196,
+          )!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -6418,16 +7790,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingChainResponse> crateApiVotingVotechainListRounds(
-      {required String baseUrl, required Coin c}) {
+  Future<VotingChainResponse> crateApiVotingVotechainListRounds({
+    required String baseUrl,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(baseUrl, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 186, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 197,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_chain_response,
@@ -6447,10 +7825,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingChainResponse> crateApiVotingVotechainResubmitShare(
-      {required String serverUrl,
-      required String payloadJson,
-      required Coin c}) {
+  Future<VotingChainResponse> crateApiVotingVotechainResubmitShare({
+    required String serverUrl,
+    required String payloadJson,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6458,8 +7837,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(serverUrl, serializer);
           sse_encode_String(payloadJson, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 187, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 198,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_chain_response,
@@ -6479,8 +7862,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingChainResponse> crateApiVotingVotechainRoundStatus(
-      {required String baseUrl, required String roundId, required Coin c}) {
+  Future<VotingChainResponse> crateApiVotingVotechainRoundStatus({
+    required String baseUrl,
+    required String roundId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6488,8 +7874,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(baseUrl, serializer);
           sse_encode_String(roundId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 188, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 199,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_chain_response,
@@ -6509,8 +7899,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingChainResponse> crateApiVotingVotechainRoundTally(
-      {required String baseUrl, required String roundId, required Coin c}) {
+  Future<VotingChainResponse> crateApiVotingVotechainRoundTally({
+    required String baseUrl,
+    required String roundId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6518,8 +7911,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(baseUrl, serializer);
           sse_encode_String(roundId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 189, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 200,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_chain_response,
@@ -6539,11 +7936,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingChainResponse> crateApiVotingVotechainShareStatus(
-      {required String serverUrl,
-      required String roundId,
-      required String shareId,
-      required Coin c}) {
+  Future<VotingChainResponse> crateApiVotingVotechainShareStatus({
+    required String serverUrl,
+    required String roundId,
+    required String shareId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6552,8 +7950,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(roundId, serializer);
           sse_encode_String(shareId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 190, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 201,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_chain_response,
@@ -6573,10 +7975,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingChainResponse> crateApiVotingVotechainSubmitDelegation(
-      {required String baseUrl,
-      required String submissionJson,
-      required Coin c}) {
+  Future<VotingChainResponse> crateApiVotingVotechainSubmitDelegation({
+    required String baseUrl,
+    required String submissionJson,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6584,8 +7987,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(baseUrl, serializer);
           sse_encode_String(submissionJson, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 191, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 202,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_chain_response,
@@ -6605,10 +8012,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingChainResponse> crateApiVotingVotechainSubmitShare(
-      {required String serverUrl,
-      required String payloadJson,
-      required Coin c}) {
+  Future<VotingChainResponse> crateApiVotingVotechainSubmitShare({
+    required String serverUrl,
+    required String payloadJson,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6616,8 +8024,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(serverUrl, serializer);
           sse_encode_String(payloadJson, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 192, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 203,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_chain_response,
@@ -6637,10 +8049,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingChainResponse> crateApiVotingVotechainSubmitVote(
-      {required String baseUrl,
-      required String submissionJson,
-      required Coin c}) {
+  Future<VotingChainResponse> crateApiVotingVotechainSubmitVote({
+    required String baseUrl,
+    required String submissionJson,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6648,8 +8061,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(baseUrl, serializer);
           sse_encode_String(submissionJson, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 193, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 204,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_chain_response,
@@ -6669,8 +8086,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingChainResponse> crateApiVotingVotechainTxConfirmation(
-      {required String baseUrl, required String txHash, required Coin c}) {
+  Future<VotingChainResponse> crateApiVotingVotechainTxConfirmation({
+    required String baseUrl,
+    required String txHash,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6678,8 +8098,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(baseUrl, serializer);
           sse_encode_String(txHash, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 194, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 205,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_chain_response,
@@ -6699,16 +8123,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<VotingBallotIntent>> crateApiVotingVotingBallotIntents(
-      {required String roundId, required Coin c}) {
+  Future<List<VotingBallotIntent>> crateApiVotingVotingBallotIntents({
+    required String roundId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(roundId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 195, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 206,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_voting_ballot_intent,
@@ -6728,12 +8158,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingVoteCommitments> crateApiVotingVotingCommit(
-      {required String roundId,
-      required int bundleIndex,
-      required String draftsJson,
-      required String voteNodeUrl,
-      required Coin c}) {
+  Future<VotingVoteCommitments> crateApiVotingVotingCommit({
+    required String roundId,
+    required int bundleIndex,
+    required String draftsJson,
+    required String voteNodeUrl,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6743,8 +8174,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(draftsJson, serializer);
           sse_encode_String(voteNodeUrl, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 196, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 207,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_vote_commitments,
@@ -6758,17 +8193,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiVotingVotingCommitConstMeta => const TaskConstMeta(
-        debugName: "voting_commit",
-        argNames: ["roundId", "bundleIndex", "draftsJson", "voteNodeUrl", "c"],
-      );
+    debugName: "voting_commit",
+    argNames: ["roundId", "bundleIndex", "draftsJson", "voteNodeUrl", "c"],
+  );
 
   @override
-  Stream<VotingVoteCommitStage> crateApiVotingVotingCommitWithProgress(
-      {required String roundId,
-      required int bundleIndex,
-      required String draftsJson,
-      required String voteNodeUrl,
-      required Coin c}) {
+  Stream<VotingVoteCommitStage> crateApiVotingVotingCommitWithProgress({
+    required String roundId,
+    required int bundleIndex,
+    required String draftsJson,
+    required String voteNodeUrl,
+    required Coin c,
+  }) {
     final sink = RustStreamSink<VotingVoteCommitStage>();
     unawaited(
       handler.executeNormal(
@@ -6776,14 +8212,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           callFfi: (port_) {
             final serializer = SseSerializer(generalizedFrbRustBinding);
             sse_encode_StreamSink_voting_vote_commit_stage_Sse(
-                sink, serializer);
+              sink,
+              serializer,
+            );
             sse_encode_String(roundId, serializer);
             sse_encode_u_32(bundleIndex, serializer);
             sse_encode_String(draftsJson, serializer);
             sse_encode_String(voteNodeUrl, serializer);
             sse_encode_box_autoadd_coin(c, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer,
-                funcId: 197, port: port_);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 208,
+              port: port_,
+            );
           },
           codec: SseCodec(
             decodeSuccessData: sse_decode_voting_vote_commitments,
@@ -6807,21 +8249,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "bundleIndex",
           "draftsJson",
           "voteNodeUrl",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<VotingConfig?> crateApiVotingVotingConfigCached(
-      {required String source, required Coin c}) {
+  Future<VotingConfig?> crateApiVotingVotingConfigCached({
+    required String source,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(source, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 198, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 209,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_voting_config,
@@ -6847,8 +8295,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 199, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 210,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -6868,16 +8320,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingConfig> crateApiVotingVotingConfigResolve(
-      {required String source, required Coin c}) {
+  Future<VotingConfig> crateApiVotingVotingConfigResolve({
+    required String source,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(source, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 200, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 211,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_config,
@@ -6897,13 +8355,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingVoteConfirmation> crateApiVotingVotingConfirm(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required String txHash,
-      required String eventsJson,
-      required Coin c}) {
+  Future<VotingVoteConfirmation> crateApiVotingVotingConfirm({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required String txHash,
+    required String eventsJson,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6914,8 +8373,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(txHash, serializer);
           sse_encode_String(eventsJson, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 201, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 212,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_vote_confirmation,
@@ -6937,13 +8400,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "proposalId",
           "txHash",
           "eventsJson",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<String?> crateApiVotingVotingDelegationVanCommitmentHex(
-      {required String roundId, required int bundleIndex, required Coin c}) {
+  Future<String?> crateApiVotingVotingDelegationVanCommitmentHex({
+    required String roundId,
+    required int bundleIndex,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -6951,8 +8417,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(roundId, serializer);
           sse_encode_u_32(bundleIndex, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 202, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 213,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_String,
@@ -6972,16 +8442,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String?> crateApiVotingVotingDraftsLoad(
-      {required String roundId, required Coin c}) {
+  Future<String?> crateApiVotingVotingDraftsLoad({
+    required String roundId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(roundId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 203, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 214,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_String,
@@ -7001,8 +8477,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiVotingVotingDraftsSave(
-      {required String roundId, required String draftsJson, required Coin c}) {
+  Future<void> crateApiVotingVotingDraftsSave({
+    required String roundId,
+    required String draftsJson,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7010,8 +8489,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(roundId, serializer);
           sse_encode_String(draftsJson, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 204, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 215,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -7031,16 +8514,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<BigInt> crateApiVotingVotingEligibleWeight(
-      {required int snapshotHeight, required Coin c}) {
+  Future<BigInt> crateApiVotingVotingEligibleWeight({
+    required int snapshotHeight,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(snapshotHeight, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 205, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 216,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_u_64,
@@ -7066,8 +8555,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 206, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 217,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -7081,10 +8574,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiVotingVotingHotkeyCreateConstMeta =>
-      const TaskConstMeta(
-        debugName: "voting_hotkey_create",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "voting_hotkey_create", argNames: ["c"]);
 
   @override
   Future<String> crateApiVotingVotingHotkeyGet({required Coin c}) {
@@ -7093,8 +8583,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 207, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 218,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -7108,18 +8602,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiVotingVotingHotkeyGetConstMeta =>
-      const TaskConstMeta(
-        debugName: "voting_hotkey_get",
-        argNames: ["c"],
-      );
+      const TaskConstMeta(debugName: "voting_hotkey_get", argNames: ["c"]);
 
   @override
-  Future<void> crateApiVotingVotingMarkVoteSubmitted(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required String txHash,
-      required Coin c}) {
+  Future<void> crateApiVotingVotingMarkVoteSubmitted({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required String txHash,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7129,8 +8621,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(proposalId, serializer);
           sse_encode_String(txHash, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 208, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 219,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -7150,11 +8646,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingVotePayloads> crateApiVotingVotingPayloads(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required Coin c}) {
+  Future<VotingVotePayloads> crateApiVotingVotingPayloads({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7163,8 +8660,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(bundleIndex, serializer);
           sse_encode_u_32(proposalId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 209, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 220,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_vote_payloads,
@@ -7184,10 +8685,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingRoundPlan> crateApiVotingVotingPlan(
-      {required String roundId,
-      required List<int> proposalIds,
-      required Coin c}) {
+  Future<VotingRoundPlan> crateApiVotingVotingPlan({
+    required String roundId,
+    required List<int> proposalIds,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7195,8 +8697,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(roundId, serializer);
           sse_encode_list_prim_u_32_loose(proposalIds, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 210, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 221,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_round_plan,
@@ -7210,19 +8716,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiVotingVotingPlanConstMeta => const TaskConstMeta(
-        debugName: "voting_plan",
-        argNames: ["roundId", "proposalIds", "c"],
-      );
+    debugName: "voting_plan",
+    argNames: ["roundId", "proposalIds", "c"],
+  );
 
   @override
-  Future<void> crateApiVotingVotingRecordExecution(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required String voteTxHash,
-      required BigInt vcTreePosition,
-      required String shareDeliveriesJson,
-      required Coin c}) {
+  Future<void> crateApiVotingVotingRecordExecution({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required String voteTxHash,
+    required BigInt vcTreePosition,
+    required String shareDeliveriesJson,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7234,8 +8741,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_64(vcTreePosition, serializer);
           sse_encode_String(shareDeliveriesJson, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 211, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 222,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -7249,7 +8760,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           voteTxHash,
           vcTreePosition,
           shareDeliveriesJson,
-          c
+          c,
         ],
         apiImpl: this,
       ),
@@ -7266,16 +8777,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "voteTxHash",
           "vcTreePosition",
           "shareDeliveriesJson",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<void> crateApiVotingVotingRecoverConfirmDelegationFromTree(
-      {required String roundId,
-      required int bundleIndex,
-      required int vanLeafPosition,
-      required Coin c}) {
+  Future<void> crateApiVotingVotingRecoverConfirmDelegationFromTree({
+    required String roundId,
+    required int bundleIndex,
+    required int vanLeafPosition,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7284,8 +8796,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(bundleIndex, serializer);
           sse_encode_u_32(vanLeafPosition, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 212, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 223,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -7300,21 +8816,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta
-      get kCrateApiVotingVotingRecoverConfirmDelegationFromTreeConstMeta =>
-          const TaskConstMeta(
-            debugName: "voting_recover_confirm_delegation_from_tree",
-            argNames: ["roundId", "bundleIndex", "vanLeafPosition", "c"],
-          );
+  get kCrateApiVotingVotingRecoverConfirmDelegationFromTreeConstMeta =>
+      const TaskConstMeta(
+        debugName: "voting_recover_confirm_delegation_from_tree",
+        argNames: ["roundId", "bundleIndex", "vanLeafPosition", "c"],
+      );
 
   @override
   Future<VotingTreeVoteConfirmation>
-      crateApiVotingVotingRecoverConfirmVoteFromTree(
-          {required String roundId,
-          required int bundleIndex,
-          required int proposalId,
-          required BigInt vcTreePosition,
-          int? vanLeafPosition,
-          required Coin c}) {
+  crateApiVotingVotingRecoverConfirmVoteFromTree({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required BigInt vcTreePosition,
+    int? vanLeafPosition,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7325,8 +8842,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_64(vcTreePosition, serializer);
           sse_encode_opt_box_autoadd_u_32(vanLeafPosition, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 213, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 224,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_tree_vote_confirmation,
@@ -7339,7 +8860,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           proposalId,
           vcTreePosition,
           vanLeafPosition,
-          c
+          c,
         ],
         apiImpl: this,
       ),
@@ -7355,21 +8876,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "proposalId",
           "vcTreePosition",
           "vanLeafPosition",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<VotingRoundRecovery> crateApiVotingVotingRecovery(
-      {required String roundId, required Coin c}) {
+  Future<VotingRoundRecovery> crateApiVotingVotingRecovery({
+    required String roundId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(roundId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 214, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 225,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_round_recovery,
@@ -7389,16 +8916,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiVotingVotingRecoveryClear(
-      {required String roundId, required Coin c}) {
+  Future<void> crateApiVotingVotingRecoveryClear({
+    required String roundId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(roundId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 215, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 226,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -7418,16 +8951,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiVotingVotingResetSessionState(
-      {required String roundId, required Coin c}) {
+  Future<void> crateApiVotingVotingResetSessionState({
+    required String roundId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(roundId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 216, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 227,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -7447,13 +8986,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String> crateApiVotingVotingRoundParamsJson(
-      {required String source,
-      required String roundId,
-      required BigInt snapshotHeight,
-      required List<int> ncRoot,
-      required List<int> nullifierImtRoot,
-      required Coin c}) {
+  Future<String> crateApiVotingVotingRoundParamsJson({
+    required String source,
+    required String roundId,
+    required BigInt snapshotHeight,
+    required List<int> ncRoot,
+    required List<int> nullifierImtRoot,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7464,8 +9004,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_prim_u_8_loose(ncRoot, serializer);
           sse_encode_list_prim_u_8_loose(nullifierImtRoot, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 217, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 228,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -7478,7 +9022,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           snapshotHeight,
           ncRoot,
           nullifierImtRoot,
-          c
+          c,
         ],
         apiImpl: this,
       ),
@@ -7494,7 +9038,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "snapshotHeight",
           "ncRoot",
           "nullifierImtRoot",
-          "c"
+          "c",
         ],
       );
 
@@ -7505,8 +9049,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 218, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 229,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_voting_round_info,
@@ -7519,22 +9067,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiVotingVotingRoundsConstMeta => const TaskConstMeta(
-        debugName: "voting_rounds",
-        argNames: ["c"],
-      );
+  TaskConstMeta get kCrateApiVotingVotingRoundsConstMeta =>
+      const TaskConstMeta(debugName: "voting_rounds", argNames: ["c"]);
 
   @override
-  Future<List<VotingRoundSession>> crateApiVotingVotingSessions(
-      {required List<String> roundIds, required Coin c}) {
+  Future<List<VotingRoundSession>> crateApiVotingVotingSessions({
+    required List<String> roundIds,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_String(roundIds, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 219, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 230,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_voting_round_session,
@@ -7554,13 +9106,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiVotingVotingSetBallotIntent(
-      {required String roundId,
-      required int proposalId,
-      required bool skipped,
-      required int choice,
-      required int numOptions,
-      required Coin c}) {
+  Future<void> crateApiVotingVotingSetBallotIntent({
+    required String roundId,
+    required int proposalId,
+    required bool skipped,
+    required int choice,
+    required int numOptions,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7571,8 +9124,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(choice, serializer);
           sse_encode_u_32(numOptions, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 220, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 231,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -7594,18 +9151,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "skipped",
           "choice",
           "numOptions",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<void> crateApiVotingVotingShareAddServers(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required int shareIndex,
-      required List<String> newUrls,
-      required Coin c}) {
+  Future<void> crateApiVotingVotingShareAddServers({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required int shareIndex,
+    required List<String> newUrls,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7616,8 +9174,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(shareIndex, serializer);
           sse_encode_list_String(newUrls, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 221, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 232,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -7639,17 +9201,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "proposalId",
           "shareIndex",
           "newUrls",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<void> crateApiVotingVotingShareConfirm(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required int shareIndex,
-      required Coin c}) {
+  Future<void> crateApiVotingVotingShareConfirm({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required int shareIndex,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7659,8 +9222,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(proposalId, serializer);
           sse_encode_u_32(shareIndex, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 222, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 233,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -7680,16 +9247,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<VotingShareSubmissionPayload>> crateApiVotingVotingSharePayloads(
-      {required String roundId, required Coin c}) {
+  Future<List<VotingShareSubmissionPayload>> crateApiVotingVotingSharePayloads({
+    required String roundId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(roundId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 223, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 234,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_voting_share_submission_payload,
@@ -7709,14 +9282,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingSharePlan> crateApiVotingVotingSharePlan(
-      {required String roundId,
-      required BigInt now,
-      required BigInt ceremonyStart,
-      BigInt? voteEnd,
-      required List<String> serverUrls,
-      required bool singleShare,
-      required Coin c}) {
+  Future<VotingSharePlan> crateApiVotingVotingSharePlan({
+    required String roundId,
+    required BigInt now,
+    required BigInt ceremonyStart,
+    BigInt? voteEnd,
+    required List<String> serverUrls,
+    required bool singleShare,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7728,8 +9302,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_String(serverUrls, serializer);
           sse_encode_bool(singleShare, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 224, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 235,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_share_plan,
@@ -7743,7 +9321,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           voteEnd,
           serverUrls,
           singleShare,
-          c
+          c,
         ],
         apiImpl: this,
       ),
@@ -7760,19 +9338,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "voteEnd",
           "serverUrls",
           "singleShare",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<List<VotingSharePlanItem>> crateApiVotingVotingSharePlans(
-      {required int shareCount,
-      required List<String> serverUrls,
-      required BigInt now,
-      required BigInt voteEnd,
-      required BigInt ceremonyStart,
-      required bool singleShare,
-      required Coin c}) {
+  Future<List<VotingSharePlanItem>> crateApiVotingVotingSharePlans({
+    required int shareCount,
+    required List<String> serverUrls,
+    required BigInt now,
+    required BigInt voteEnd,
+    required BigInt ceremonyStart,
+    required bool singleShare,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7784,8 +9363,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_64(ceremonyStart, serializer);
           sse_encode_bool(singleShare, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 225, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 236,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_voting_share_plan_item,
@@ -7799,7 +9382,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           voteEnd,
           ceremonyStart,
           singleShare,
-          c
+          c,
         ],
         apiImpl: this,
       ),
@@ -7816,19 +9399,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "voteEnd",
           "ceremonyStart",
           "singleShare",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<void> crateApiVotingVotingShareRecord(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required int shareIndex,
-      required List<String> sentToUrls,
-      required BigInt submitAt,
-      required Coin c}) {
+  Future<void> crateApiVotingVotingShareRecord({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required int shareIndex,
+    required List<String> sentToUrls,
+    required BigInt submitAt,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7840,8 +9424,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_String(sentToUrls, serializer);
           sse_encode_u_64(submitAt, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 226, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 237,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -7855,7 +9443,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           shareIndex,
           sentToUrls,
           submitAt,
-          c
+          c,
         ],
         apiImpl: this,
       ),
@@ -7872,22 +9460,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "shareIndex",
           "sentToUrls",
           "submitAt",
-          "c"
+          "c",
         ],
       );
 
   @override
   Future<List<VotingShareDelegationRecord>>
-      crateApiVotingVotingShareUnconfirmed(
-          {required String roundId, required Coin c}) {
+  crateApiVotingVotingShareUnconfirmed({
+    required String roundId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(roundId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 227, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 238,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_voting_share_delegation_record,
@@ -7907,14 +9501,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String> crateApiVotingVotingShareWireJson(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required int shareIndex,
-      BigInt? vcTreePosition,
-      required BigInt submitAt,
-      required Coin c}) {
+  Future<String> crateApiVotingVotingShareWireJson({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required int shareIndex,
+    BigInt? vcTreePosition,
+    required BigInt submitAt,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7926,8 +9521,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_opt_box_autoadd_u_64(vcTreePosition, serializer);
           sse_encode_u_64(submitAt, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 228, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 239,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -7941,7 +9540,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           shareIndex,
           vcTreePosition,
           submitAt,
-          c
+          c,
         ],
         apiImpl: this,
       ),
@@ -7958,13 +9557,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "shareIndex",
           "vcTreePosition",
           "submitAt",
-          "c"
+          "c",
         ],
       );
 
   @override
-  Future<int> crateApiVotingVotingSyncTree(
-      {required String roundId, required String voteNodeUrl, required Coin c}) {
+  Future<int> crateApiVotingVotingSyncTree({
+    required String roundId,
+    required String voteNodeUrl,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -7972,8 +9574,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(roundId, serializer);
           sse_encode_String(voteNodeUrl, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 229, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 240,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_u_32,
@@ -7993,10 +9599,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<BigInt?> crateApiVotingVotingTreeFindLeaf(
-      {required String roundId,
-      required String nodeUrl,
-      required String targetHex}) {
+  Future<BigInt?> crateApiVotingVotingTreeFindLeaf({
+    required String roundId,
+    required String nodeUrl,
+    required String targetHex,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -8004,8 +9611,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(roundId, serializer);
           sse_encode_String(nodeUrl, serializer);
           sse_encode_String(targetHex, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 230, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 241,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_u_64,
@@ -8025,11 +9636,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<VotingVanWitness> crateApiVotingVotingVanWitness(
-      {required String roundId,
-      required int bundleIndex,
-      required String voteNodeUrl,
-      required Coin c}) {
+  Future<VotingVanWitness> crateApiVotingVotingVanWitness({
+    required String roundId,
+    required int bundleIndex,
+    required String voteNodeUrl,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -8038,8 +9650,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(bundleIndex, serializer);
           sse_encode_String(voteNodeUrl, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 231, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 242,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_voting_van_witness,
@@ -8059,11 +9675,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String> crateApiVotingVotingVoteCommitmentHex(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required Coin c}) {
+  Future<String> crateApiVotingVotingVoteCommitmentHex({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -8072,8 +9689,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(bundleIndex, serializer);
           sse_encode_u_32(proposalId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 232, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 243,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -8093,11 +9714,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String> crateApiVotingVotingVoteVanCommitmentHex(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required Coin c}) {
+  Future<String> crateApiVotingVotingVoteVanCommitmentHex({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -8106,8 +9728,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(bundleIndex, serializer);
           sse_encode_u_32(proposalId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 233, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 244,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -8127,11 +9753,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String> crateApiVotingVotingVoteWireJson(
-      {required String roundId,
-      required int bundleIndex,
-      required int proposalId,
-      required Coin c}) {
+  Future<String> crateApiVotingVotingVoteWireJson({
+    required String roundId,
+    required int bundleIndex,
+    required int proposalId,
+    required Coin c,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -8140,8 +9767,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_u_32(bundleIndex, serializer);
           sse_encode_u_32(proposalId, serializer);
           sse_encode_box_autoadd_coin(c, serializer);
-          pdeCallFfi(generalizedFrbRustBinding, serializer,
-              funcId: 234, port: port_);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 245,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -8161,8 +9792,44 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   Future<void> Function(int, dynamic)
-      encode_DartFn_Inputs_list_prim_u_8_strict_Output_unit_AnyhowException(
-          FutureOr<void> Function(Uint8List) raw) {
+  encode_DartFn_Inputs_list_prim_u_8_strict_Output_list_prim_u_8_strict_AnyhowException(
+    FutureOr<Uint8List> Function(Uint8List) raw,
+  ) {
+    return (callId, rawArg0) async {
+      final arg0 = dco_decode_list_prim_u_8_strict(rawArg0);
+
+      Box<Uint8List>? rawOutput;
+      Box<AnyhowException>? rawError;
+      try {
+        rawOutput = Box(await raw(arg0));
+      } catch (e, s) {
+        rawError = Box(AnyhowException("$e\n\n$s"));
+      }
+
+      final serializer = SseSerializer(generalizedFrbRustBinding);
+      assert((rawOutput != null) ^ (rawError != null));
+      if (rawOutput != null) {
+        serializer.buffer.putUint8(0);
+        sse_encode_list_prim_u_8_strict(rawOutput.value, serializer);
+      } else {
+        serializer.buffer.putUint8(1);
+        sse_encode_AnyhowException(rawError!.value, serializer);
+      }
+      final output = serializer.intoRaw();
+
+      generalizedFrbRustBinding.dartFnDeliverOutput(
+        callId: callId,
+        ptr: output.ptr,
+        rustVecLen: output.rustVecLen,
+        dataLen: output.dataLen,
+      );
+    };
+  }
+
+  Future<void> Function(int, dynamic)
+  encode_DartFn_Inputs_list_prim_u_8_strict_Output_unit_AnyhowException(
+    FutureOr<void> Function(Uint8List) raw,
+  ) {
     return (callId, rawArg0) async {
       final arg0 = dco_decode_list_prim_u_8_strict(rawArg0);
 
@@ -8195,36 +9862,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_DartVault => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault;
+  get rust_arc_increment_strong_count_DartVault => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault;
 
   RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_DartVault => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault;
+  get rust_arc_decrement_strong_count_DartVault => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault;
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_Mempool => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool;
+  get rust_arc_increment_strong_count_Mempool => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool;
 
   RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_Mempool => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool;
+  get rust_arc_decrement_strong_count_Mempool => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool;
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_NoteMigration => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration;
+  get rust_arc_increment_strong_count_NoteMigration => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration;
 
   RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_NoteMigration => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration;
+  get rust_arc_decrement_strong_count_NoteMigration => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration;
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_TransparentScanner => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner;
+  get rust_arc_increment_strong_count_TransparentScanner => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner;
 
   RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_TransparentScanner => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner;
+  get rust_arc_decrement_strong_count_TransparentScanner => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner;
 
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
@@ -8234,80 +9901,99 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   DartVault
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-          dynamic raw) {
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return DartVaultImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
   Mempool
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
-          dynamic raw) {
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return MempoolImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
   NoteMigration
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
-          dynamic raw) {
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return NoteMigrationImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
   TransparentScanner
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-          dynamic raw) {
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return TransparentScannerImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
   Mempool
-      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
-          dynamic raw) {
+  dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return MempoolImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
   TransparentScanner
-      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-          dynamic raw) {
+  dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return TransparentScannerImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
   DartVault
-      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-          dynamic raw) {
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return DartVaultImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
   NoteMigration
-      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
-          dynamic raw) {
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return NoteMigrationImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
   TransparentScanner
-      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-          dynamic raw) {
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return TransparentScannerImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
+  FutureOr<Uint8List> Function(Uint8List)
+  dco_decode_DartFn_Inputs_list_prim_u_8_strict_Output_list_prim_u_8_strict_AnyhowException(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError('');
+  }
+
+  @protected
   FutureOr<void> Function(Uint8List)
-      dco_decode_DartFn_Inputs_list_prim_u_8_strict_Output_unit_AnyhowException(
-          dynamic raw) {
+  dco_decode_DartFn_Inputs_list_prim_u_8_strict_Output_unit_AnyhowException(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError('');
   }
@@ -8320,32 +10006,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   DartVault
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-          dynamic raw) {
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return DartVaultImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
   Mempool
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
-          dynamic raw) {
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return MempoolImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
   NoteMigration
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
-          dynamic raw) {
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return NoteMigrationImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
   TransparentScanner
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-          dynamic raw) {
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return TransparentScannerImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -8364,56 +10054,62 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   RustStreamSink<LogMessage> dco_decode_StreamSink_log_message_Sse(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
 
   @protected
   RustStreamSink<MempoolMsg> dco_decode_StreamSink_mempool_msg_Sse(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
 
   @protected
   RustStreamSink<MigrationStatus> dco_decode_StreamSink_migration_status_Sse(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
 
   @protected
   RustStreamSink<SigningEvent> dco_decode_StreamSink_signing_event_Sse(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
 
   @protected
   RustStreamSink<SigningStatus> dco_decode_StreamSink_signing_status_Sse(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
 
   @protected
   RustStreamSink<SyncProgress> dco_decode_StreamSink_sync_progress_Sse(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
 
   @protected
   RustStreamSink<VotingDelegationProgress>
-      dco_decode_StreamSink_voting_delegation_progress_Sse(dynamic raw) {
+  dco_decode_StreamSink_voting_delegation_progress_Sse(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
 
   @protected
   RustStreamSink<VotingVoteCommitStage>
-      dco_decode_StreamSink_voting_vote_commit_stage_Sse(dynamic raw) {
+  dco_decode_StreamSink_voting_vote_commit_stage_Sse(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
@@ -8603,7 +10299,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingCompletedVoteDisplay
-      dco_decode_box_autoadd_voting_completed_vote_display(dynamic raw) {
+  dco_decode_box_autoadd_voting_completed_vote_display(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_voting_completed_vote_display(raw);
   }
@@ -8695,9 +10391,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 0:
         return DKGStatus_WaitParams();
       case 1:
-        return DKGStatus_WaitAddresses(
-          dco_decode_list_String(raw[1]),
-        );
+        return DKGStatus_WaitAddresses(dco_decode_list_String(raw[1]));
       case 2:
         return DKGStatus_PublishRound0Pkg();
       case 3:
@@ -8715,9 +10409,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 9:
         return DKGStatus_Finalize();
       case 10:
-        return DKGStatus_SharedAddress(
-          dco_decode_String(raw[1]),
-        );
+        return DKGStatus_SharedAddress(dco_decode_String(raw[1]));
       default:
         throw Exception("unreachable");
     }
@@ -8749,10 +10441,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
       throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return Folder(
-      id: dco_decode_u_32(arr[0]),
-      name: dco_decode_String(arr[1]),
-    );
+    return Folder(id: dco_decode_u_32(arr[0]), name: dco_decode_String(arr[1]));
   }
 
   @protected
@@ -8939,7 +10628,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<(String, double, bool)> dco_decode_list_record_string_f_64_bool(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_record_string_f_64_bool)
@@ -9014,7 +10704,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingCompletedVoteChoice> dco_decode_list_voting_completed_vote_choice(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_voting_completed_vote_choice)
@@ -9029,7 +10720,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingDelegationRecovery> dco_decode_list_voting_delegation_recovery(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_voting_delegation_recovery)
@@ -9038,7 +10730,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingDelegationStatus> dco_decode_list_voting_delegation_status(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_voting_delegation_status)
@@ -9047,7 +10740,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingEncryptedShare> dco_decode_list_voting_encrypted_share(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_voting_encrypted_share)
@@ -9074,7 +10768,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingServiceEndpoint> dco_decode_list_voting_service_endpoint(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_voting_service_endpoint)
@@ -9083,7 +10778,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingShareDelegationRecord>
-      dco_decode_list_voting_share_delegation_record(dynamic raw) {
+  dco_decode_list_voting_share_delegation_record(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_voting_share_delegation_record)
@@ -9098,7 +10793,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingSharePlanItem> dco_decode_list_voting_share_plan_item(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_voting_share_plan_item)
@@ -9107,7 +10803,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingShareSubmissionPayload>
-      dco_decode_list_voting_share_submission_payload(dynamic raw) {
+  dco_decode_list_voting_share_submission_payload(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_voting_share_submission_payload)
@@ -9124,7 +10820,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingSignedVoteCommitment>
-      dco_decode_list_voting_signed_vote_commitment(dynamic raw) {
+  dco_decode_list_voting_signed_vote_commitment(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_voting_signed_vote_commitment)
@@ -9211,9 +10907,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     final arr = raw as List<dynamic>;
     if (arr.length != 1)
       throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
-    return MemoRow(
-      cells: dco_decode_list_memo_cell(arr[0]),
-    );
+    return MemoRow(cells: dco_decode_list_memo_cell(arr[0]));
   }
 
   @protected
@@ -9247,13 +10941,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return MempoolMsg_BlockHeight(
-          dco_decode_u_32(raw[1]),
-        );
+        return MempoolMsg_BlockHeight(dco_decode_u_32(raw[1]));
       case 1:
-        return MempoolMsg_TxId(
-          dco_decode_box_autoadd_mempool_tx(raw[1]),
-        );
+        return MempoolMsg_TxId(dco_decode_box_autoadd_mempool_tx(raw[1]));
       default:
         throw Exception("unreachable");
     }
@@ -9297,21 +10987,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return MigrationEvent_SplitComplete(
-          fee: dco_decode_u_64(raw[1]),
-        );
+        return MigrationEvent_SplitComplete(fee: dco_decode_u_64(raw[1]));
       case 1:
-        return MigrationEvent_MigrateComplete(
-          fee: dco_decode_u_64(raw[1]),
-        );
+        return MigrationEvent_MigrateComplete(fee: dco_decode_u_64(raw[1]));
       case 2:
         return MigrationEvent_Complete();
       case 3:
         return MigrationEvent_NothingToDo();
       case 4:
-        return MigrationEvent_Error(
-          message: dco_decode_String(raw[1]),
-        );
+        return MigrationEvent_Error(message: dco_decode_String(raw[1]));
       default:
         throw Exception("unreachable");
     }
@@ -9434,7 +11118,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingCompletedVoteDisplay?
-      dco_decode_opt_box_autoadd_voting_completed_vote_display(dynamic raw) {
+  dco_decode_opt_box_autoadd_voting_completed_vote_display(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null
         ? null
@@ -9529,9 +11213,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     final arr = raw as List<dynamic>;
     if (arr.length != 1)
       throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
-    return PoolBalance(
-      field0: dco_decode_list_prim_u_64_strict(arr[0]),
-    );
+    return PoolBalance(field0: dco_decode_list_prim_u_64_strict(arr[0]));
   }
 
   @protected
@@ -9611,10 +11293,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.length != 2) {
       throw Exception('Expected 2 elements, got ${arr.length}');
     }
-    return (
-      dco_decode_u_32(arr[0]),
-      dco_decode_f_64(arr[1]),
-    );
+    return (dco_decode_u_32(arr[0]), dco_decode_f_64(arr[1]));
   }
 
   @protected
@@ -9639,9 +11318,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     final arr = raw as List<dynamic>;
     if (arr.length != 1)
       throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
-    return SaplingParamsStatus(
-      downloaded: dco_decode_bool(arr[0]),
-    );
+    return SaplingParamsStatus(downloaded: dco_decode_bool(arr[0]));
   }
 
   @protected
@@ -9662,13 +11339,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return SigningEvent_Progress(
-          dco_decode_String(raw[1]),
-        );
+        return SigningEvent_Progress(dco_decode_String(raw[1]));
       case 1:
-        return SigningEvent_Result(
-          dco_decode_box_autoadd_pczt_package(raw[1]),
-        );
+        return SigningEvent_Result(dco_decode_box_autoadd_pczt_package(raw[1]));
       default:
         throw Exception("unreachable");
     }
@@ -9699,9 +11372,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 9:
         return SigningStatus_SendingTransaction();
       case 10:
-        return SigningStatus_TransactionSent(
-          dco_decode_String(raw[1]),
-        );
+        return SigningStatus_TransactionSent(dco_decode_String(raw[1]));
       default:
         throw Exception("unreachable");
     }
@@ -9978,7 +11649,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingCompletedVoteChoice dco_decode_voting_completed_vote_choice(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
@@ -9991,7 +11663,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingCompletedVoteDisplay dco_decode_voting_completed_vote_display(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
@@ -10046,7 +11719,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingDelegationConfirmation dco_decode_voting_delegation_confirmation(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
@@ -10130,7 +11804,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingDelegationSubmission dco_decode_voting_delegation_submission(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 11)
@@ -10295,7 +11970,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingShareDelegationRecord dco_decode_voting_share_delegation_record(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 9)
@@ -10360,7 +12036,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingShareSubmissionPayload dco_decode_voting_share_submission_payload(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 4)
@@ -10375,7 +12052,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingShareTrackingSummary dco_decode_voting_share_tracking_summary(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 5)
@@ -10405,7 +12083,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingSignedVoteCommitment dco_decode_voting_signed_vote_commitment(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 11)
@@ -10427,7 +12106,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingTreeVoteConfirmation dco_decode_voting_tree_vote_confirmation(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
@@ -10582,83 +12262,110 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   DartVault
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-          SseDeserializer deserializer) {
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return DartVaultImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   Mempool
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
-          SseDeserializer deserializer) {
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return MempoolImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   NoteMigration
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
-          SseDeserializer deserializer) {
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return NoteMigrationImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   TransparentScanner
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-          SseDeserializer deserializer) {
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return TransparentScannerImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   Mempool
-      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
-          SseDeserializer deserializer) {
+  sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return MempoolImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   TransparentScanner
-      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-          SseDeserializer deserializer) {
+  sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return TransparentScannerImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   DartVault
-      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-          SseDeserializer deserializer) {
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return DartVaultImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   NoteMigration
-      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
-          SseDeserializer deserializer) {
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return NoteMigrationImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   TransparentScanner
-      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-          SseDeserializer deserializer) {
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return TransparentScannerImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
@@ -10670,108 +12377,130 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   DartVault
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-          SseDeserializer deserializer) {
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return DartVaultImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   Mempool
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
-          SseDeserializer deserializer) {
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return MempoolImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   NoteMigration
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
-          SseDeserializer deserializer) {
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return NoteMigrationImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   TransparentScanner
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-          SseDeserializer deserializer) {
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return TransparentScannerImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   RustStreamSink<String> sse_decode_StreamSink_String_Sse(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     throw UnimplementedError('Unreachable ()');
   }
 
   @protected
   RustStreamSink<DKGStatus> sse_decode_StreamSink_dkg_status_Sse(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     throw UnimplementedError('Unreachable ()');
   }
 
   @protected
   RustStreamSink<LogMessage> sse_decode_StreamSink_log_message_Sse(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     throw UnimplementedError('Unreachable ()');
   }
 
   @protected
   RustStreamSink<MempoolMsg> sse_decode_StreamSink_mempool_msg_Sse(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     throw UnimplementedError('Unreachable ()');
   }
 
   @protected
   RustStreamSink<MigrationStatus> sse_decode_StreamSink_migration_status_Sse(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     throw UnimplementedError('Unreachable ()');
   }
 
   @protected
   RustStreamSink<SigningEvent> sse_decode_StreamSink_signing_event_Sse(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     throw UnimplementedError('Unreachable ()');
   }
 
   @protected
   RustStreamSink<SigningStatus> sse_decode_StreamSink_signing_status_Sse(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     throw UnimplementedError('Unreachable ()');
   }
 
   @protected
   RustStreamSink<SyncProgress> sse_decode_StreamSink_sync_progress_Sse(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     throw UnimplementedError('Unreachable ()');
   }
 
   @protected
   RustStreamSink<VotingDelegationProgress>
-      sse_decode_StreamSink_voting_delegation_progress_Sse(
-          SseDeserializer deserializer) {
+  sse_decode_StreamSink_voting_delegation_progress_Sse(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     throw UnimplementedError('Unreachable ()');
   }
 
   @protected
   RustStreamSink<VotingVoteCommitStage>
-      sse_decode_StreamSink_voting_vote_commit_stage_Sse(
-          SseDeserializer deserializer) {
+  sse_decode_StreamSink_voting_vote_commit_stage_Sse(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     throw UnimplementedError('Unreachable ()');
   }
@@ -10807,26 +12536,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_time = sse_decode_u_32(deserializer);
     var var_balance = sse_decode_u_64(deserializer);
     return Account(
-        coin: var_coin,
-        id: var_id,
-        name: var_name,
-        seed: var_seed,
-        passphrase: var_passphrase,
-        aindex: var_aindex,
-        dindex: var_dindex,
-        icon: var_icon,
-        useInternal: var_useInternal,
-        birth: var_birth,
-        folder: var_folder,
-        position: var_position,
-        hidden: var_hidden,
-        saved: var_saved,
-        enabled: var_enabled,
-        internal: var_internal,
-        hw: var_hw,
-        height: var_height,
-        time: var_time,
-        balance: var_balance);
+      coin: var_coin,
+      id: var_id,
+      name: var_name,
+      seed: var_seed,
+      passphrase: var_passphrase,
+      aindex: var_aindex,
+      dindex: var_dindex,
+      icon: var_icon,
+      useInternal: var_useInternal,
+      birth: var_birth,
+      folder: var_folder,
+      position: var_position,
+      hidden: var_hidden,
+      saved: var_saved,
+      enabled: var_enabled,
+      internal: var_internal,
+      hw: var_hw,
+      height: var_height,
+      time: var_time,
+      balance: var_balance,
+    );
   }
 
   @protected
@@ -10841,14 +12571,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_hidden = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_enabled = sse_decode_opt_box_autoadd_bool(deserializer);
     return AccountUpdate(
-        coin: var_coin,
-        id: var_id,
-        name: var_name,
-        icon: var_icon,
-        birth: var_birth,
-        folder: var_folder,
-        hidden: var_hidden,
-        enabled: var_enabled);
+      coin: var_coin,
+      id: var_id,
+      name: var_name,
+      icon: var_icon,
+      birth: var_birth,
+      folder: var_folder,
+      hidden: var_hidden,
+      enabled: var_enabled,
+    );
   }
 
   @protected
@@ -10860,11 +12591,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_ua = sse_decode_opt_String(deserializer);
     var var_diversifierIndex = sse_decode_u_32(deserializer);
     return Addresses(
-        taddr: var_taddr,
-        saddr: var_saddr,
-        oaddr: var_oaddr,
-        ua: var_ua,
-        diversifierIndex: var_diversifierIndex);
+      taddr: var_taddr,
+      saddr: var_saddr,
+      oaddr: var_oaddr,
+      ua: var_ua,
+      diversifierIndex: var_diversifierIndex,
+    );
   }
 
   @protected
@@ -10875,7 +12607,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   AccountUpdate sse_decode_box_autoadd_account_update(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_account_update(deserializer));
   }
@@ -10906,7 +12639,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   FrostParams sse_decode_box_autoadd_frost_params(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_frost_params(deserializer));
   }
@@ -10937,21 +12671,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   PaymentOptions sse_decode_box_autoadd_payment_options(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_payment_options(deserializer));
   }
 
   @protected
   PcztPackage sse_decode_box_autoadd_pczt_package(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_pczt_package(deserializer));
   }
 
   @protected
   RaptorQParams sse_decode_box_autoadd_raptor_q_params(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_raptor_q_params(deserializer));
   }
@@ -10964,7 +12701,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   SigningEvent sse_decode_box_autoadd_signing_event(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_signing_event(deserializer));
   }
@@ -10989,22 +12727,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingCompletedVoteDisplay
-      sse_decode_box_autoadd_voting_completed_vote_display(
-          SseDeserializer deserializer) {
+  sse_decode_box_autoadd_voting_completed_vote_display(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_voting_completed_vote_display(deserializer));
   }
 
   @protected
   VotingConfig sse_decode_box_autoadd_voting_config(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_voting_config(deserializer));
   }
 
   @protected
   VotingPirLayout sse_decode_box_autoadd_voting_pir_layout(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_voting_pir_layout(deserializer));
   }
@@ -11029,13 +12770,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_transport = sse_decode_u_8(deserializer);
     var var_proxy = sse_decode_String(deserializer);
     return Coin.raw(
-        coin: var_coin,
-        account: var_account,
-        dbFilepath: var_dbFilepath,
-        url: var_url,
-        serverType: var_serverType,
-        transport: var_transport,
-        proxy: var_proxy);
+      coin: var_coin,
+      account: var_account,
+      dbFilepath: var_dbFilepath,
+      url: var_url,
+      serverType: var_serverType,
+      transport: var_transport,
+      proxy: var_proxy,
+    );
   }
 
   @protected
@@ -11046,7 +12788,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_addresses = sse_decode_list_String(deserializer);
     var var_notes = sse_decode_String(deserializer);
     return Contact(
-        id: var_id, name: var_name, addresses: var_addresses, notes: var_notes);
+      id: var_id,
+      name: var_name,
+      addresses: var_addresses,
+      notes: var_notes,
+    );
   }
 
   @protected
@@ -11055,7 +12801,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_contact = sse_decode_contact(deserializer);
     var var_matchedAddress = sse_decode_String(deserializer);
     return ContactMatch(
-        contact: var_contact, matchedAddress: var_matchedAddress);
+      contact: var_contact,
+      matchedAddress: var_matchedAddress,
+    );
   }
 
   @protected
@@ -11109,10 +12857,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_fromCurrency = sse_decode_String(deserializer);
     var var_toCurrency = sse_decode_String(deserializer);
     return ExchangeRate(
-        fromPrice: var_fromPrice,
-        toPrice: var_toPrice,
-        fromCurrency: var_fromCurrency,
-        toCurrency: var_toCurrency);
+      fromPrice: var_fromPrice,
+      toPrice: var_toPrice,
+      fromCurrency: var_fromCurrency,
+      toCurrency: var_toCurrency,
+    );
   }
 
   @protected
@@ -11145,9 +12894,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_coordinator = sse_decode_u_8(deserializer);
     var var_fundingAccount = sse_decode_u_32(deserializer);
     return FrostSignParams(
-        account: var_account,
-        coordinator: var_coordinator,
-        fundingAccount: var_fundingAccount);
+      account: var_account,
+      coordinator: var_coordinator,
+      fundingAccount: var_fundingAccount,
+    );
   }
 
   @protected
@@ -11218,7 +12968,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<ContactMatch> sse_decode_list_contact_match(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11231,7 +12982,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<DbAccountPreview> sse_decode_list_db_account_preview(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11256,7 +13008,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<Uint8List> sse_decode_list_list_prim_u_8_strict(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11329,7 +13082,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<MempoolAmount> sse_decode_list_mempool_amount(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11420,7 +13174,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<(String, double, bool)> sse_decode_list_record_string_f_64_bool(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11433,7 +13188,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<(int, double)> sse_decode_list_record_u_32_f_64(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11446,7 +13202,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<RestoredAccount> sse_decode_list_restored_account(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11459,7 +13216,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<TAddressTxCount> sse_decode_list_t_address_tx_count(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11556,7 +13314,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingBallotIntent> sse_decode_list_voting_ballot_intent(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11569,7 +13328,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingCompletedVoteChoice> sse_decode_list_voting_completed_vote_choice(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11582,7 +13342,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingConfigRound> sse_decode_list_voting_config_round(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11595,7 +13356,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingDelegationRecovery> sse_decode_list_voting_delegation_recovery(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11608,7 +13370,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingDelegationStatus> sse_decode_list_voting_delegation_status(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11621,7 +13384,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingEncryptedShare> sse_decode_list_voting_encrypted_share(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11634,7 +13398,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingNextStep> sse_decode_list_voting_next_step(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11647,7 +13412,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingRoundInfo> sse_decode_list_voting_round_info(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11660,7 +13426,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingRoundSession> sse_decode_list_voting_round_session(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11673,7 +13440,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingServiceEndpoint> sse_decode_list_voting_service_endpoint(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11686,8 +13454,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingShareDelegationRecord>
-      sse_decode_list_voting_share_delegation_record(
-          SseDeserializer deserializer) {
+  sse_decode_list_voting_share_delegation_record(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11700,7 +13467,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingSharePayload> sse_decode_list_voting_share_payload(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11713,7 +13481,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingSharePlanItem> sse_decode_list_voting_share_plan_item(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11726,8 +13495,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingShareSubmissionPayload>
-      sse_decode_list_voting_share_submission_payload(
-          SseDeserializer deserializer) {
+  sse_decode_list_voting_share_submission_payload(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11740,7 +13510,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingShareWorkflow> sse_decode_list_voting_share_workflow(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11753,8 +13524,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingSignedVoteCommitment>
-      sse_decode_list_voting_signed_vote_commitment(
-          SseDeserializer deserializer) {
+  sse_decode_list_voting_signed_vote_commitment(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11767,7 +13537,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<VotingVoteRecovery> sse_decode_list_voting_vote_recovery(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -11810,13 +13581,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_version = sse_decode_String(deserializer);
     var var_ping = sse_decode_u_32(deserializer);
     return LWDInfo(
-        url: var_url,
-        isTor: var_isTor,
-        height: var_height,
-        status: var_status,
-        uptime: var_uptime,
-        version: var_version,
-        ping: var_ping);
+      url: var_url,
+      isTor: var_isTor,
+      height: var_height,
+      status: var_status,
+      uptime: var_uptime,
+      version: var_version,
+      ping: var_ping,
+    );
   }
 
   @protected
@@ -11833,16 +13605,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_memo = sse_decode_opt_String(deserializer);
     var var_isUserMemo = sse_decode_bool(deserializer);
     return Memo(
-        id: var_id,
-        idTx: var_idTx,
-        idNote: var_idNote,
-        pool: var_pool,
-        height: var_height,
-        vout: var_vout,
-        time: var_time,
-        memoBytes: var_memoBytes,
-        memo: var_memo,
-        isUserMemo: var_isUserMemo);
+      id: var_id,
+      idTx: var_idTx,
+      idNote: var_idNote,
+      pool: var_pool,
+      height: var_height,
+      vout: var_vout,
+      time: var_time,
+      memoBytes: var_memoBytes,
+      memo: var_memo,
+      isUserMemo: var_isUserMemo,
+    );
   }
 
   @protected
@@ -11876,7 +13649,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_name = sse_decode_String(deserializer);
     var var_value = sse_decode_i_64(deserializer);
     return MempoolAmount(
-        account: var_account, name: var_name, value: var_value);
+      account: var_account,
+      name: var_name,
+      value: var_value,
+    );
   }
 
   @protected
@@ -11909,15 +13685,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_address = sse_decode_opt_String(deserializer);
     var var_memo = sse_decode_opt_String(deserializer);
     return MempoolNote(
-        account: var_account,
-        name: var_name,
-        value: var_value,
-        pool: var_pool,
-        scope: var_scope,
-        diversifier: var_diversifier,
-        diversifierIndex: var_diversifierIndex,
-        address: var_address,
-        memo: var_memo);
+      account: var_account,
+      name: var_name,
+      value: var_value,
+      pool: var_pool,
+      scope: var_scope,
+      diversifier: var_diversifier,
+      diversifierIndex: var_diversifierIndex,
+      address: var_address,
+      memo: var_memo,
+    );
   }
 
   @protected
@@ -11928,7 +13705,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_notes = sse_decode_list_mempool_note(deserializer);
     var var_size = sse_decode_u_32(deserializer);
     return MempoolTx(
-        txid: var_txid, amounts: var_amounts, notes: var_notes, size: var_size);
+      txid: var_txid,
+      amounts: var_amounts,
+      notes: var_notes,
+      size: var_size,
+    );
   }
 
   @protected
@@ -11969,16 +13750,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_nextAction = sse_decode_String(deserializer);
     var var_workSummary = sse_decode_String(deserializer);
     return MigrationStatus(
-        phase: var_phase,
-        splitFees: var_splitFees,
-        migrateFees: var_migrateFees,
-        totalFees: var_totalFees,
-        sdNotesCount: var_sdNotesCount,
-        nonSdNotesCount: var_nonSdNotesCount,
-        ironwoodSdCount: var_ironwoodSdCount,
-        progress: var_progress,
-        nextAction: var_nextAction,
-        workSummary: var_workSummary);
+      phase: var_phase,
+      splitFees: var_splitFees,
+      migrateFees: var_migrateFees,
+      totalFees: var_totalFees,
+      sdNotesCount: var_sdNotesCount,
+      nonSdNotesCount: var_nonSdNotesCount,
+      ironwoodSdCount: var_ironwoodSdCount,
+      progress: var_progress,
+      nextAction: var_nextAction,
+      workSummary: var_workSummary,
+    );
   }
 
   @protected
@@ -11998,29 +13780,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_internal = sse_decode_bool(deserializer);
     var var_hw = sse_decode_u_8(deserializer);
     return NewAccount(
-        icon: var_icon,
-        name: var_name,
-        restore: var_restore,
-        key: var_key,
-        passphrase: var_passphrase,
-        fingerprint: var_fingerprint,
-        aindex: var_aindex,
-        birth: var_birth,
-        folder: var_folder,
-        pools: var_pools,
-        useInternal: var_useInternal,
-        internal: var_internal,
-        hw: var_hw);
+      icon: var_icon,
+      name: var_name,
+      restore: var_restore,
+      key: var_key,
+      passphrase: var_passphrase,
+      fingerprint: var_fingerprint,
+      aindex: var_aindex,
+      birth: var_birth,
+      folder: var_folder,
+      pools: var_pools,
+      useInternal: var_useInternal,
+      internal: var_internal,
+      hw: var_hw,
+    );
   }
 
   @protected
   OpenAliasResolution sse_decode_open_alias_resolution(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_recipients = sse_decode_list_recipient(deserializer);
     var var_dnssecStatus = sse_decode_String(deserializer);
     return OpenAliasResolution(
-        recipients: var_recipients, dnssecStatus: var_dnssecStatus);
+      recipients: var_recipients,
+      dnssecStatus: var_dnssecStatus,
+    );
   }
 
   @protected
@@ -12058,7 +13844,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   FrostParams? sse_decode_opt_box_autoadd_frost_params(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
@@ -12136,13 +13923,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingCompletedVoteDisplay?
-      sse_decode_opt_box_autoadd_voting_completed_vote_display(
-          SseDeserializer deserializer) {
+  sse_decode_opt_box_autoadd_voting_completed_vote_display(
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_voting_completed_vote_display(
-          deserializer));
+        deserializer,
+      ));
     } else {
       return null;
     }
@@ -12150,7 +13939,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingConfig? sse_decode_opt_box_autoadd_voting_config(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
@@ -12162,7 +13952,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingPirLayout? sse_decode_opt_box_autoadd_voting_pir_layout(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
@@ -12213,10 +14004,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_smartTransparent = sse_decode_bool(deserializer);
     var var_category = sse_decode_opt_box_autoadd_u_32(deserializer);
     return PaymentOptions(
-        srcPools: var_srcPools,
-        recipientPaysFee: var_recipientPaysFee,
-        smartTransparent: var_smartTransparent,
-        category: var_category);
+      srcPools: var_srcPools,
+      recipientPaysFee: var_recipientPaysFee,
+      smartTransparent: var_smartTransparent,
+      category: var_category,
+    );
   }
 
   @protected
@@ -12233,16 +14025,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_category = sse_decode_opt_box_autoadd_u_32(deserializer);
     var var_isIssuance = sse_decode_bool(deserializer);
     return PcztPackage(
-        pczt: var_pczt,
-        nSpends: var_nSpends,
-        saplingIndices: var_saplingIndices,
-        orchardIndices: var_orchardIndices,
-        ironwoodIndices: var_ironwoodIndices,
-        canSign: var_canSign,
-        canBroadcast: var_canBroadcast,
-        price: var_price,
-        category: var_category,
-        isIssuance: var_isIssuance);
+      pczt: var_pczt,
+      nSpends: var_nSpends,
+      saplingIndices: var_saplingIndices,
+      orchardIndices: var_orchardIndices,
+      ironwoodIndices: var_ironwoodIndices,
+      canSign: var_canSign,
+      canBroadcast: var_canBroadcast,
+      price: var_price,
+      category: var_category,
+      isIssuance: var_isIssuance,
+    );
   }
 
   @protected
@@ -12257,14 +14050,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_types = sse_decode_list_String(deserializer);
     var var_memoPrefixes = sse_decode_list_String(deserializer);
     return PluginInfo(
-        id: var_id,
-        name: var_name,
-        version: var_version,
-        author: var_author,
-        description: var_description,
-        enabled: var_enabled,
-        types: var_types,
-        memoPrefixes: var_memoPrefixes);
+      id: var_id,
+      name: var_name,
+      version: var_version,
+      author: var_author,
+      description: var_description,
+      enabled: var_enabled,
+      types: var_types,
+      memoPrefixes: var_memoPrefixes,
+    );
   }
 
   @protected
@@ -12281,17 +14075,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_ecLevel = sse_decode_u_8(deserializer);
     var var_repair = sse_decode_u_32(deserializer);
     return RaptorQParams(
-        version: var_version, ecLevel: var_ecLevel, repair: var_repair);
+      version: var_version,
+      ecLevel: var_ecLevel,
+      repair: var_repair,
+    );
   }
 
   @protected
   RawOpenAliasResolution sse_decode_raw_open_alias_resolution(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_records = sse_decode_list_String(deserializer);
     var var_dnssecStatus = sse_decode_String(deserializer);
     return RawOpenAliasResolution(
-        records: var_records, dnssecStatus: var_dnssecStatus);
+      records: var_records,
+      dnssecStatus: var_dnssecStatus,
+    );
   }
 
   @protected
@@ -12315,19 +14115,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_assetBase = sse_decode_list_prim_u_8_strict(deserializer);
     var var_assetName = sse_decode_opt_String(deserializer);
     return Recipient(
-        address: var_address,
-        amount: var_amount,
-        pools: var_pools,
-        userMemo: var_userMemo,
-        memoBytes: var_memoBytes,
-        price: var_price,
-        assetBase: var_assetBase,
-        assetName: var_assetName);
+      address: var_address,
+      amount: var_amount,
+      pools: var_pools,
+      userMemo: var_userMemo,
+      memoBytes: var_memoBytes,
+      price: var_price,
+      assetBase: var_assetBase,
+      assetName: var_assetName,
+    );
   }
 
   @protected
   (String, double, bool) sse_decode_record_string_f_64_bool(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_field0 = sse_decode_String(deserializer);
     var var_field1 = sse_decode_f_64(deserializer);
@@ -12353,17 +14155,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_useInternal = sse_decode_bool(deserializer);
     var var_birthHeight = sse_decode_u_32(deserializer);
     return RestoredAccount(
-        timestamp: var_timestamp,
-        name: var_name,
-        seed: var_seed,
-        aindex: var_aindex,
-        useInternal: var_useInternal,
-        birthHeight: var_birthHeight);
+      timestamp: var_timestamp,
+      name: var_name,
+      seed: var_seed,
+      aindex: var_aindex,
+      useInternal: var_useInternal,
+      birthHeight: var_birthHeight,
+    );
   }
 
   @protected
   SaplingParamsStatus sse_decode_sapling_params_status(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_downloaded = sse_decode_bool(deserializer);
     return SaplingParamsStatus(downloaded: var_downloaded);
@@ -12457,13 +14261,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_txCount = sse_decode_u_32(deserializer);
     var var_time = sse_decode_u_32(deserializer);
     return TAddressTxCount(
-        pool: var_pool,
-        address: var_address,
-        scope: var_scope,
-        dindex: var_dindex,
-        amount: var_amount,
-        txCount: var_txCount,
-        time: var_time);
+      pool: var_pool,
+      address: var_address,
+      scope: var_scope,
+      dindex: var_dindex,
+      amount: var_amount,
+      txCount: var_txCount,
+      time: var_time,
+    );
   }
 
   @protected
@@ -12485,21 +14290,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_isUserMemo = sse_decode_bool(deserializer);
     var var_contactName = sse_decode_opt_String(deserializer);
     return Tx(
-        id: var_id,
-        txid: var_txid,
-        height: var_height,
-        time: var_time,
-        value: var_value,
-        fee: var_fee,
-        tpe: var_tpe,
-        category: var_category,
-        zsaValue: var_zsaValue,
-        assetId: var_assetId,
-        assetDisplay: var_assetDisplay,
-        price: var_price,
-        memo: var_memo,
-        isUserMemo: var_isUserMemo,
-        contactName: var_contactName);
+      id: var_id,
+      txid: var_txid,
+      height: var_height,
+      time: var_time,
+      value: var_value,
+      fee: var_fee,
+      tpe: var_tpe,
+      category: var_category,
+      zsaValue: var_zsaValue,
+      assetId: var_assetId,
+      assetDisplay: var_assetDisplay,
+      price: var_price,
+      memo: var_memo,
+      isUserMemo: var_isUserMemo,
+      contactName: var_contactName,
+    );
   }
 
   @protected
@@ -12518,18 +14324,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_memos = sse_decode_list_tx_memo(deserializer);
     var var_userMemo = sse_decode_opt_String(deserializer);
     return TxAccount(
-        id: var_id,
-        account: var_account,
-        txid: var_txid,
-        height: var_height,
-        time: var_time,
-        price: var_price,
-        category: var_category,
-        notes: var_notes,
-        spends: var_spends,
-        outputs: var_outputs,
-        memos: var_memos,
-        userMemo: var_userMemo);
+      id: var_id,
+      account: var_account,
+      txid: var_txid,
+      height: var_height,
+      time: var_time,
+      price: var_price,
+      category: var_category,
+      notes: var_notes,
+      spends: var_spends,
+      outputs: var_outputs,
+      memos: var_memos,
+      userMemo: var_userMemo,
+    );
   }
 
   @protected
@@ -12541,11 +14348,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_memo = sse_decode_opt_String(deserializer);
     var var_memoBytes = sse_decode_list_prim_u_8_strict(deserializer);
     return TxMemo(
-        note: var_note,
-        output: var_output,
-        pool: var_pool,
-        memo: var_memo,
-        memoBytes: var_memoBytes);
+      note: var_note,
+      output: var_output,
+      pool: var_pool,
+      memo: var_memo,
+      memoBytes: var_memoBytes,
+    );
   }
 
   @protected
@@ -12564,18 +14372,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_idAsset = sse_decode_opt_box_autoadd_u_32(deserializer);
     var var_assetDisplay = sse_decode_String(deserializer);
     return TxNote(
-        id: var_id,
-        pool: var_pool,
-        height: var_height,
-        tx: var_tx,
-        scope: var_scope,
-        diversifier: var_diversifier,
-        diversifierIndex: var_diversifierIndex,
-        value: var_value,
-        locked: var_locked,
-        memo: var_memo,
-        idAsset: var_idAsset,
-        assetDisplay: var_assetDisplay);
+      id: var_id,
+      pool: var_pool,
+      height: var_height,
+      tx: var_tx,
+      scope: var_scope,
+      diversifier: var_diversifier,
+      diversifierIndex: var_diversifierIndex,
+      value: var_value,
+      locked: var_locked,
+      memo: var_memo,
+      idAsset: var_idAsset,
+      assetDisplay: var_assetDisplay,
+    );
   }
 
   @protected
@@ -12588,12 +14397,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_address = sse_decode_String(deserializer);
     var var_contactName = sse_decode_opt_String(deserializer);
     return TxOutput(
-        id: var_id,
-        pool: var_pool,
-        height: var_height,
-        value: var_value,
-        address: var_address,
-        contactName: var_contactName);
+      id: var_id,
+      pool: var_pool,
+      height: var_height,
+      value: var_value,
+      address: var_address,
+      contactName: var_contactName,
+    );
   }
 
   @protected
@@ -12606,12 +14416,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_canSign = sse_decode_bool(deserializer);
     var var_canBroadcast = sse_decode_bool(deserializer);
     return TxPlan(
-        height: var_height,
-        inputs: var_inputs,
-        outputs: var_outputs,
-        fee: var_fee,
-        canSign: var_canSign,
-        canBroadcast: var_canBroadcast);
+      height: var_height,
+      inputs: var_inputs,
+      outputs: var_outputs,
+      fee: var_fee,
+      canSign: var_canSign,
+      canBroadcast: var_canBroadcast,
+    );
   }
 
   @protected
@@ -12621,7 +14432,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_amount = sse_decode_opt_box_autoadd_u_64(deserializer);
     var var_assetName = sse_decode_String(deserializer);
     return TxPlanIn(
-        pool: var_pool, amount: var_amount, assetName: var_assetName);
+      pool: var_pool,
+      amount: var_amount,
+      assetName: var_assetName,
+    );
   }
 
   @protected
@@ -12632,10 +14446,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_address = sse_decode_String(deserializer);
     var var_assetName = sse_decode_String(deserializer);
     return TxPlanOut(
-        pool: var_pool,
-        amount: var_amount,
-        address: var_address,
-        assetName: var_assetName);
+      pool: var_pool,
+      amount: var_amount,
+      address: var_address,
+      assetName: var_assetName,
+    );
   }
 
   @protected
@@ -12648,12 +14463,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_idAsset = sse_decode_opt_box_autoadd_u_32(deserializer);
     var var_assetDisplay = sse_decode_String(deserializer);
     return TxSpend(
-        id: var_id,
-        pool: var_pool,
-        height: var_height,
-        value: var_value,
-        idAsset: var_idAsset,
-        assetDisplay: var_assetDisplay);
+      id: var_id,
+      pool: var_pool,
+      height: var_height,
+      value: var_value,
+      idAsset: var_idAsset,
+      assetDisplay: var_assetDisplay,
+    );
   }
 
   @protected
@@ -12700,47 +14516,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingBallotIntent sse_decode_voting_ballot_intent(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_proposalId = sse_decode_u_32(deserializer);
     var var_skipped = sse_decode_bool(deserializer);
     var var_choice = sse_decode_opt_box_autoadd_u_32(deserializer);
     return VotingBallotIntent(
-        proposalId: var_proposalId, skipped: var_skipped, choice: var_choice);
+      proposalId: var_proposalId,
+      skipped: var_skipped,
+      choice: var_choice,
+    );
   }
 
   @protected
   VotingChainResponse sse_decode_voting_chain_response(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_statusCode = sse_decode_u_16(deserializer);
     var var_body = sse_decode_String(deserializer);
     var var_retryAfterSecs = sse_decode_opt_box_autoadd_u_64(deserializer);
     return VotingChainResponse(
-        statusCode: var_statusCode,
-        body: var_body,
-        retryAfterSecs: var_retryAfterSecs);
+      statusCode: var_statusCode,
+      body: var_body,
+      retryAfterSecs: var_retryAfterSecs,
+    );
   }
 
   @protected
   VotingCompletedVoteChoice sse_decode_voting_completed_vote_choice(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_proposalId = sse_decode_u_32(deserializer);
     var var_choice = sse_decode_opt_box_autoadd_u_32(deserializer);
     return VotingCompletedVoteChoice(
-        proposalId: var_proposalId, choice: var_choice);
+      proposalId: var_proposalId,
+      choice: var_choice,
+    );
   }
 
   @protected
   VotingCompletedVoteDisplay sse_decode_voting_completed_vote_display(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_choices =
-        sse_decode_list_voting_completed_vote_choice(deserializer);
+    var var_choices = sse_decode_list_voting_completed_vote_choice(
+      deserializer,
+    );
     var var_votedAt = sse_decode_opt_box_autoadd_u_64(deserializer);
     return VotingCompletedVoteDisplay(
-        choices: var_choices, votedAt: var_votedAt);
+      choices: var_choices,
+      votedAt: var_votedAt,
+    );
   }
 
   @protected
@@ -12752,23 +14581,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_switchKind = sse_decode_String(deserializer);
     var var_voteServers = sse_decode_list_voting_service_endpoint(deserializer);
     var var_pirServers = sse_decode_list_voting_service_endpoint(deserializer);
-    var var_pirLayout =
-        sse_decode_opt_box_autoadd_voting_pir_layout(deserializer);
+    var var_pirLayout = sse_decode_opt_box_autoadd_voting_pir_layout(
+      deserializer,
+    );
     var var_rounds = sse_decode_list_voting_config_round(deserializer);
     return VotingConfig(
-        source: var_source,
-        sourceFingerprint: var_sourceFingerprint,
-        trustedKeyFingerprint: var_trustedKeyFingerprint,
-        switchKind: var_switchKind,
-        voteServers: var_voteServers,
-        pirServers: var_pirServers,
-        pirLayout: var_pirLayout,
-        rounds: var_rounds);
+      source: var_source,
+      sourceFingerprint: var_sourceFingerprint,
+      trustedKeyFingerprint: var_trustedKeyFingerprint,
+      switchKind: var_switchKind,
+      voteServers: var_voteServers,
+      pirServers: var_pirServers,
+      pirLayout: var_pirLayout,
+      rounds: var_rounds,
+    );
   }
 
   @protected
   VotingConfigRound sse_decode_voting_config_round(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_roundId = sse_decode_String(deserializer);
     var var_eaPk = sse_decode_list_prim_u_8_strict(deserializer);
@@ -12777,27 +14609,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingDelegationBuild sse_decode_voting_delegation_build(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_submission = sse_decode_voting_delegation_submission(deserializer);
     var var_wireJson = sse_decode_String(deserializer);
     return VotingDelegationBuild(
-        submission: var_submission, wireJson: var_wireJson);
+      submission: var_submission,
+      wireJson: var_wireJson,
+    );
   }
 
   @protected
   VotingDelegationConfirmation sse_decode_voting_delegation_confirmation(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_txHash = sse_decode_String(deserializer);
     var var_vanLeafPosition = sse_decode_u_32(deserializer);
     return VotingDelegationConfirmation(
-        txHash: var_txHash, vanLeafPosition: var_vanLeafPosition);
+      txHash: var_txHash,
+      vanLeafPosition: var_vanLeafPosition,
+    );
   }
 
   @protected
   VotingDelegationProgress sse_decode_voting_delegation_progress(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var tag_ = sse_decode_i_32(deserializer);
@@ -12826,7 +14665,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingDelegationRecovery sse_decode_voting_delegation_recovery(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_bundleIndex = sse_decode_u_32(deserializer);
     var var_phase = sse_decode_String(deserializer);
@@ -12834,16 +14674,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_txHash = sse_decode_opt_String(deserializer);
     var var_vanLeafPosition = sse_decode_opt_box_autoadd_u_32(deserializer);
     return VotingDelegationRecovery(
-        bundleIndex: var_bundleIndex,
-        phase: var_phase,
-        workflowPhase: var_workflowPhase,
-        txHash: var_txHash,
-        vanLeafPosition: var_vanLeafPosition);
+      bundleIndex: var_bundleIndex,
+      phase: var_phase,
+      workflowPhase: var_workflowPhase,
+      txHash: var_txHash,
+      vanLeafPosition: var_vanLeafPosition,
+    );
   }
 
   @protected
   VotingDelegationSetup sse_decode_voting_delegation_setup(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_pcztBytes = sse_decode_list_prim_u_8_strict(deserializer);
     var var_pcztSighash = sse_decode_list_prim_u_8_strict(deserializer);
@@ -12852,28 +14694,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_actionBytes = sse_decode_list_prim_u_8_strict(deserializer);
     var var_tx1Effects = sse_decode_list_prim_u_8_strict(deserializer);
     return VotingDelegationSetup(
-        pcztBytes: var_pcztBytes,
-        pcztSighash: var_pcztSighash,
-        rk: var_rk,
-        actionIndex: var_actionIndex,
-        actionBytes: var_actionBytes,
-        tx1Effects: var_tx1Effects);
+      pcztBytes: var_pcztBytes,
+      pcztSighash: var_pcztSighash,
+      rk: var_rk,
+      actionIndex: var_actionIndex,
+      actionBytes: var_actionBytes,
+      tx1Effects: var_tx1Effects,
+    );
   }
 
   @protected
   VotingDelegationStatus sse_decode_voting_delegation_status(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_bundleIndex = sse_decode_u_32(deserializer);
     var var_phase = sse_decode_String(deserializer);
     var var_txHash = sse_decode_opt_String(deserializer);
     return VotingDelegationStatus(
-        bundleIndex: var_bundleIndex, phase: var_phase, txHash: var_txHash);
+      bundleIndex: var_bundleIndex,
+      phase: var_phase,
+      txHash: var_txHash,
+    );
   }
 
   @protected
   VotingDelegationSubmission sse_decode_voting_delegation_submission(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_proof = sse_decode_list_prim_u_8_strict(deserializer);
     var var_rk = sse_decode_list_prim_u_8_strict(deserializer);
@@ -12887,28 +14735,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_sighash = sse_decode_list_prim_u_8_strict(deserializer);
     var var_tx1Effects = sse_decode_list_prim_u_8_strict(deserializer);
     return VotingDelegationSubmission(
-        proof: var_proof,
-        rk: var_rk,
-        nfSigned: var_nfSigned,
-        cmxNew: var_cmxNew,
-        govComm: var_govComm,
-        govNullifiers: var_govNullifiers,
-        alpha: var_alpha,
-        voteRoundId: var_voteRoundId,
-        spendAuthSig: var_spendAuthSig,
-        sighash: var_sighash,
-        tx1Effects: var_tx1Effects);
+      proof: var_proof,
+      rk: var_rk,
+      nfSigned: var_nfSigned,
+      cmxNew: var_cmxNew,
+      govComm: var_govComm,
+      govNullifiers: var_govNullifiers,
+      alpha: var_alpha,
+      voteRoundId: var_voteRoundId,
+      spendAuthSig: var_spendAuthSig,
+      sighash: var_sighash,
+      tx1Effects: var_tx1Effects,
+    );
   }
 
   @protected
   VotingEncryptedShare sse_decode_voting_encrypted_share(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_c1 = sse_decode_list_prim_u_8_strict(deserializer);
     var var_c2 = sse_decode_list_prim_u_8_strict(deserializer);
     var var_shareIndex = sse_decode_u_32(deserializer);
     return VotingEncryptedShare(
-        c1: var_c1, c2: var_c2, shareIndex: var_shareIndex);
+      c1: var_c1,
+      c2: var_c2,
+      shareIndex: var_shareIndex,
+    );
   }
 
   @protected
@@ -12920,11 +14773,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_choice = sse_decode_u_32(deserializer);
     var var_shareIndex = sse_decode_u_32(deserializer);
     return VotingNextStep(
-        kind: var_kind,
-        bundleIndex: var_bundleIndex,
-        proposalId: var_proposalId,
-        choice: var_choice,
-        shareIndex: var_shareIndex);
+      kind: var_kind,
+      bundleIndex: var_bundleIndex,
+      proposalId: var_proposalId,
+      choice: var_choice,
+      shareIndex: var_shareIndex,
+    );
   }
 
   @protected
@@ -12935,15 +14789,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_tier1Layers = sse_decode_u_32(deserializer);
     var var_polyLen = sse_decode_u_32(deserializer);
     return VotingPirLayout(
-        pirDepth: var_pirDepth,
-        tier0Layers: var_tier0Layers,
-        tier1Layers: var_tier1Layers,
-        polyLen: var_polyLen);
+      pirDepth: var_pirDepth,
+      tier0Layers: var_tier0Layers,
+      tier1Layers: var_tier1Layers,
+      polyLen: var_polyLen,
+    );
   }
 
   @protected
   VotingPreparedInfo sse_decode_voting_prepared_info(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_roundId = sse_decode_String(deserializer);
     var var_bundleIndex = sse_decode_u_32(deserializer);
@@ -12951,11 +14807,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_delegatedWeightZatoshi = sse_decode_u_64(deserializer);
     var var_roundName = sse_decode_String(deserializer);
     return VotingPreparedInfo(
-        roundId: var_roundId,
-        bundleIndex: var_bundleIndex,
-        eligibleWeightZatoshi: var_eligibleWeightZatoshi,
-        delegatedWeightZatoshi: var_delegatedWeightZatoshi,
-        roundName: var_roundName);
+      roundId: var_roundId,
+      bundleIndex: var_bundleIndex,
+      eligibleWeightZatoshi: var_eligibleWeightZatoshi,
+      delegatedWeightZatoshi: var_delegatedWeightZatoshi,
+      roundName: var_roundName,
+    );
   }
 
   @protected
@@ -12965,18 +14822,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_network = sse_decode_String(deserializer);
     var var_snapshotHeight = sse_decode_u_64(deserializer);
     var var_hotkeyAddress = sse_decode_opt_String(deserializer);
-    var var_eligibleWeightZatoshi =
-        sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_eligibleWeightZatoshi = sse_decode_opt_box_autoadd_u_64(
+      deserializer,
+    );
     var var_bundleCount = sse_decode_u_32(deserializer);
     var var_createdAt = sse_decode_u_64(deserializer);
     return VotingRoundInfo(
-        roundId: var_roundId,
-        network: var_network,
-        snapshotHeight: var_snapshotHeight,
-        hotkeyAddress: var_hotkeyAddress,
-        eligibleWeightZatoshi: var_eligibleWeightZatoshi,
-        bundleCount: var_bundleCount,
-        createdAt: var_createdAt);
+      roundId: var_roundId,
+      network: var_network,
+      snapshotHeight: var_snapshotHeight,
+      hotkeyAddress: var_hotkeyAddress,
+      eligibleWeightZatoshi: var_eligibleWeightZatoshi,
+      bundleCount: var_bundleCount,
+      createdAt: var_createdAt,
+    );
   }
 
   @protected
@@ -12987,8 +14846,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_nextSteps = sse_decode_list_voting_next_step(deserializer);
     var var_openProposals = sse_decode_list_prim_u_32_strict(deserializer);
     var var_allDecided = sse_decode_bool(deserializer);
-    var var_delegationStatuses =
-        sse_decode_list_voting_delegation_status(deserializer);
+    var var_delegationStatuses = sse_decode_list_voting_delegation_status(
+      deserializer,
+    );
     var var_blockingRecovery = sse_decode_bool(deserializer);
     var var_blockingShareWork = sse_decode_bool(deserializer);
     var var_hotkeyBound = sse_decode_bool(deserializer);
@@ -12999,64 +14859,72 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_needsDraftSetup = sse_decode_bool(deserializer);
     var var_primaryAction = sse_decode_String(deserializer);
     return VotingRoundPlan(
-        roundId: var_roundId,
-        pendingRecovery: var_pendingRecovery,
-        nextSteps: var_nextSteps,
-        openProposals: var_openProposals,
-        allDecided: var_allDecided,
-        delegationStatuses: var_delegationStatuses,
-        blockingRecovery: var_blockingRecovery,
-        blockingShareWork: var_blockingShareWork,
-        hotkeyBound: var_hotkeyBound,
-        completedVoteArtifact: var_completedVoteArtifact,
-        completedForDisplay: var_completedForDisplay,
-        completedVoteDisplay: var_completedVoteDisplay,
-        needsDraftSetup: var_needsDraftSetup,
-        primaryAction: var_primaryAction);
+      roundId: var_roundId,
+      pendingRecovery: var_pendingRecovery,
+      nextSteps: var_nextSteps,
+      openProposals: var_openProposals,
+      allDecided: var_allDecided,
+      delegationStatuses: var_delegationStatuses,
+      blockingRecovery: var_blockingRecovery,
+      blockingShareWork: var_blockingShareWork,
+      hotkeyBound: var_hotkeyBound,
+      completedVoteArtifact: var_completedVoteArtifact,
+      completedForDisplay: var_completedForDisplay,
+      completedVoteDisplay: var_completedVoteDisplay,
+      needsDraftSetup: var_needsDraftSetup,
+      primaryAction: var_primaryAction,
+    );
   }
 
   @protected
   VotingRoundRecovery sse_decode_voting_round_recovery(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_roundId = sse_decode_String(deserializer);
     var var_bundleCount = sse_decode_u_32(deserializer);
-    var var_delegation =
-        sse_decode_list_voting_delegation_recovery(deserializer);
+    var var_delegation = sse_decode_list_voting_delegation_recovery(
+      deserializer,
+    );
     var var_votes = sse_decode_list_voting_vote_recovery(deserializer);
     var var_shares = sse_decode_list_voting_share_workflow(deserializer);
-    var var_shareDelegations =
-        sse_decode_list_voting_share_delegation_record(deserializer);
+    var var_shareDelegations = sse_decode_list_voting_share_delegation_record(
+      deserializer,
+    );
     var var_unconfirmedShareDelegations =
         sse_decode_list_voting_share_delegation_record(deserializer);
     return VotingRoundRecovery(
-        roundId: var_roundId,
-        bundleCount: var_bundleCount,
-        delegation: var_delegation,
-        votes: var_votes,
-        shares: var_shares,
-        shareDelegations: var_shareDelegations,
-        unconfirmedShareDelegations: var_unconfirmedShareDelegations);
+      roundId: var_roundId,
+      bundleCount: var_bundleCount,
+      delegation: var_delegation,
+      votes: var_votes,
+      shares: var_shares,
+      shareDelegations: var_shareDelegations,
+      unconfirmedShareDelegations: var_unconfirmedShareDelegations,
+    );
   }
 
   @protected
   VotingRoundSession sse_decode_voting_round_session(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_roundId = sse_decode_String(deserializer);
     var var_plan = sse_decode_voting_round_plan(deserializer);
     var var_recovery = sse_decode_voting_round_recovery(deserializer);
     var var_intents = sse_decode_list_voting_ballot_intent(deserializer);
     return VotingRoundSession(
-        roundId: var_roundId,
-        plan: var_plan,
-        recovery: var_recovery,
-        intents: var_intents);
+      roundId: var_roundId,
+      plan: var_plan,
+      recovery: var_recovery,
+      intents: var_intents,
+    );
   }
 
   @protected
   VotingServiceEndpoint sse_decode_voting_service_endpoint(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_url = sse_decode_String(deserializer);
     var var_label = sse_decode_String(deserializer);
@@ -13065,7 +14933,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingShareDelegationRecord sse_decode_voting_share_delegation_record(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_roundId = sse_decode_String(deserializer);
     var var_bundleIndex = sse_decode_u_32(deserializer);
@@ -13077,20 +14946,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_submitAt = sse_decode_u_64(deserializer);
     var var_createdAt = sse_decode_u_64(deserializer);
     return VotingShareDelegationRecord(
-        roundId: var_roundId,
-        bundleIndex: var_bundleIndex,
-        proposalId: var_proposalId,
-        shareIndex: var_shareIndex,
-        sentToUrls: var_sentToUrls,
-        nullifier: var_nullifier,
-        confirmed: var_confirmed,
-        submitAt: var_submitAt,
-        createdAt: var_createdAt);
+      roundId: var_roundId,
+      bundleIndex: var_bundleIndex,
+      proposalId: var_proposalId,
+      shareIndex: var_shareIndex,
+      sentToUrls: var_sentToUrls,
+      nullifier: var_nullifier,
+      confirmed: var_confirmed,
+      submitAt: var_submitAt,
+      createdAt: var_createdAt,
+    );
   }
 
   @protected
   VotingSharePayload sse_decode_voting_share_payload(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_sharesHash = sse_decode_list_prim_u_8_strict(deserializer);
     var var_proposalId = sse_decode_u_32(deserializer);
@@ -13101,62 +14972,70 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_shareComms = sse_decode_list_list_prim_u_8_strict(deserializer);
     var var_primaryBlind = sse_decode_list_prim_u_8_strict(deserializer);
     return VotingSharePayload(
-        sharesHash: var_sharesHash,
-        proposalId: var_proposalId,
-        voteDecision: var_voteDecision,
-        encShare: var_encShare,
-        treePosition: var_treePosition,
-        allEncShares: var_allEncShares,
-        shareComms: var_shareComms,
-        primaryBlind: var_primaryBlind);
+      sharesHash: var_sharesHash,
+      proposalId: var_proposalId,
+      voteDecision: var_voteDecision,
+      encShare: var_encShare,
+      treePosition: var_treePosition,
+      allEncShares: var_allEncShares,
+      shareComms: var_shareComms,
+      primaryBlind: var_primaryBlind,
+    );
   }
 
   @protected
   VotingSharePlan sse_decode_voting_share_plan(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_summary = sse_decode_voting_share_tracking_summary(deserializer);
-    var var_nextTrackingDelaySecs =
-        sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_nextTrackingDelaySecs = sse_decode_opt_box_autoadd_u_64(
+      deserializer,
+    );
     var var_lastMoment = sse_decode_bool(deserializer);
     var var_submissions = sse_decode_list_voting_share_plan_item(deserializer);
     return VotingSharePlan(
-        summary: var_summary,
-        nextTrackingDelaySecs: var_nextTrackingDelaySecs,
-        lastMoment: var_lastMoment,
-        submissions: var_submissions);
+      summary: var_summary,
+      nextTrackingDelaySecs: var_nextTrackingDelaySecs,
+      lastMoment: var_lastMoment,
+      submissions: var_submissions,
+    );
   }
 
   @protected
   VotingSharePlanItem sse_decode_voting_share_plan_item(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_submitAt = sse_decode_u_64(deserializer);
     var var_targetCount = sse_decode_u_32(deserializer);
     var var_targetServers = sse_decode_list_String(deserializer);
     return VotingSharePlanItem(
-        submitAt: var_submitAt,
-        targetCount: var_targetCount,
-        targetServers: var_targetServers);
+      submitAt: var_submitAt,
+      targetCount: var_targetCount,
+      targetServers: var_targetServers,
+    );
   }
 
   @protected
   VotingShareSubmissionPayload sse_decode_voting_share_submission_payload(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_bundleIndex = sse_decode_u_32(deserializer);
     var var_proposalId = sse_decode_u_32(deserializer);
     var var_shareIndex = sse_decode_u_32(deserializer);
     var var_vcTreePosition = sse_decode_opt_box_autoadd_u_64(deserializer);
     return VotingShareSubmissionPayload(
-        bundleIndex: var_bundleIndex,
-        proposalId: var_proposalId,
-        shareIndex: var_shareIndex,
-        vcTreePosition: var_vcTreePosition);
+      bundleIndex: var_bundleIndex,
+      proposalId: var_proposalId,
+      shareIndex: var_shareIndex,
+      vcTreePosition: var_vcTreePosition,
+    );
   }
 
   @protected
   VotingShareTrackingSummary sse_decode_voting_share_tracking_summary(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_total = sse_decode_u_64(deserializer);
     var var_confirmed = sse_decode_u_64(deserializer);
@@ -13164,38 +15043,43 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_ready = sse_decode_u_64(deserializer);
     var var_overdue = sse_decode_u_64(deserializer);
     return VotingShareTrackingSummary(
-        total: var_total,
-        confirmed: var_confirmed,
-        waiting: var_waiting,
-        ready: var_ready,
-        overdue: var_overdue);
+      total: var_total,
+      confirmed: var_confirmed,
+      waiting: var_waiting,
+      ready: var_ready,
+      overdue: var_overdue,
+    );
   }
 
   @protected
   VotingShareWorkflow sse_decode_voting_share_workflow(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_bundleIndex = sse_decode_u_32(deserializer);
     var var_proposalId = sse_decode_u_32(deserializer);
     var var_shareIndex = sse_decode_u_32(deserializer);
     var var_phase = sse_decode_String(deserializer);
     return VotingShareWorkflow(
-        bundleIndex: var_bundleIndex,
-        proposalId: var_proposalId,
-        shareIndex: var_shareIndex,
-        phase: var_phase);
+      bundleIndex: var_bundleIndex,
+      proposalId: var_proposalId,
+      shareIndex: var_shareIndex,
+      phase: var_phase,
+    );
   }
 
   @protected
   VotingSignedVoteCommitment sse_decode_voting_signed_vote_commitment(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_proposalId = sse_decode_u_32(deserializer);
     var var_choice = sse_decode_u_32(deserializer);
     var var_voteRoundId = sse_decode_String(deserializer);
     var var_vanNullifier = sse_decode_list_prim_u_8_strict(deserializer);
-    var var_voteAuthorityNoteNew =
-        sse_decode_list_prim_u_8_strict(deserializer);
+    var var_voteAuthorityNoteNew = sse_decode_list_prim_u_8_strict(
+      deserializer,
+    );
     var var_voteCommitment = sse_decode_list_prim_u_8_strict(deserializer);
     var var_proof = sse_decode_list_prim_u_8_strict(deserializer);
     var var_anchorHeight = sse_decode_u_32(deserializer);
@@ -13203,28 +15087,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_voteAuthSig = sse_decode_list_prim_u_8_strict(deserializer);
     var var_commitmentBundleJson = sse_decode_String(deserializer);
     return VotingSignedVoteCommitment(
-        proposalId: var_proposalId,
-        choice: var_choice,
-        voteRoundId: var_voteRoundId,
-        vanNullifier: var_vanNullifier,
-        voteAuthorityNoteNew: var_voteAuthorityNoteNew,
-        voteCommitment: var_voteCommitment,
-        proof: var_proof,
-        anchorHeight: var_anchorHeight,
-        rVpk: var_rVpk,
-        voteAuthSig: var_voteAuthSig,
-        commitmentBundleJson: var_commitmentBundleJson);
+      proposalId: var_proposalId,
+      choice: var_choice,
+      voteRoundId: var_voteRoundId,
+      vanNullifier: var_vanNullifier,
+      voteAuthorityNoteNew: var_voteAuthorityNoteNew,
+      voteCommitment: var_voteCommitment,
+      proof: var_proof,
+      anchorHeight: var_anchorHeight,
+      rVpk: var_rVpk,
+      voteAuthSig: var_voteAuthSig,
+      commitmentBundleJson: var_commitmentBundleJson,
+    );
   }
 
   @protected
   VotingTreeVoteConfirmation sse_decode_voting_tree_vote_confirmation(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_vcTreePosition = sse_decode_u_64(deserializer);
     var var_vanLeafPosition = sse_decode_opt_box_autoadd_u_32(deserializer);
     return VotingTreeVoteConfirmation(
-        vcTreePosition: var_vcTreePosition,
-        vanLeafPosition: var_vanLeafPosition);
+      vcTreePosition: var_vcTreePosition,
+      vanLeafPosition: var_vanLeafPosition,
+    );
   }
 
   @protected
@@ -13234,14 +15121,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_position = sse_decode_u_32(deserializer);
     var var_anchorHeight = sse_decode_u_32(deserializer);
     return VotingVanWitness(
-        authPath: var_authPath,
-        position: var_position,
-        anchorHeight: var_anchorHeight);
+      authPath: var_authPath,
+      position: var_position,
+      anchorHeight: var_anchorHeight,
+    );
   }
 
   @protected
   VotingVoteCommitStage sse_decode_voting_vote_commit_stage(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var tag_ = sse_decode_i_32(deserializer);
@@ -13250,25 +15139,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         var var_proposalId = sse_decode_u_32(deserializer);
         var var_bundleIndex = sse_decode_u_32(deserializer);
         return VotingVoteCommitStage_ProofStarting(
-            proposalId: var_proposalId, bundleIndex: var_bundleIndex);
+          proposalId: var_proposalId,
+          bundleIndex: var_bundleIndex,
+        );
       case 1:
         var var_proposalId = sse_decode_u_32(deserializer);
         var var_bundleIndex = sse_decode_u_32(deserializer);
         var var_progress = sse_decode_f_64(deserializer);
         return VotingVoteCommitStage_ProofProgress(
-            proposalId: var_proposalId,
-            bundleIndex: var_bundleIndex,
-            progress: var_progress);
+          proposalId: var_proposalId,
+          bundleIndex: var_bundleIndex,
+          progress: var_progress,
+        );
       case 2:
         var var_proposalId = sse_decode_u_32(deserializer);
         var var_bundleIndex = sse_decode_u_32(deserializer);
         return VotingVoteCommitStage_SharePayloadsBuilding(
-            proposalId: var_proposalId, bundleIndex: var_bundleIndex);
+          proposalId: var_proposalId,
+          bundleIndex: var_bundleIndex,
+        );
       case 3:
         var var_proposalId = sse_decode_u_32(deserializer);
         var var_bundleIndex = sse_decode_u_32(deserializer);
         return VotingVoteCommitStage_Signing(
-            proposalId: var_proposalId, bundleIndex: var_bundleIndex);
+          proposalId: var_proposalId,
+          bundleIndex: var_bundleIndex,
+        );
       default:
         throw UnimplementedError('');
     }
@@ -13276,41 +15172,51 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   VotingVoteCommitments sse_decode_voting_vote_commitments(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_bundleIndex = sse_decode_u_32(deserializer);
-    var var_commitments =
-        sse_decode_list_voting_signed_vote_commitment(deserializer);
+    var var_commitments = sse_decode_list_voting_signed_vote_commitment(
+      deserializer,
+    );
     return VotingVoteCommitments(
-        bundleIndex: var_bundleIndex, commitments: var_commitments);
+      bundleIndex: var_bundleIndex,
+      commitments: var_commitments,
+    );
   }
 
   @protected
   VotingVoteConfirmation sse_decode_voting_vote_confirmation(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_txHash = sse_decode_String(deserializer);
     var var_vanLeafPosition = sse_decode_u_32(deserializer);
     var var_vcTreePosition = sse_decode_u_64(deserializer);
     return VotingVoteConfirmation(
-        txHash: var_txHash,
-        vanLeafPosition: var_vanLeafPosition,
-        vcTreePosition: var_vcTreePosition);
+      txHash: var_txHash,
+      vanLeafPosition: var_vanLeafPosition,
+      vcTreePosition: var_vcTreePosition,
+    );
   }
 
   @protected
   VotingVotePayloads sse_decode_voting_vote_payloads(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_submission = sse_decode_voting_vote_submission(deserializer);
     var var_sharePayloads = sse_decode_list_voting_share_payload(deserializer);
     return VotingVotePayloads(
-        submission: var_submission, sharePayloads: var_sharePayloads);
+      submission: var_submission,
+      sharePayloads: var_sharePayloads,
+    );
   }
 
   @protected
   VotingVoteRecovery sse_decode_voting_vote_recovery(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_bundleIndex = sse_decode_u_32(deserializer);
     var var_proposalId = sse_decode_u_32(deserializer);
@@ -13321,40 +15227,44 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_vcTreePosition = sse_decode_opt_box_autoadd_u_64(deserializer);
     var var_hasCommitmentBundle = sse_decode_bool(deserializer);
     return VotingVoteRecovery(
-        bundleIndex: var_bundleIndex,
-        proposalId: var_proposalId,
-        choice: var_choice,
-        phase: var_phase,
-        workflowPhase: var_workflowPhase,
-        txHash: var_txHash,
-        vcTreePosition: var_vcTreePosition,
-        hasCommitmentBundle: var_hasCommitmentBundle);
+      bundleIndex: var_bundleIndex,
+      proposalId: var_proposalId,
+      choice: var_choice,
+      phase: var_phase,
+      workflowPhase: var_workflowPhase,
+      txHash: var_txHash,
+      vcTreePosition: var_vcTreePosition,
+      hasCommitmentBundle: var_hasCommitmentBundle,
+    );
   }
 
   @protected
   VotingVoteSubmission sse_decode_voting_vote_submission(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_voteRoundId = sse_decode_String(deserializer);
     var var_proposalId = sse_decode_u_32(deserializer);
     var var_vanNullifier = sse_decode_list_prim_u_8_strict(deserializer);
-    var var_voteAuthorityNoteNew =
-        sse_decode_list_prim_u_8_strict(deserializer);
+    var var_voteAuthorityNoteNew = sse_decode_list_prim_u_8_strict(
+      deserializer,
+    );
     var var_voteCommitment = sse_decode_list_prim_u_8_strict(deserializer);
     var var_proof = sse_decode_list_prim_u_8_strict(deserializer);
     var var_rVpk = sse_decode_list_prim_u_8_strict(deserializer);
     var var_voteAuthSig = sse_decode_list_prim_u_8_strict(deserializer);
     var var_anchorHeight = sse_decode_u_32(deserializer);
     return VotingVoteSubmission(
-        voteRoundId: var_voteRoundId,
-        proposalId: var_proposalId,
-        vanNullifier: var_vanNullifier,
-        voteAuthorityNoteNew: var_voteAuthorityNoteNew,
-        voteCommitment: var_voteCommitment,
-        proof: var_proof,
-        rVpk: var_rVpk,
-        voteAuthSig: var_voteAuthSig,
-        anchorHeight: var_anchorHeight);
+      voteRoundId: var_voteRoundId,
+      proposalId: var_proposalId,
+      vanNullifier: var_vanNullifier,
+      voteAuthorityNoteNew: var_voteAuthorityNoteNew,
+      voteCommitment: var_voteCommitment,
+      proof: var_proof,
+      rVpk: var_rVpk,
+      voteAuthSig: var_voteAuthSig,
+      anchorHeight: var_anchorHeight,
+    );
   }
 
   @protected
@@ -13369,170 +15279,245 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_firstSeenHeight = sse_decode_u_32(deserializer);
     var var_balance = sse_decode_u_64(deserializer);
     return ZsaHolding(
-        idAsset: var_idAsset,
-        assetDescHash: var_assetDescHash,
-        assetName: var_assetName,
-        ik: var_ik,
-        assetBase: var_assetBase,
-        finalized: var_finalized,
-        firstSeenHeight: var_firstSeenHeight,
-        balance: var_balance);
+      idAsset: var_idAsset,
+      assetDescHash: var_assetDescHash,
+      assetName: var_assetName,
+      ik: var_ik,
+      assetBase: var_assetBase,
+      finalized: var_finalized,
+      firstSeenHeight: var_firstSeenHeight,
+      balance: var_balance,
+    );
   }
 
   @protected
   void sse_encode_AnyhowException(
-      AnyhowException self, SseSerializer serializer) {
+    AnyhowException self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.message, serializer);
   }
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-          DartVault self, SseSerializer serializer) {
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
+    DartVault self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as DartVaultImpl).frbInternalSseEncode(move: true), serializer);
+      (self as DartVaultImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
-          Mempool self, SseSerializer serializer) {
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
+    Mempool self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as MempoolImpl).frbInternalSseEncode(move: true), serializer);
+      (self as MempoolImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
-          NoteMigration self, SseSerializer serializer) {
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
+    NoteMigration self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as NoteMigrationImpl).frbInternalSseEncode(move: true),
-        serializer);
+      (self as NoteMigrationImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-          TransparentScanner self, SseSerializer serializer) {
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
+    TransparentScanner self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as TransparentScannerImpl).frbInternalSseEncode(move: true),
-        serializer);
+      (self as TransparentScannerImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
-          Mempool self, SseSerializer serializer) {
+  sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
+    Mempool self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as MempoolImpl).frbInternalSseEncode(move: false), serializer);
+      (self as MempoolImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-          TransparentScanner self, SseSerializer serializer) {
+  sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
+    TransparentScanner self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as TransparentScannerImpl).frbInternalSseEncode(move: false),
-        serializer);
+      (self as TransparentScannerImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-          DartVault self, SseSerializer serializer) {
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
+    DartVault self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as DartVaultImpl).frbInternalSseEncode(move: false), serializer);
+      (self as DartVaultImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
-          NoteMigration self, SseSerializer serializer) {
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
+    NoteMigration self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as NoteMigrationImpl).frbInternalSseEncode(move: false),
-        serializer);
+      (self as NoteMigrationImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-          TransparentScanner self, SseSerializer serializer) {
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
+    TransparentScanner self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as TransparentScannerImpl).frbInternalSseEncode(move: false),
-        serializer);
+      (self as TransparentScannerImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_DartFn_Inputs_list_prim_u_8_strict_Output_unit_AnyhowException(
-          FutureOr<void> Function(Uint8List) self, SseSerializer serializer) {
+  sse_encode_DartFn_Inputs_list_prim_u_8_strict_Output_list_prim_u_8_strict_AnyhowException(
+    FutureOr<Uint8List> Function(Uint8List) self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_DartOpaque(
-        encode_DartFn_Inputs_list_prim_u_8_strict_Output_unit_AnyhowException(
-            self),
-        serializer);
+      encode_DartFn_Inputs_list_prim_u_8_strict_Output_list_prim_u_8_strict_AnyhowException(
+        self,
+      ),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_DartFn_Inputs_list_prim_u_8_strict_Output_unit_AnyhowException(
+    FutureOr<void> Function(Uint8List) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_DartOpaque(
+      encode_DartFn_Inputs_list_prim_u_8_strict_Output_unit_AnyhowException(
+        self,
+      ),
+      serializer,
+    );
   }
 
   @protected
   void sse_encode_DartOpaque(Object self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_isize(
-        PlatformPointerUtil.ptrToPlatformInt64(encodeDartOpaque(
-            self, portManager.dartHandlerPort, generalizedFrbRustBinding)),
-        serializer);
+      PlatformPointerUtil.ptrToPlatformInt64(
+        encodeDartOpaque(
+          self,
+          portManager.dartHandlerPort,
+          generalizedFrbRustBinding,
+        ),
+      ),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
-          DartVault self, SseSerializer serializer) {
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDartVault(
+    DartVault self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as DartVaultImpl).frbInternalSseEncode(move: null), serializer);
+      (self as DartVaultImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
-          Mempool self, SseSerializer serializer) {
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMempool(
+    Mempool self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as MempoolImpl).frbInternalSseEncode(move: null), serializer);
+      (self as MempoolImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
-          NoteMigration self, SseSerializer serializer) {
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNoteMigration(
+    NoteMigration self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as NoteMigrationImpl).frbInternalSseEncode(move: null),
-        serializer);
+      (self as NoteMigrationImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
   }
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
-          TransparentScanner self, SseSerializer serializer) {
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTransparentScanner(
+    TransparentScanner self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as TransparentScannerImpl).frbInternalSseEncode(move: null),
-        serializer);
+      (self as TransparentScannerImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
   }
 
   @protected
   void sse_encode_StreamSink_String_Sse(
-      RustStreamSink<String> self, SseSerializer serializer) {
+    RustStreamSink<String> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(
       self.setupAndSerialize(
@@ -13547,7 +15532,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_StreamSink_dkg_status_Sse(
-      RustStreamSink<DKGStatus> self, SseSerializer serializer) {
+    RustStreamSink<DKGStatus> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(
       self.setupAndSerialize(
@@ -13562,7 +15549,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_StreamSink_log_message_Sse(
-      RustStreamSink<LogMessage> self, SseSerializer serializer) {
+    RustStreamSink<LogMessage> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(
       self.setupAndSerialize(
@@ -13577,7 +15566,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_StreamSink_mempool_msg_Sse(
-      RustStreamSink<MempoolMsg> self, SseSerializer serializer) {
+    RustStreamSink<MempoolMsg> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(
       self.setupAndSerialize(
@@ -13592,7 +15583,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_StreamSink_migration_status_Sse(
-      RustStreamSink<MigrationStatus> self, SseSerializer serializer) {
+    RustStreamSink<MigrationStatus> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(
       self.setupAndSerialize(
@@ -13607,7 +15600,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_StreamSink_signing_event_Sse(
-      RustStreamSink<SigningEvent> self, SseSerializer serializer) {
+    RustStreamSink<SigningEvent> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(
       self.setupAndSerialize(
@@ -13622,7 +15617,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_StreamSink_signing_status_Sse(
-      RustStreamSink<SigningStatus> self, SseSerializer serializer) {
+    RustStreamSink<SigningStatus> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(
       self.setupAndSerialize(
@@ -13637,7 +15634,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_StreamSink_sync_progress_Sse(
-      RustStreamSink<SyncProgress> self, SseSerializer serializer) {
+    RustStreamSink<SyncProgress> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(
       self.setupAndSerialize(
@@ -13652,7 +15651,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_StreamSink_voting_delegation_progress_Sse(
-      RustStreamSink<VotingDelegationProgress> self, SseSerializer serializer) {
+    RustStreamSink<VotingDelegationProgress> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(
       self.setupAndSerialize(
@@ -13667,7 +15668,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_StreamSink_voting_vote_commit_stage_Sse(
-      RustStreamSink<VotingVoteCommitStage> self, SseSerializer serializer) {
+    RustStreamSink<VotingVoteCommitStage> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(
       self.setupAndSerialize(
@@ -13742,7 +15745,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_box_autoadd_account_update(
-      AccountUpdate self, SseSerializer serializer) {
+    AccountUpdate self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_account_update(self, serializer);
   }
@@ -13755,7 +15760,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_box_autoadd_category(
-      Category self, SseSerializer serializer) {
+    Category self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_category(self, serializer);
   }
@@ -13774,7 +15781,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_box_autoadd_frost_params(
-      FrostParams self, SseSerializer serializer) {
+    FrostParams self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_frost_params(self, serializer);
   }
@@ -13787,42 +15796,54 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_box_autoadd_i_64(
-      PlatformInt64 self, SseSerializer serializer) {
+    PlatformInt64 self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_64(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_mempool_tx(
-      MempoolTx self, SseSerializer serializer) {
+    MempoolTx self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_mempool_tx(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_new_account(
-      NewAccount self, SseSerializer serializer) {
+    NewAccount self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_new_account(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_payment_options(
-      PaymentOptions self, SseSerializer serializer) {
+    PaymentOptions self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_payment_options(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_pczt_package(
-      PcztPackage self, SseSerializer serializer) {
+    PcztPackage self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_pczt_package(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_raptor_q_params(
-      RaptorQParams self, SseSerializer serializer) {
+    RaptorQParams self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_raptor_q_params(self, serializer);
   }
@@ -13835,7 +15856,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_box_autoadd_signing_event(
-      SigningEvent self, SseSerializer serializer) {
+    SigningEvent self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_signing_event(self, serializer);
   }
@@ -13860,21 +15883,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_box_autoadd_voting_completed_vote_display(
-      VotingCompletedVoteDisplay self, SseSerializer serializer) {
+    VotingCompletedVoteDisplay self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_voting_completed_vote_display(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_voting_config(
-      VotingConfig self, SseSerializer serializer) {
+    VotingConfig self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_voting_config(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_voting_pir_layout(
-      VotingPirLayout self, SseSerializer serializer) {
+    VotingPirLayout self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_voting_pir_layout(self, serializer);
   }
@@ -13917,7 +15946,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_db_account_preview(
-      DbAccountPreview self, SseSerializer serializer) {
+    DbAccountPreview self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.id, serializer);
     sse_encode_String(self.name, serializer);
@@ -13986,7 +16017,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_frost_sign_params(
-      FrostSignParams self, SseSerializer serializer) {
+    FrostSignParams self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.account, serializer);
     sse_encode_u_8(self.coordinator, serializer);
@@ -14049,7 +16082,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_contact_match(
-      List<ContactMatch> self, SseSerializer serializer) {
+    List<ContactMatch> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14059,7 +16094,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_db_account_preview(
-      List<DbAccountPreview> self, SseSerializer serializer) {
+    List<DbAccountPreview> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14078,7 +16115,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_list_prim_u_8_strict(
-      List<Uint8List> self, SseSerializer serializer) {
+    List<Uint8List> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14106,7 +16145,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_memo_cell(
-      List<MemoCell> self, SseSerializer serializer) {
+    List<MemoCell> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14125,7 +16166,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_memo_section(
-      List<MemoSection> self, SseSerializer serializer) {
+    List<MemoSection> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14135,7 +16178,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_mempool_amount(
-      List<MempoolAmount> self, SseSerializer serializer) {
+    List<MempoolAmount> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14145,7 +16190,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_mempool_note(
-      List<MempoolNote> self, SseSerializer serializer) {
+    List<MempoolNote> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14155,7 +16202,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_plugin_info(
-      List<PluginInfo> self, SseSerializer serializer) {
+    List<PluginInfo> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14165,16 +16214,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_prim_u_32_loose(
-      List<int> self, SseSerializer serializer) {
+    List<int> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
-    serializer.buffer
-        .putUint32List(self is Uint32List ? self : Uint32List.fromList(self));
+    serializer.buffer.putUint32List(
+      self is Uint32List ? self : Uint32List.fromList(self),
+    );
   }
 
   @protected
   void sse_encode_list_prim_u_32_strict(
-      Uint32List self, SseSerializer serializer) {
+    Uint32List self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint32List(self);
@@ -14182,7 +16236,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_prim_u_64_strict(
-      Uint64List self, SseSerializer serializer) {
+    Uint64List self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint64List(self);
@@ -14190,16 +16246,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_prim_u_8_loose(
-      List<int> self, SseSerializer serializer) {
+    List<int> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
-    serializer.buffer
-        .putUint8List(self is Uint8List ? self : Uint8List.fromList(self));
+    serializer.buffer.putUint8List(
+      self is Uint8List ? self : Uint8List.fromList(self),
+    );
   }
 
   @protected
   void sse_encode_list_prim_u_8_strict(
-      Uint8List self, SseSerializer serializer) {
+    Uint8List self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint8List(self);
@@ -14207,7 +16268,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_prim_usize_strict(
-      Uint64List self, SseSerializer serializer) {
+    Uint64List self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint64List(self);
@@ -14215,7 +16278,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_recipient(
-      List<Recipient> self, SseSerializer serializer) {
+    List<Recipient> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14225,7 +16290,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_record_string_f_64_bool(
-      List<(String, double, bool)> self, SseSerializer serializer) {
+    List<(String, double, bool)> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14235,7 +16302,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_record_u_32_f_64(
-      List<(int, double)> self, SseSerializer serializer) {
+    List<(int, double)> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14245,7 +16314,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_restored_account(
-      List<RestoredAccount> self, SseSerializer serializer) {
+    List<RestoredAccount> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14255,7 +16326,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_t_address_tx_count(
-      List<TAddressTxCount> self, SseSerializer serializer) {
+    List<TAddressTxCount> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14292,7 +16365,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_tx_output(
-      List<TxOutput> self, SseSerializer serializer) {
+    List<TxOutput> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14302,7 +16377,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_tx_plan_in(
-      List<TxPlanIn> self, SseSerializer serializer) {
+    List<TxPlanIn> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14312,7 +16389,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_tx_plan_out(
-      List<TxPlanOut> self, SseSerializer serializer) {
+    List<TxPlanOut> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14331,7 +16410,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_ballot_intent(
-      List<VotingBallotIntent> self, SseSerializer serializer) {
+    List<VotingBallotIntent> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14341,7 +16422,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_completed_vote_choice(
-      List<VotingCompletedVoteChoice> self, SseSerializer serializer) {
+    List<VotingCompletedVoteChoice> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14351,7 +16434,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_config_round(
-      List<VotingConfigRound> self, SseSerializer serializer) {
+    List<VotingConfigRound> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14361,7 +16446,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_delegation_recovery(
-      List<VotingDelegationRecovery> self, SseSerializer serializer) {
+    List<VotingDelegationRecovery> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14371,7 +16458,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_delegation_status(
-      List<VotingDelegationStatus> self, SseSerializer serializer) {
+    List<VotingDelegationStatus> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14381,7 +16470,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_encrypted_share(
-      List<VotingEncryptedShare> self, SseSerializer serializer) {
+    List<VotingEncryptedShare> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14391,7 +16482,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_next_step(
-      List<VotingNextStep> self, SseSerializer serializer) {
+    List<VotingNextStep> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14401,7 +16494,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_round_info(
-      List<VotingRoundInfo> self, SseSerializer serializer) {
+    List<VotingRoundInfo> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14411,7 +16506,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_round_session(
-      List<VotingRoundSession> self, SseSerializer serializer) {
+    List<VotingRoundSession> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14421,7 +16518,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_service_endpoint(
-      List<VotingServiceEndpoint> self, SseSerializer serializer) {
+    List<VotingServiceEndpoint> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14431,7 +16530,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_share_delegation_record(
-      List<VotingShareDelegationRecord> self, SseSerializer serializer) {
+    List<VotingShareDelegationRecord> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14441,7 +16542,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_share_payload(
-      List<VotingSharePayload> self, SseSerializer serializer) {
+    List<VotingSharePayload> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14451,7 +16554,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_share_plan_item(
-      List<VotingSharePlanItem> self, SseSerializer serializer) {
+    List<VotingSharePlanItem> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14461,7 +16566,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_share_submission_payload(
-      List<VotingShareSubmissionPayload> self, SseSerializer serializer) {
+    List<VotingShareSubmissionPayload> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14471,7 +16578,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_share_workflow(
-      List<VotingShareWorkflow> self, SseSerializer serializer) {
+    List<VotingShareWorkflow> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14481,7 +16590,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_signed_vote_commitment(
-      List<VotingSignedVoteCommitment> self, SseSerializer serializer) {
+    List<VotingSignedVoteCommitment> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14491,7 +16602,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_voting_vote_recovery(
-      List<VotingVoteRecovery> self, SseSerializer serializer) {
+    List<VotingVoteRecovery> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14501,7 +16614,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_zsa_holding(
-      List<ZsaHolding> self, SseSerializer serializer) {
+    List<ZsaHolding> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -14611,7 +16726,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_migration_event(
-      MigrationEvent self, SseSerializer serializer) {
+    MigrationEvent self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
       case MigrationEvent_SplitComplete(fee: final fee):
@@ -14632,7 +16749,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_migration_status(
-      MigrationStatus self, SseSerializer serializer) {
+    MigrationStatus self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.phase, serializer);
     sse_encode_u_64(self.splitFees, serializer);
@@ -14666,7 +16785,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_open_alias_resolution(
-      OpenAliasResolution self, SseSerializer serializer) {
+    OpenAliasResolution self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_recipient(self.recipients, serializer);
     sse_encode_String(self.dnssecStatus, serializer);
@@ -14704,7 +16825,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_box_autoadd_frost_params(
-      FrostParams? self, SseSerializer serializer) {
+    FrostParams? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -14725,7 +16848,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_box_autoadd_i_64(
-      PlatformInt64? self, SseSerializer serializer) {
+    PlatformInt64? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -14776,7 +16901,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_box_autoadd_voting_completed_vote_display(
-      VotingCompletedVoteDisplay? self, SseSerializer serializer) {
+    VotingCompletedVoteDisplay? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -14787,7 +16914,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_box_autoadd_voting_config(
-      VotingConfig? self, SseSerializer serializer) {
+    VotingConfig? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -14798,7 +16927,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_box_autoadd_voting_pir_layout(
-      VotingPirLayout? self, SseSerializer serializer) {
+    VotingPirLayout? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -14809,7 +16940,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_list_String(
-      List<String>? self, SseSerializer serializer) {
+    List<String>? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -14820,7 +16953,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_list_prim_u_8_strict(
-      Uint8List? self, SseSerializer serializer) {
+    Uint8List? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -14831,7 +16966,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_list_recipient(
-      List<Recipient>? self, SseSerializer serializer) {
+    List<Recipient>? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -14842,7 +16979,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_payment_options(
-      PaymentOptions self, SseSerializer serializer) {
+    PaymentOptions self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_8(self.srcPools, serializer);
     sse_encode_bool(self.recipientPaysFee, serializer);
@@ -14886,7 +17025,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_raptor_q_params(
-      RaptorQParams self, SseSerializer serializer) {
+    RaptorQParams self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_16(self.version, serializer);
     sse_encode_u_8(self.ecLevel, serializer);
@@ -14895,7 +17036,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_raw_open_alias_resolution(
-      RawOpenAliasResolution self, SseSerializer serializer) {
+    RawOpenAliasResolution self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_String(self.records, serializer);
     sse_encode_String(self.dnssecStatus, serializer);
@@ -14924,7 +17067,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_record_string_f_64_bool(
-      (String, double, bool) self, SseSerializer serializer) {
+    (String, double, bool) self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.$1, serializer);
     sse_encode_f_64(self.$2, serializer);
@@ -14933,7 +17078,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_record_u_32_f_64(
-      (int, double) self, SseSerializer serializer) {
+    (int, double) self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.$1, serializer);
     sse_encode_f_64(self.$2, serializer);
@@ -14941,7 +17088,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_restored_account(
-      RestoredAccount self, SseSerializer serializer) {
+    RestoredAccount self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.timestamp, serializer);
     sse_encode_String(self.name, serializer);
@@ -14953,7 +17102,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_sapling_params_status(
-      SaplingParamsStatus self, SseSerializer serializer) {
+    SaplingParamsStatus self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_bool(self.downloaded, serializer);
   }
@@ -15026,7 +17177,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_t_address_tx_count(
-      TAddressTxCount self, SseSerializer serializer) {
+    TAddressTxCount self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_8(self.pool, serializer);
     sse_encode_String(self.address, serializer);
@@ -15194,7 +17347,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_ballot_intent(
-      VotingBallotIntent self, SseSerializer serializer) {
+    VotingBallotIntent self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.proposalId, serializer);
     sse_encode_bool(self.skipped, serializer);
@@ -15203,7 +17358,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_chain_response(
-      VotingChainResponse self, SseSerializer serializer) {
+    VotingChainResponse self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_16(self.statusCode, serializer);
     sse_encode_String(self.body, serializer);
@@ -15212,7 +17369,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_completed_vote_choice(
-      VotingCompletedVoteChoice self, SseSerializer serializer) {
+    VotingCompletedVoteChoice self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.proposalId, serializer);
     sse_encode_opt_box_autoadd_u_32(self.choice, serializer);
@@ -15220,7 +17379,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_completed_vote_display(
-      VotingCompletedVoteDisplay self, SseSerializer serializer) {
+    VotingCompletedVoteDisplay self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_voting_completed_vote_choice(self.choices, serializer);
     sse_encode_opt_box_autoadd_u_64(self.votedAt, serializer);
@@ -15241,7 +17402,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_config_round(
-      VotingConfigRound self, SseSerializer serializer) {
+    VotingConfigRound self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.roundId, serializer);
     sse_encode_list_prim_u_8_strict(self.eaPk, serializer);
@@ -15249,7 +17412,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_delegation_build(
-      VotingDelegationBuild self, SseSerializer serializer) {
+    VotingDelegationBuild self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_voting_delegation_submission(self.submission, serializer);
     sse_encode_String(self.wireJson, serializer);
@@ -15257,7 +17422,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_delegation_confirmation(
-      VotingDelegationConfirmation self, SseSerializer serializer) {
+    VotingDelegationConfirmation self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.txHash, serializer);
     sse_encode_u_32(self.vanLeafPosition, serializer);
@@ -15265,7 +17432,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_delegation_progress(
-      VotingDelegationProgress self, SseSerializer serializer) {
+    VotingDelegationProgress self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
       case VotingDelegationProgress_SelectingNotes():
@@ -15290,7 +17459,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_delegation_recovery(
-      VotingDelegationRecovery self, SseSerializer serializer) {
+    VotingDelegationRecovery self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.bundleIndex, serializer);
     sse_encode_String(self.phase, serializer);
@@ -15301,7 +17472,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_delegation_setup(
-      VotingDelegationSetup self, SseSerializer serializer) {
+    VotingDelegationSetup self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(self.pcztBytes, serializer);
     sse_encode_list_prim_u_8_strict(self.pcztSighash, serializer);
@@ -15313,7 +17486,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_delegation_status(
-      VotingDelegationStatus self, SseSerializer serializer) {
+    VotingDelegationStatus self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.bundleIndex, serializer);
     sse_encode_String(self.phase, serializer);
@@ -15322,7 +17497,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_delegation_submission(
-      VotingDelegationSubmission self, SseSerializer serializer) {
+    VotingDelegationSubmission self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(self.proof, serializer);
     sse_encode_list_prim_u_8_strict(self.rk, serializer);
@@ -15339,7 +17516,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_encrypted_share(
-      VotingEncryptedShare self, SseSerializer serializer) {
+    VotingEncryptedShare self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(self.c1, serializer);
     sse_encode_list_prim_u_8_strict(self.c2, serializer);
@@ -15348,7 +17527,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_next_step(
-      VotingNextStep self, SseSerializer serializer) {
+    VotingNextStep self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.kind, serializer);
     sse_encode_u_32(self.bundleIndex, serializer);
@@ -15359,7 +17540,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_pir_layout(
-      VotingPirLayout self, SseSerializer serializer) {
+    VotingPirLayout self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.pirDepth, serializer);
     sse_encode_u_32(self.tier0Layers, serializer);
@@ -15369,7 +17552,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_prepared_info(
-      VotingPreparedInfo self, SseSerializer serializer) {
+    VotingPreparedInfo self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.roundId, serializer);
     sse_encode_u_32(self.bundleIndex, serializer);
@@ -15380,7 +17565,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_round_info(
-      VotingRoundInfo self, SseSerializer serializer) {
+    VotingRoundInfo self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.roundId, serializer);
     sse_encode_String(self.network, serializer);
@@ -15393,7 +17580,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_round_plan(
-      VotingRoundPlan self, SseSerializer serializer) {
+    VotingRoundPlan self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.roundId, serializer);
     sse_encode_bool(self.pendingRecovery, serializer);
@@ -15401,21 +17590,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_prim_u_32_strict(self.openProposals, serializer);
     sse_encode_bool(self.allDecided, serializer);
     sse_encode_list_voting_delegation_status(
-        self.delegationStatuses, serializer);
+      self.delegationStatuses,
+      serializer,
+    );
     sse_encode_bool(self.blockingRecovery, serializer);
     sse_encode_bool(self.blockingShareWork, serializer);
     sse_encode_bool(self.hotkeyBound, serializer);
     sse_encode_bool(self.completedVoteArtifact, serializer);
     sse_encode_bool(self.completedForDisplay, serializer);
     sse_encode_opt_box_autoadd_voting_completed_vote_display(
-        self.completedVoteDisplay, serializer);
+      self.completedVoteDisplay,
+      serializer,
+    );
     sse_encode_bool(self.needsDraftSetup, serializer);
     sse_encode_String(self.primaryAction, serializer);
   }
 
   @protected
   void sse_encode_voting_round_recovery(
-      VotingRoundRecovery self, SseSerializer serializer) {
+    VotingRoundRecovery self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.roundId, serializer);
     sse_encode_u_32(self.bundleCount, serializer);
@@ -15423,14 +17618,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_voting_vote_recovery(self.votes, serializer);
     sse_encode_list_voting_share_workflow(self.shares, serializer);
     sse_encode_list_voting_share_delegation_record(
-        self.shareDelegations, serializer);
+      self.shareDelegations,
+      serializer,
+    );
     sse_encode_list_voting_share_delegation_record(
-        self.unconfirmedShareDelegations, serializer);
+      self.unconfirmedShareDelegations,
+      serializer,
+    );
   }
 
   @protected
   void sse_encode_voting_round_session(
-      VotingRoundSession self, SseSerializer serializer) {
+    VotingRoundSession self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.roundId, serializer);
     sse_encode_voting_round_plan(self.plan, serializer);
@@ -15440,7 +17641,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_service_endpoint(
-      VotingServiceEndpoint self, SseSerializer serializer) {
+    VotingServiceEndpoint self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.url, serializer);
     sse_encode_String(self.label, serializer);
@@ -15448,7 +17651,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_share_delegation_record(
-      VotingShareDelegationRecord self, SseSerializer serializer) {
+    VotingShareDelegationRecord self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.roundId, serializer);
     sse_encode_u_32(self.bundleIndex, serializer);
@@ -15463,7 +17668,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_share_payload(
-      VotingSharePayload self, SseSerializer serializer) {
+    VotingSharePayload self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(self.sharesHash, serializer);
     sse_encode_u_32(self.proposalId, serializer);
@@ -15477,7 +17684,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_share_plan(
-      VotingSharePlan self, SseSerializer serializer) {
+    VotingSharePlan self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_voting_share_tracking_summary(self.summary, serializer);
     sse_encode_opt_box_autoadd_u_64(self.nextTrackingDelaySecs, serializer);
@@ -15487,7 +17696,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_share_plan_item(
-      VotingSharePlanItem self, SseSerializer serializer) {
+    VotingSharePlanItem self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_64(self.submitAt, serializer);
     sse_encode_u_32(self.targetCount, serializer);
@@ -15496,7 +17707,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_share_submission_payload(
-      VotingShareSubmissionPayload self, SseSerializer serializer) {
+    VotingShareSubmissionPayload self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.bundleIndex, serializer);
     sse_encode_u_32(self.proposalId, serializer);
@@ -15506,7 +17719,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_share_tracking_summary(
-      VotingShareTrackingSummary self, SseSerializer serializer) {
+    VotingShareTrackingSummary self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_64(self.total, serializer);
     sse_encode_u_64(self.confirmed, serializer);
@@ -15517,7 +17732,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_share_workflow(
-      VotingShareWorkflow self, SseSerializer serializer) {
+    VotingShareWorkflow self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.bundleIndex, serializer);
     sse_encode_u_32(self.proposalId, serializer);
@@ -15527,7 +17744,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_signed_vote_commitment(
-      VotingSignedVoteCommitment self, SseSerializer serializer) {
+    VotingSignedVoteCommitment self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.proposalId, serializer);
     sse_encode_u_32(self.choice, serializer);
@@ -15544,7 +17763,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_tree_vote_confirmation(
-      VotingTreeVoteConfirmation self, SseSerializer serializer) {
+    VotingTreeVoteConfirmation self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_64(self.vcTreePosition, serializer);
     sse_encode_opt_box_autoadd_u_32(self.vanLeafPosition, serializer);
@@ -15552,7 +17773,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_van_witness(
-      VotingVanWitness self, SseSerializer serializer) {
+    VotingVanWitness self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_list_prim_u_8_strict(self.authPath, serializer);
     sse_encode_u_32(self.position, serializer);
@@ -15561,36 +17784,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_vote_commit_stage(
-      VotingVoteCommitStage self, SseSerializer serializer) {
+    VotingVoteCommitStage self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
       case VotingVoteCommitStage_ProofStarting(
-          proposalId: final proposalId,
-          bundleIndex: final bundleIndex
-        ):
+        proposalId: final proposalId,
+        bundleIndex: final bundleIndex,
+      ):
         sse_encode_i_32(0, serializer);
         sse_encode_u_32(proposalId, serializer);
         sse_encode_u_32(bundleIndex, serializer);
       case VotingVoteCommitStage_ProofProgress(
-          proposalId: final proposalId,
-          bundleIndex: final bundleIndex,
-          progress: final progress
-        ):
+        proposalId: final proposalId,
+        bundleIndex: final bundleIndex,
+        progress: final progress,
+      ):
         sse_encode_i_32(1, serializer);
         sse_encode_u_32(proposalId, serializer);
         sse_encode_u_32(bundleIndex, serializer);
         sse_encode_f_64(progress, serializer);
       case VotingVoteCommitStage_SharePayloadsBuilding(
-          proposalId: final proposalId,
-          bundleIndex: final bundleIndex
-        ):
+        proposalId: final proposalId,
+        bundleIndex: final bundleIndex,
+      ):
         sse_encode_i_32(2, serializer);
         sse_encode_u_32(proposalId, serializer);
         sse_encode_u_32(bundleIndex, serializer);
       case VotingVoteCommitStage_Signing(
-          proposalId: final proposalId,
-          bundleIndex: final bundleIndex
-        ):
+        proposalId: final proposalId,
+        bundleIndex: final bundleIndex,
+      ):
         sse_encode_i_32(3, serializer);
         sse_encode_u_32(proposalId, serializer);
         sse_encode_u_32(bundleIndex, serializer);
@@ -15599,7 +17824,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_vote_commitments(
-      VotingVoteCommitments self, SseSerializer serializer) {
+    VotingVoteCommitments self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.bundleIndex, serializer);
     sse_encode_list_voting_signed_vote_commitment(self.commitments, serializer);
@@ -15607,7 +17834,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_vote_confirmation(
-      VotingVoteConfirmation self, SseSerializer serializer) {
+    VotingVoteConfirmation self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.txHash, serializer);
     sse_encode_u_32(self.vanLeafPosition, serializer);
@@ -15616,7 +17845,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_vote_payloads(
-      VotingVotePayloads self, SseSerializer serializer) {
+    VotingVotePayloads self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_voting_vote_submission(self.submission, serializer);
     sse_encode_list_voting_share_payload(self.sharePayloads, serializer);
@@ -15624,7 +17855,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_vote_recovery(
-      VotingVoteRecovery self, SseSerializer serializer) {
+    VotingVoteRecovery self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.bundleIndex, serializer);
     sse_encode_u_32(self.proposalId, serializer);
@@ -15638,7 +17871,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_voting_vote_submission(
-      VotingVoteSubmission self, SseSerializer serializer) {
+    VotingVoteSubmission self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.voteRoundId, serializer);
     sse_encode_u_32(self.proposalId, serializer);
@@ -15669,11 +17904,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 class DartVaultImpl extends RustOpaque implements DartVault {
   // Not to be used by end users
   DartVaultImpl.frbInternalDcoDecode(List<dynamic> wire)
-      : super.frbInternalDcoDecode(wire, _kStaticData);
+    : super.frbInternalDcoDecode(wire, _kStaticData);
 
   // Not to be used by end users
   DartVaultImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
@@ -15684,75 +17919,82 @@ class DartVaultImpl extends RustOpaque implements DartVault {
         RustLib.instance.api.rust_arc_decrement_strong_count_DartVaultPtr,
   );
 
-  Future<List<RestoredAccount>> recover(
-          {required List<int> vaultBytes, required String masterPassword}) =>
-      RustLib.instance.api.crateApiVaultDartVaultRecover(
-          that: this, vaultBytes: vaultBytes, masterPassword: masterPassword);
+  Future<List<RestoredAccount>> recover({
+    required List<int> vaultBytes,
+    required String masterPassword,
+  }) => RustLib.instance.api.crateApiVaultDartVaultRecover(
+    that: this,
+    vaultBytes: vaultBytes,
+    masterPassword: masterPassword,
+  );
 
-  Future<List<RestoredAccount>> recoverWithPrf(
-          {required List<int> vaultBytes,
-          required String deviceIdStr,
-          required List<int> prfOutput}) =>
-      RustLib.instance.api.crateApiVaultDartVaultRecoverWithPrf(
-          that: this,
-          vaultBytes: vaultBytes,
-          deviceIdStr: deviceIdStr,
-          prfOutput: prfOutput);
+  Future<List<RestoredAccount>> recoverWithPrf({
+    required List<int> vaultBytes,
+    required String deviceIdStr,
+    required List<int> prfOutput,
+  }) => RustLib.instance.api.crateApiVaultDartVaultRecoverWithPrf(
+    that: this,
+    vaultBytes: vaultBytes,
+    deviceIdStr: deviceIdStr,
+    prfOutput: prfOutput,
+  );
 
-  Future<void> registerDevice(
-          {required List<int> initBytes,
-          required String masterPassword,
-          required String deviceIdStr,
-          required List<int> prfOutput}) =>
-      RustLib.instance.api.crateApiVaultDartVaultRegisterDevice(
-          that: this,
-          initBytes: initBytes,
-          masterPassword: masterPassword,
-          deviceIdStr: deviceIdStr,
-          prfOutput: prfOutput);
+  Future<void> registerDevice({
+    required List<int> initBytes,
+    required String masterPassword,
+    required String deviceIdStr,
+    required List<int> prfOutput,
+  }) => RustLib.instance.api.crateApiVaultDartVaultRegisterDevice(
+    that: this,
+    initBytes: initBytes,
+    masterPassword: masterPassword,
+    deviceIdStr: deviceIdStr,
+    prfOutput: prfOutput,
+  );
 
-  Future<Uint8List> setMasterPassword(
-          {String? oldPassword,
-          required String newPassword,
-          Uint8List? oldBytes}) =>
-      RustLib.instance.api.crateApiVaultDartVaultSetMasterPassword(
-          that: this,
-          oldPassword: oldPassword,
-          newPassword: newPassword,
-          oldBytes: oldBytes);
+  Future<Uint8List> setMasterPassword({
+    String? oldPassword,
+    required String newPassword,
+    Uint8List? oldBytes,
+  }) => RustLib.instance.api.crateApiVaultDartVaultSetMasterPassword(
+    that: this,
+    oldPassword: oldPassword,
+    newPassword: newPassword,
+    oldBytes: oldBytes,
+  );
 
-  Future<void> storeAccount(
-          {required int timestamp,
-          required String name,
-          required String seed,
-          required int aindex,
-          required bool useInternal,
-          required int birthHeight,
-          required List<int> pk}) =>
-      RustLib.instance.api.crateApiVaultDartVaultStoreAccount(
-          that: this,
-          timestamp: timestamp,
-          name: name,
-          seed: seed,
-          aindex: aindex,
-          useInternal: useInternal,
-          birthHeight: birthHeight,
-          pk: pk);
+  Future<void> storeAccount({
+    required int timestamp,
+    required String name,
+    required String seed,
+    required int aindex,
+    required bool useInternal,
+    required int birthHeight,
+    required List<int> pk,
+  }) => RustLib.instance.api.crateApiVaultDartVaultStoreAccount(
+    that: this,
+    timestamp: timestamp,
+    name: name,
+    seed: seed,
+    aindex: aindex,
+    useInternal: useInternal,
+    birthHeight: birthHeight,
+    pk: pk,
+  );
 
-  Future<void> test() => RustLib.instance.api.crateApiVaultDartVaultTest(
-        that: this,
-      );
+  Future<void> test() =>
+      RustLib.instance.api.crateApiVaultDartVaultTest(that: this);
 }
 
 @sealed
 class MempoolImpl extends RustOpaque implements Mempool {
   // Not to be used by end users
   MempoolImpl.frbInternalDcoDecode(List<dynamic> wire)
-      : super.frbInternalDcoDecode(wire, _kStaticData);
+    : super.frbInternalDcoDecode(wire, _kStaticData);
 
   // Not to be used by end users
   MempoolImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
@@ -15763,9 +18005,8 @@ class MempoolImpl extends RustOpaque implements Mempool {
         RustLib.instance.api.rust_arc_decrement_strong_count_MempoolPtr,
   );
 
-  Future<void> cancel() => RustLib.instance.api.crateApiMempoolMempoolCancel(
-        that: this,
-      );
+  Future<void> cancel() =>
+      RustLib.instance.api.crateApiMempoolMempoolCancel(that: this);
 
   Stream<MempoolMsg> run({required Coin c}) =>
       RustLib.instance.api.crateApiMempoolMempoolRun(that: this, c: c);
@@ -15775,11 +18016,11 @@ class MempoolImpl extends RustOpaque implements Mempool {
 class NoteMigrationImpl extends RustOpaque implements NoteMigration {
   // Not to be used by end users
   NoteMigrationImpl.frbInternalDcoDecode(List<dynamic> wire)
-      : super.frbInternalDcoDecode(wire, _kStaticData);
+    : super.frbInternalDcoDecode(wire, _kStaticData);
 
   // Not to be used by end users
   NoteMigrationImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
@@ -15791,13 +18032,14 @@ class NoteMigrationImpl extends RustOpaque implements NoteMigration {
   );
 
   Future<void> cancel() =>
-      RustLib.instance.api.crateApiMigrateNoteMigrationCancel(
-        that: this,
-      );
+      RustLib.instance.api.crateApiMigrateNoteMigrationCancel(that: this);
 
   Stream<MigrationStatus> run({required Coin c, required BigInt meanDelayMs}) =>
       RustLib.instance.api.crateApiMigrateNoteMigrationRun(
-          that: this, c: c, meanDelayMs: meanDelayMs);
+        that: this,
+        c: c,
+        meanDelayMs: meanDelayMs,
+      );
 
   /// Supplies a height observed by the shared Dart block-height service.
   void updateHeight({required int height}) => RustLib.instance.api
@@ -15808,12 +18050,13 @@ class NoteMigrationImpl extends RustOpaque implements NoteMigration {
 class TransparentScannerImpl extends RustOpaque implements TransparentScanner {
   // Not to be used by end users
   TransparentScannerImpl.frbInternalDcoDecode(List<dynamic> wire)
-      : super.frbInternalDcoDecode(wire, _kStaticData);
+    : super.frbInternalDcoDecode(wire, _kStaticData);
 
   // Not to be used by end users
   TransparentScannerImpl.frbInternalSseDecode(
-      BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+    BigInt ptr,
+    int externalSizeOnNative,
+  ) : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
@@ -15821,16 +18064,22 @@ class TransparentScannerImpl extends RustOpaque implements TransparentScanner {
     rustArcDecrementStrongCount:
         RustLib.instance.api.rust_arc_decrement_strong_count_TransparentScanner,
     rustArcDecrementStrongCountPtr: RustLib
-        .instance.api.rust_arc_decrement_strong_count_TransparentScannerPtr,
+        .instance
+        .api
+        .rust_arc_decrement_strong_count_TransparentScannerPtr,
   );
 
   Future<void> cancel() =>
-      RustLib.instance.api.crateApiSweepTransparentScannerCancel(
-        that: this,
-      );
+      RustLib.instance.api.crateApiSweepTransparentScannerCancel(that: this);
 
-  Stream<String> run(
-          {required int endHeight, required int gapLimit, required Coin c}) =>
-      RustLib.instance.api.crateApiSweepTransparentScannerRun(
-          that: this, endHeight: endHeight, gapLimit: gapLimit, c: c);
+  Stream<String> run({
+    required int endHeight,
+    required int gapLimit,
+    required Coin c,
+  }) => RustLib.instance.api.crateApiSweepTransparentScannerRun(
+    that: this,
+    endHeight: endHeight,
+    gapLimit: gapLimit,
+    c: c,
+  );
 }

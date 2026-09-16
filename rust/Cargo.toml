@@ -163,7 +163,7 @@ rand = "0.6"
 vote-commitment-tree = { git = "https://github.com/hhanh00/zcash_voting.git", rev = "049504162f11a09c89d33414d35e747851891d04" }
 
 [features]
-default = ["flutter", "nym"]
+default = ["flutter"]
 flutter = ["flutter_rust_bridge"]
 bundled-sapling-params = ["zcash_proofs/bundled-prover"]
 graphql = ["juniper", "juniper_warp", "juniper_graphql_ws", "dataloader", "warp", "jsonwebtoken", "bigdecimal", "chrono", "figment", "clap"]

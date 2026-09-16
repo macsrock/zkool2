@@ -9409,6 +9409,7 @@ dependencies = [
  "orchard",
  "pasta_curves",
  "pczt",
+ "postcard",
  "prost 0.14.4",
  "qrcode",
  "rand 0.6.5",

@@ -28,77 +28,86 @@ Future<String> votingHotkeyGet({required Coin c}) =>
 /// witnesses are rooted at the snapshot's Ironwood `nc_root`. On success the
 /// round inputs are persisted (props table) so a restart can re-prepare via
 /// [`delegation_prepare_resume`].
-Future<VotingPreparedInfo> delegationPrepare(
-        {required String roundParamsJson,
-        required String roundName,
-        String? sessionJson,
-        required int bundleIndex,
-        int? maxRealNotesPerBundle,
-        required String lightwalletdUrl,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingDelegationPrepare(
-        roundParamsJson: roundParamsJson,
-        roundName: roundName,
-        sessionJson: sessionJson,
-        bundleIndex: bundleIndex,
-        maxRealNotesPerBundle: maxRealNotesPerBundle,
-        lightwalletdUrl: lightwalletdUrl,
-        c: c);
+Future<VotingPreparedInfo> delegationPrepare({
+  required String roundParamsJson,
+  required String roundName,
+  String? sessionJson,
+  required int bundleIndex,
+  int? maxRealNotesPerBundle,
+  required String lightwalletdUrl,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingDelegationPrepare(
+  roundParamsJson: roundParamsJson,
+  roundName: roundName,
+  sessionJson: sessionJson,
+  bundleIndex: bundleIndex,
+  maxRealNotesPerBundle: maxRealNotesPerBundle,
+  lightwalletdUrl: lightwalletdUrl,
+  c: c,
+);
 
 /// Re-runs [`delegation_prepare`] for a round whose prepared bundle was lost
 /// with the process (the prepared-bundle cache is process-local). Inputs come
 /// from the config saved by the first prepare; the optional params override
 /// the saved values when present.
-Future<VotingPreparedInfo> delegationPrepareResume(
-        {required String roundId,
-        required int bundleIndex,
-        int? maxRealNotesPerBundle,
-        String? lightwalletdUrl,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingDelegationPrepareResume(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        maxRealNotesPerBundle: maxRealNotesPerBundle,
-        lightwalletdUrl: lightwalletdUrl,
-        c: c);
+Future<VotingPreparedInfo> delegationPrepareResume({
+  required String roundId,
+  required int bundleIndex,
+  int? maxRealNotesPerBundle,
+  String? lightwalletdUrl,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingDelegationPrepareResume(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  maxRealNotesPerBundle: maxRealNotesPerBundle,
+  lightwalletdUrl: lightwalletdUrl,
+  c: c,
+);
 
 /// Builds and persists the governance PCZT setup for a prepared bundle.
-Future<VotingDelegationSetup> delegationSetup(
-        {required String roundId, required int bundleIndex, required Coin c}) =>
-    RustLib.instance.api.crateApiVotingDelegationSetup(
-        roundId: roundId, bundleIndex: bundleIndex, c: c);
+Future<VotingDelegationSetup> delegationSetup({
+  required String roundId,
+  required int bundleIndex,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingDelegationSetup(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  c: c,
+);
 
 /// Signs with the wallet seed, proves against the PIR server, and assembles
 /// the chain-ready delegation submission for the vote chain.
-Future<VotingDelegationSubmission> delegationSignAndSubmit(
-        {required String roundId,
-        required int bundleIndex,
-        required List<int> pcztBytes,
-        required VotingPirLayout pirLayout,
-        required String pirServerUrl,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingDelegationSignAndSubmit(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        pcztBytes: pcztBytes,
-        pirLayout: pirLayout,
-        pirServerUrl: pirServerUrl,
-        c: c);
+Future<VotingDelegationSubmission> delegationSignAndSubmit({
+  required String roundId,
+  required int bundleIndex,
+  required List<int> pcztBytes,
+  required VotingPirLayout pirLayout,
+  required String pirServerUrl,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingDelegationSignAndSubmit(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  pcztBytes: pcztBytes,
+  pirLayout: pirLayout,
+  pirServerUrl: pirServerUrl,
+  c: c,
+);
 
 /// Records a confirmed delegation transaction and persists the bundle's VAN
 /// position (required before any vote).
-Future<VotingDelegationConfirmation> delegationConfirm(
-        {required String roundId,
-        required int bundleIndex,
-        required String txHash,
-        required String eventsJson,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingDelegationConfirm(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        txHash: txHash,
-        eventsJson: eventsJson,
-        c: c);
+Future<VotingDelegationConfirmation> delegationConfirm({
+  required String roundId,
+  required int bundleIndex,
+  required String txHash,
+  required String eventsJson,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingDelegationConfirm(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  txHash: txHash,
+  eventsJson: eventsJson,
+  c: c,
+);
 
 /// Builds and signs the delegation payload with live progress events
 /// (`delegation_sign_and_submit` without the progress stream).
@@ -106,79 +115,101 @@ Future<VotingDelegationConfirmation> delegationConfirm(
 /// `pir_layout` is persisted on first use; pass `None` after a restart to
 /// resume with the saved layout. Returns the submission together with its
 /// vote-chain wire JSON body (ready for `votechain_submit_delegation`).
-Stream<VotingDelegationProgress> delegationBuildSubmission(
-        {required String roundId,
-        required int bundleIndex,
-        required List<int> pcztBytes,
-        VotingPirLayout? pirLayout,
-        required String pirServerUrl,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingDelegationBuildSubmission(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        pcztBytes: pcztBytes,
-        pirLayout: pirLayout,
-        pirServerUrl: pirServerUrl,
-        c: c);
+Stream<VotingDelegationProgress> delegationBuildSubmission({
+  required String roundId,
+  required int bundleIndex,
+  required List<int> pcztBytes,
+  VotingPirLayout? pirLayout,
+  required String pirServerUrl,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingDelegationBuildSubmission(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  pcztBytes: pcztBytes,
+  pirLayout: pirLayout,
+  pirServerUrl: pirServerUrl,
+  c: c,
+);
 
 /// Returns the vote-chain wire JSON built by the last
 /// [`delegation_build_submission`] run for a bundle, if any.
-Future<String?> delegationWireJson(
-        {required String roundId, required int bundleIndex, required Coin c}) =>
-    RustLib.instance.api.crateApiVotingDelegationWireJson(
-        roundId: roundId, bundleIndex: bundleIndex, c: c);
+Future<String?> delegationWireJson({
+  required String roundId,
+  required int bundleIndex,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingDelegationWireJson(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  c: c,
+);
 
 /// Atomically records a delegation transaction hash with idempotency checks,
 /// so a restart between broadcast and confirmation resumes via `PollDelegation`
 /// instead of re-broadcasting.
-Future<void> delegationMarkSubmitted(
-        {required String roundId,
-        required int bundleIndex,
-        required String txHash,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingDelegationMarkSubmitted(
-        roundId: roundId, bundleIndex: bundleIndex, txHash: txHash, c: c);
+Future<void> delegationMarkSubmitted({
+  required String roundId,
+  required int bundleIndex,
+  required String txHash,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingDelegationMarkSubmitted(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  txHash: txHash,
+  c: c,
+);
 
 /// Returns the recorded delegation transaction hash for a bundle, if any.
-Future<String?> delegationTxHash(
-        {required String roundId, required int bundleIndex, required Coin c}) =>
-    RustLib.instance.api.crateApiVotingDelegationTxHash(
-        roundId: roundId, bundleIndex: bundleIndex, c: c);
+Future<String?> delegationTxHash({
+  required String roundId,
+  required int bundleIndex,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingDelegationTxHash(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  c: c,
+);
 
 /// Persists the voter's terminal decision for one proposal before any
 /// zero-knowledge work, so a crash cannot lose the ballot and later votes are
 /// conflict-checked against it.
-Future<void> votingSetBallotIntent(
-        {required String roundId,
-        required int proposalId,
-        required bool skipped,
-        required int choice,
-        required int numOptions,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingSetBallotIntent(
-        roundId: roundId,
-        proposalId: proposalId,
-        skipped: skipped,
-        choice: choice,
-        numOptions: numOptions,
-        c: c);
+Future<void> votingSetBallotIntent({
+  required String roundId,
+  required int proposalId,
+  required bool skipped,
+  required int choice,
+  required int numOptions,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingSetBallotIntent(
+  roundId: roundId,
+  proposalId: proposalId,
+  skipped: skipped,
+  choice: choice,
+  numOptions: numOptions,
+  c: c,
+);
 
 /// Returns the quantized voting weight (zatoshi) for the account's eligible
 /// shielded notes at `snapshot_height`, computed with the same canonical
 /// bundle planning as the delegation prepare step — but from the local DB
 /// only (no witnesses, no tree state). Shown pre-submission as an estimate.
-Future<BigInt> votingEligibleWeight(
-        {required int snapshotHeight, required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingEligibleWeight(
-        snapshotHeight: snapshotHeight, c: c);
+Future<BigInt> votingEligibleWeight({
+  required int snapshotHeight,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingEligibleWeight(
+  snapshotHeight: snapshotHeight,
+  c: c,
+);
 
 /// Persists the draft ballot for a round (props table, wallet-scoped).
-Future<void> votingDraftsSave(
-        {required String roundId,
-        required String draftsJson,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingDraftsSave(
-        roundId: roundId, draftsJson: draftsJson, c: c);
+Future<void> votingDraftsSave({
+  required String roundId,
+  required String draftsJson,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingDraftsSave(
+  roundId: roundId,
+  draftsJson: draftsJson,
+  c: c,
+);
 
 /// Returns the persisted draft ballot for a round, if any.
 Future<String?> votingDraftsLoad({required String roundId, required Coin c}) =>
@@ -187,173 +218,191 @@ Future<String?> votingDraftsLoad({required String roundId, required Coin c}) =>
 /// Commits one bundle's votes with live stage events. Draft votes are
 /// JSON-serialized fork `DraftVote`s; the VAN witness is derived internally
 /// after syncing the vote tree.
-Stream<VotingVoteCommitStage> votingCommitWithProgress(
-        {required String roundId,
-        required int bundleIndex,
-        required String draftsJson,
-        required String voteNodeUrl,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingCommitWithProgress(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        draftsJson: draftsJson,
-        voteNodeUrl: voteNodeUrl,
-        c: c);
+Stream<VotingVoteCommitStage> votingCommitWithProgress({
+  required String roundId,
+  required int bundleIndex,
+  required String draftsJson,
+  required String voteNodeUrl,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingCommitWithProgress(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  draftsJson: draftsJson,
+  voteNodeUrl: voteNodeUrl,
+  c: c,
+);
 
 /// Reconstructs the chain-ready wire JSON for a committed vote.
-Future<String> votingVoteWireJson(
-        {required String roundId,
-        required int bundleIndex,
-        required int proposalId,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingVoteWireJson(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        proposalId: proposalId,
-        c: c);
+Future<String> votingVoteWireJson({
+  required String roundId,
+  required int bundleIndex,
+  required int proposalId,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingVoteWireJson(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  proposalId: proposalId,
+  c: c,
+);
 
 /// Atomically records a cast-vote transaction hash with idempotency checks, so
 /// a restart between broadcast and confirmation resumes via `PollVote`.
-Future<void> votingMarkVoteSubmitted(
-        {required String roundId,
-        required int bundleIndex,
-        required int proposalId,
-        required String txHash,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingMarkVoteSubmitted(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        proposalId: proposalId,
-        txHash: txHash,
-        c: c);
+Future<void> votingMarkVoteSubmitted({
+  required String roundId,
+  required int bundleIndex,
+  required int proposalId,
+  required String txHash,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingMarkVoteSubmitted(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  proposalId: proposalId,
+  txHash: txHash,
+  c: c,
+);
 
 /// Records a helper-share submission (derives the nullifier from recovery
 /// state).
-Future<void> votingShareRecord(
-        {required String roundId,
-        required int bundleIndex,
-        required int proposalId,
-        required int shareIndex,
-        required List<String> sentToUrls,
-        required BigInt submitAt,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingShareRecord(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        proposalId: proposalId,
-        shareIndex: shareIndex,
-        sentToUrls: sentToUrls,
-        submitAt: submitAt,
-        c: c);
+Future<void> votingShareRecord({
+  required String roundId,
+  required int bundleIndex,
+  required int proposalId,
+  required int shareIndex,
+  required List<String> sentToUrls,
+  required BigInt submitAt,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingShareRecord(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  proposalId: proposalId,
+  shareIndex: shareIndex,
+  sentToUrls: sentToUrls,
+  submitAt: submitAt,
+  c: c,
+);
 
 /// Lists unconfirmed helper-share records for a round.
-Future<List<VotingShareDelegationRecord>> votingShareUnconfirmed(
-        {required String roundId, required Coin c}) =>
-    RustLib.instance.api
-        .crateApiVotingVotingShareUnconfirmed(roundId: roundId, c: c);
+Future<List<VotingShareDelegationRecord>> votingShareUnconfirmed({
+  required String roundId,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingShareUnconfirmed(
+  roundId: roundId,
+  c: c,
+);
 
 /// Marks one helper-share record confirmed.
-Future<void> votingShareConfirm(
-        {required String roundId,
-        required int bundleIndex,
-        required int proposalId,
-        required int shareIndex,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingShareConfirm(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        proposalId: proposalId,
-        shareIndex: shareIndex,
-        c: c);
+Future<void> votingShareConfirm({
+  required String roundId,
+  required int bundleIndex,
+  required int proposalId,
+  required int shareIndex,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingShareConfirm(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  proposalId: proposalId,
+  shareIndex: shareIndex,
+  c: c,
+);
 
 /// Adds helper URLs to an existing share record after resubmission.
-Future<void> votingShareAddServers(
-        {required String roundId,
-        required int bundleIndex,
-        required int proposalId,
-        required int shareIndex,
-        required List<String> newUrls,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingShareAddServers(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        proposalId: proposalId,
-        shareIndex: shareIndex,
-        newUrls: newUrls,
-        c: c);
+Future<void> votingShareAddServers({
+  required String roundId,
+  required int bundleIndex,
+  required int proposalId,
+  required int shareIndex,
+  required List<String> newUrls,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingShareAddServers(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  proposalId: proposalId,
+  shareIndex: shareIndex,
+  newUrls: newUrls,
+  c: c,
+);
 
 /// Reconstructs one helper-share payload as helper wire JSON from the
 /// persisted commitment bundle.
-Future<String> votingShareWireJson(
-        {required String roundId,
-        required int bundleIndex,
-        required int proposalId,
-        required int shareIndex,
-        BigInt? vcTreePosition,
-        required BigInt submitAt,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingShareWireJson(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        proposalId: proposalId,
-        shareIndex: shareIndex,
-        vcTreePosition: vcTreePosition,
-        submitAt: submitAt,
-        c: c);
+Future<String> votingShareWireJson({
+  required String roundId,
+  required int bundleIndex,
+  required int proposalId,
+  required int shareIndex,
+  BigInt? vcTreePosition,
+  required BigInt submitAt,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingShareWireJson(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  proposalId: proposalId,
+  shareIndex: shareIndex,
+  vcTreePosition: vcTreePosition,
+  submitAt: submitAt,
+  c: c,
+);
 
 /// Best-effort pre-sync of the vote commitment tree for a round, returning
 /// the latest synced tree height. Requires the round to exist locally (it is
 /// created by the first prepare); callers may ignore failures.
-Future<int> votingSyncTree(
-        {required String roundId,
-        required String voteNodeUrl,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingSyncTree(
-        roundId: roundId, voteNodeUrl: voteNodeUrl, c: c);
+Future<int> votingSyncTree({
+  required String roundId,
+  required String voteNodeUrl,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingSyncTree(
+  roundId: roundId,
+  voteNodeUrl: voteNodeUrl,
+  c: c,
+);
 
 /// Enumerates the share payloads of the round's confirmed votes — the
 /// first-pass submission source.
-Future<List<VotingShareSubmissionPayload>> votingSharePayloads(
-        {required String roundId, required Coin c}) =>
-    RustLib.instance.api
-        .crateApiVotingVotingSharePayloads(roundId: roundId, c: c);
+Future<List<VotingShareSubmissionPayload>> votingSharePayloads({
+  required String roundId,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingSharePayloads(
+  roundId: roundId,
+  c: c,
+);
 
 /// Count-based share submission plans (submitAt + target servers per share),
 /// mirroring vizor's `planShareSubmissions`: policy-sized CSPRNG entropy
 /// drawn per call, timing from the round's ceremony start / vote end.
-Future<List<VotingSharePlanItem>> votingSharePlans(
-        {required int shareCount,
-        required List<String> serverUrls,
-        required BigInt now,
-        required BigInt voteEnd,
-        required BigInt ceremonyStart,
-        required bool singleShare,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingSharePlans(
-        shareCount: shareCount,
-        serverUrls: serverUrls,
-        now: now,
-        voteEnd: voteEnd,
-        ceremonyStart: ceremonyStart,
-        singleShare: singleShare,
-        c: c);
+Future<List<VotingSharePlanItem>> votingSharePlans({
+  required int shareCount,
+  required List<String> serverUrls,
+  required BigInt now,
+  required BigInt voteEnd,
+  required BigInt ceremonyStart,
+  required bool singleShare,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingSharePlans(
+  shareCount: shareCount,
+  serverUrls: serverUrls,
+  now: now,
+  voteEnd: voteEnd,
+  ceremonyStart: ceremonyStart,
+  singleShare: singleShare,
+  c: c,
+);
 
-Future<VotingSharePlan> votingSharePlan(
-        {required String roundId,
-        required BigInt now,
-        required BigInt ceremonyStart,
-        BigInt? voteEnd,
-        required List<String> serverUrls,
-        required bool singleShare,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingSharePlan(
-        roundId: roundId,
-        now: now,
-        ceremonyStart: ceremonyStart,
-        voteEnd: voteEnd,
-        serverUrls: serverUrls,
-        singleShare: singleShare,
-        c: c);
+Future<VotingSharePlan> votingSharePlan({
+  required String roundId,
+  required BigInt now,
+  required BigInt ceremonyStart,
+  BigInt? voteEnd,
+  required List<String> serverUrls,
+  required bool singleShare,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingSharePlan(
+  roundId: roundId,
+  now: now,
+  ceremonyStart: ceremonyStart,
+  voteEnd: voteEnd,
+  serverUrls: serverUrls,
+  singleShare: singleShare,
+  c: c,
+);
 
 /// Resolves and authenticates the voting config for a source URL.
 ///
@@ -362,188 +411,211 @@ Future<VotingSharePlan> votingSharePlan(
 /// the config switch against the previously resolved summary. The result is
 /// cached in the props table so [`voting_config_cached`] can serve as a
 /// last-good fallback.
-Future<VotingConfig> votingConfigResolve(
-        {required String source, required Coin c}) =>
-    RustLib.instance.api
-        .crateApiVotingVotingConfigResolve(source: source, c: c);
+Future<VotingConfig> votingConfigResolve({
+  required String source,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingConfigResolve(
+  source: source,
+  c: c,
+);
 
 /// Returns the last cached resolved config for a source URL, if any.
-Future<VotingConfig?> votingConfigCached(
-        {required String source, required Coin c}) =>
+Future<VotingConfig?> votingConfigCached({
+  required String source,
+  required Coin c,
+}) =>
     RustLib.instance.api.crateApiVotingVotingConfigCached(source: source, c: c);
 
 /// Builds the round params JSON for `delegation_prepare` from the cached
 /// authenticated config plus chain-reported snapshot fields (`ea_pk` is
 /// pinned to the authenticated config, so a stale endpoint cannot steer
 /// voting to the wrong authority or roots).
-Future<String> votingRoundParamsJson(
-        {required String source,
-        required String roundId,
-        required BigInt snapshotHeight,
-        required List<int> ncRoot,
-        required List<int> nullifierImtRoot,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingRoundParamsJson(
-        source: source,
-        roundId: roundId,
-        snapshotHeight: snapshotHeight,
-        ncRoot: ncRoot,
-        nullifierImtRoot: nullifierImtRoot,
-        c: c);
+Future<String> votingRoundParamsJson({
+  required String source,
+  required String roundId,
+  required BigInt snapshotHeight,
+  required List<int> ncRoot,
+  required List<int> nullifierImtRoot,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingRoundParamsJson(
+  source: source,
+  roundId: roundId,
+  snapshotHeight: snapshotHeight,
+  ncRoot: ncRoot,
+  nullifierImtRoot: nullifierImtRoot,
+  c: c,
+);
 
 /// Clears the cached resolved configs (all sources).
 Future<void> votingConfigClearCache({required Coin c}) =>
     RustLib.instance.api.crateApiVotingVotingConfigClearCache(c: c);
 
 /// Syncs the vote-authority-note tree and derives this bundle's VAN witness.
-Future<VotingVanWitness> votingVanWitness(
-        {required String roundId,
-        required int bundleIndex,
-        required String voteNodeUrl,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingVanWitness(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        voteNodeUrl: voteNodeUrl,
-        c: c);
+Future<VotingVanWitness> votingVanWitness({
+  required String roundId,
+  required int bundleIndex,
+  required String voteNodeUrl,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingVanWitness(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  voteNodeUrl: voteNodeUrl,
+  c: c,
+);
 
 /// Commits a batch of vote drafts for one bundle (hotkey-signed).
 ///
 /// Chains the VAN witness derivation internally, so this may be called right
 /// after `voting_van_witness` or standalone.
-Future<VotingVoteCommitments> votingCommit(
-        {required String roundId,
-        required int bundleIndex,
-        required String draftsJson,
-        required String voteNodeUrl,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingCommit(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        draftsJson: draftsJson,
-        voteNodeUrl: voteNodeUrl,
-        c: c);
+Future<VotingVoteCommitments> votingCommit({
+  required String roundId,
+  required int bundleIndex,
+  required String draftsJson,
+  required String voteNodeUrl,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingCommit(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  draftsJson: draftsJson,
+  voteNodeUrl: voteNodeUrl,
+  c: c,
+);
 
 /// Returns the chain-ready vote submission and helper-share payloads for one
 /// committed vote.
-Future<VotingVotePayloads> votingPayloads(
-        {required String roundId,
-        required int bundleIndex,
-        required int proposalId,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingPayloads(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        proposalId: proposalId,
-        c: c);
+Future<VotingVotePayloads> votingPayloads({
+  required String roundId,
+  required int bundleIndex,
+  required int proposalId,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingPayloads(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  proposalId: proposalId,
+  c: c,
+);
 
 /// Records successful vote-chain and helper-share submissions for one vote.
-Future<void> votingRecordExecution(
-        {required String roundId,
-        required int bundleIndex,
-        required int proposalId,
-        required String voteTxHash,
-        required BigInt vcTreePosition,
-        required String shareDeliveriesJson,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingRecordExecution(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        proposalId: proposalId,
-        voteTxHash: voteTxHash,
-        vcTreePosition: vcTreePosition,
-        shareDeliveriesJson: shareDeliveriesJson,
-        c: c);
+Future<void> votingRecordExecution({
+  required String roundId,
+  required int bundleIndex,
+  required int proposalId,
+  required String voteTxHash,
+  required BigInt vcTreePosition,
+  required String shareDeliveriesJson,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingRecordExecution(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  proposalId: proposalId,
+  voteTxHash: voteTxHash,
+  vcTreePosition: vcTreePosition,
+  shareDeliveriesJson: shareDeliveriesJson,
+  c: c,
+);
 
 /// Records a confirmed cast-vote transaction.
-Future<VotingVoteConfirmation> votingConfirm(
-        {required String roundId,
-        required int bundleIndex,
-        required int proposalId,
-        required String txHash,
-        required String eventsJson,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingConfirm(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        proposalId: proposalId,
-        txHash: txHash,
-        eventsJson: eventsJson,
-        c: c);
+Future<VotingVoteConfirmation> votingConfirm({
+  required String roundId,
+  required int bundleIndex,
+  required int proposalId,
+  required String txHash,
+  required String eventsJson,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingConfirm(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  proposalId: proposalId,
+  txHash: txHash,
+  eventsJson: eventsJson,
+  c: c,
+);
 
 /// Hex-encoded vote commitment leaf value for one committed vote, used to
 /// locate the vote's commitment-tree leaf when the tx hash is unknown.
-Future<String> votingVoteCommitmentHex(
-        {required String roundId,
-        required int bundleIndex,
-        required int proposalId,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingVoteCommitmentHex(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        proposalId: proposalId,
-        c: c);
+Future<String> votingVoteCommitmentHex({
+  required String roundId,
+  required int bundleIndex,
+  required int proposalId,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingVoteCommitmentHex(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  proposalId: proposalId,
+  c: c,
+);
 
 /// Hex-encoded cast-vote VAN output commitment for one committed vote (the
 /// commitment-tree leaf appended immediately before the vote commitment).
-Future<String> votingVoteVanCommitmentHex(
-        {required String roundId,
-        required int bundleIndex,
-        required int proposalId,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingVoteVanCommitmentHex(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        proposalId: proposalId,
-        c: c);
+Future<String> votingVoteVanCommitmentHex({
+  required String roundId,
+  required int bundleIndex,
+  required int proposalId,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingVoteVanCommitmentHex(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  proposalId: proposalId,
+  c: c,
+);
 
 /// Hex-encoded delegation VAN commitment (`gov_comm`) for a bundle, or `None`
 /// when it was never persisted. Used to locate the delegation's tree leaf.
-Future<String?> votingDelegationVanCommitmentHex(
-        {required String roundId, required int bundleIndex, required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingDelegationVanCommitmentHex(
-        roundId: roundId, bundleIndex: bundleIndex, c: c);
+Future<String?> votingDelegationVanCommitmentHex({
+  required String roundId,
+  required int bundleIndex,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingDelegationVanCommitmentHex(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  c: c,
+);
 
 /// Scans the round's commitment tree for a leaf matching `target_hex` and
 /// returns its global position, or `None` when absent.
-Future<BigInt?> votingTreeFindLeaf(
-        {required String roundId,
-        required String nodeUrl,
-        required String targetHex}) =>
-    RustLib.instance.api.crateApiVotingVotingTreeFindLeaf(
-        roundId: roundId, nodeUrl: nodeUrl, targetHex: targetHex);
+Future<BigInt?> votingTreeFindLeaf({
+  required String roundId,
+  required String nodeUrl,
+  required String targetHex,
+}) => RustLib.instance.api.crateApiVotingVotingTreeFindLeaf(
+  roundId: roundId,
+  nodeUrl: nodeUrl,
+  targetHex: targetHex,
+);
 
 /// Records a cast-vote confirmation whose evidence came from a
 /// commitment-tree scan (no tx hash available). The vote's phase becomes
 /// Confirmed so the resume plan proceeds to share submission.
-Future<VotingTreeVoteConfirmation> votingRecoverConfirmVoteFromTree(
-        {required String roundId,
-        required int bundleIndex,
-        required int proposalId,
-        required BigInt vcTreePosition,
-        int? vanLeafPosition,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingRecoverConfirmVoteFromTree(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        proposalId: proposalId,
-        vcTreePosition: vcTreePosition,
-        vanLeafPosition: vanLeafPosition,
-        c: c);
+Future<VotingTreeVoteConfirmation> votingRecoverConfirmVoteFromTree({
+  required String roundId,
+  required int bundleIndex,
+  required int proposalId,
+  required BigInt vcTreePosition,
+  int? vanLeafPosition,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingRecoverConfirmVoteFromTree(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  proposalId: proposalId,
+  vcTreePosition: vcTreePosition,
+  vanLeafPosition: vanLeafPosition,
+  c: c,
+);
 
 /// Records a delegation confirmation recovered from a commitment-tree scan
 /// (no tx hash available). The bundle's phase becomes Confirmed so voting can
 /// proceed.
-Future<void> votingRecoverConfirmDelegationFromTree(
-        {required String roundId,
-        required int bundleIndex,
-        required int vanLeafPosition,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingRecoverConfirmDelegationFromTree(
-        roundId: roundId,
-        bundleIndex: bundleIndex,
-        vanLeafPosition: vanLeafPosition,
-        c: c);
+Future<void> votingRecoverConfirmDelegationFromTree({
+  required String roundId,
+  required int bundleIndex,
+  required int vanLeafPosition,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingRecoverConfirmDelegationFromTree(
+  roundId: roundId,
+  bundleIndex: bundleIndex,
+  vanLeafPosition: vanLeafPosition,
+  c: c,
+);
 
 /// Lists rounds persisted in the voting DB for the current wallet.
 Future<List<VotingRoundInfo>> votingRounds({required Coin c}) =>
@@ -552,112 +624,160 @@ Future<List<VotingRoundInfo>> votingRounds({required Coin c}) =>
 /// Returns the derived resume plan for a round (the ordered work that remains
 /// after any restart; empty `next_steps` with `primary_action == "done"` means
 /// the round is complete for this wallet).
-Future<VotingRoundPlan> votingPlan(
-        {required String roundId,
-        required List<int> proposalIds,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingPlan(
-        roundId: roundId, proposalIds: proposalIds, c: c);
+Future<VotingRoundPlan> votingPlan({
+  required String roundId,
+  required List<int> proposalIds,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingPlan(
+  roundId: roundId,
+  proposalIds: proposalIds,
+  c: c,
+);
 
 /// Returns the full read-only recovery snapshot for a round.
-Future<VotingRoundRecovery> votingRecovery(
-        {required String roundId, required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotingRecovery(roundId: roundId, c: c);
+Future<VotingRoundRecovery> votingRecovery({
+  required String roundId,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingRecovery(roundId: roundId, c: c);
 
 /// Clears unconfirmed recovery artifacts for a round. Ballot intents, recorded
 /// confirmations, and imported delegation capabilities are preserved.
 Future<void> votingRecoveryClear({required String roundId, required Coin c}) =>
-    RustLib.instance.api
-        .crateApiVotingVotingRecoveryClear(roundId: roundId, c: c);
+    RustLib.instance.api.crateApiVotingVotingRecoveryClear(
+      roundId: roundId,
+      c: c,
+    );
 
 /// Resets process-local vote-tree cache and clears unsigned delegation setup
 /// fields for a round (the fork's recovery when a restart after
 /// `build_governance_pczt` persisted `pczt_sighash` makes re-setup refuse to
 /// overwrite it). Submitted bundles, imported capabilities, and bundles with
 /// persisted Keystone signatures are preserved.
-Future<void> votingResetSessionState(
-        {required String roundId, required Coin c}) =>
-    RustLib.instance.api
-        .crateApiVotingVotingResetSessionState(roundId: roundId, c: c);
+Future<void> votingResetSessionState({
+  required String roundId,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingResetSessionState(
+  roundId: roundId,
+  c: c,
+);
 
 /// Returns the persisted ballot intents for a round, sorted by proposal id.
-Future<List<VotingBallotIntent>> votingBallotIntents(
-        {required String roundId, required Coin c}) =>
-    RustLib.instance.api
-        .crateApiVotingVotingBallotIntents(roundId: roundId, c: c);
+Future<List<VotingBallotIntent>> votingBallotIntents({
+  required String roundId,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotingBallotIntents(
+  roundId: roundId,
+  c: c,
+);
 
 /// Loads sessions for many rounds in a single Rust call that holds ONE pool
 /// connection (the per-round entry points above would need one connection per
 /// round and stall the pool once the page has many rounds).
-Future<List<VotingRoundSession>> votingSessions(
-        {required List<String> roundIds, required Coin c}) =>
+Future<List<VotingRoundSession>> votingSessions({
+  required List<String> roundIds,
+  required Coin c,
+}) =>
     RustLib.instance.api.crateApiVotingVotingSessions(roundIds: roundIds, c: c);
 
 /// Lists rounds from the vote server (`{ "rounds": [...] }`).
-Future<VotingChainResponse> votechainListRounds(
-        {required String baseUrl, required Coin c}) =>
-    RustLib.instance.api
-        .crateApiVotingVotechainListRounds(baseUrl: baseUrl, c: c);
+Future<VotingChainResponse> votechainListRounds({
+  required String baseUrl,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotechainListRounds(
+  baseUrl: baseUrl,
+  c: c,
+);
 
 /// Fetches one round's status (`{ "round": ... }` envelope).
-Future<VotingChainResponse> votechainRoundStatus(
-        {required String baseUrl, required String roundId, required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotechainRoundStatus(
-        baseUrl: baseUrl, roundId: roundId, c: c);
+Future<VotingChainResponse> votechainRoundStatus({
+  required String baseUrl,
+  required String roundId,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotechainRoundStatus(
+  baseUrl: baseUrl,
+  roundId: roundId,
+  c: c,
+);
 
 /// Fetches the round tally envelope.
-Future<VotingChainResponse> votechainRoundTally(
-        {required String baseUrl, required String roundId, required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotechainRoundTally(
-        baseUrl: baseUrl, roundId: roundId, c: c);
+Future<VotingChainResponse> votechainRoundTally({
+  required String baseUrl,
+  required String roundId,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotechainRoundTally(
+  baseUrl: baseUrl,
+  roundId: roundId,
+  c: c,
+);
 
 /// Broadcasts a delegation transaction to the vote chain.
-Future<VotingChainResponse> votechainSubmitDelegation(
-        {required String baseUrl,
-        required String submissionJson,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotechainSubmitDelegation(
-        baseUrl: baseUrl, submissionJson: submissionJson, c: c);
+Future<VotingChainResponse> votechainSubmitDelegation({
+  required String baseUrl,
+  required String submissionJson,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotechainSubmitDelegation(
+  baseUrl: baseUrl,
+  submissionJson: submissionJson,
+  c: c,
+);
 
 /// Broadcasts a vote commitment transaction to the vote chain.
-Future<VotingChainResponse> votechainSubmitVote(
-        {required String baseUrl,
-        required String submissionJson,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotechainSubmitVote(
-        baseUrl: baseUrl, submissionJson: submissionJson, c: c);
+Future<VotingChainResponse> votechainSubmitVote({
+  required String baseUrl,
+  required String submissionJson,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotechainSubmitVote(
+  baseUrl: baseUrl,
+  submissionJson: submissionJson,
+  c: c,
+);
 
 /// Fetches the on-chain confirmation for a transaction; 404 = not confirmed.
-Future<VotingChainResponse> votechainTxConfirmation(
-        {required String baseUrl, required String txHash, required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotechainTxConfirmation(
-        baseUrl: baseUrl, txHash: txHash, c: c);
+Future<VotingChainResponse> votechainTxConfirmation({
+  required String baseUrl,
+  required String txHash,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotechainTxConfirmation(
+  baseUrl: baseUrl,
+  txHash: txHash,
+  c: c,
+);
 
 /// Posts one encrypted share to a helper server.
-Future<VotingChainResponse> votechainSubmitShare(
-        {required String serverUrl,
-        required String payloadJson,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotechainSubmitShare(
-        serverUrl: serverUrl, payloadJson: payloadJson, c: c);
+Future<VotingChainResponse> votechainSubmitShare({
+  required String serverUrl,
+  required String payloadJson,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotechainSubmitShare(
+  serverUrl: serverUrl,
+  payloadJson: payloadJson,
+  c: c,
+);
 
 /// Resends a previously generated share to a helper server (same endpoint as
 /// the initial submission).
-Future<VotingChainResponse> votechainResubmitShare(
-        {required String serverUrl,
-        required String payloadJson,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotechainResubmitShare(
-        serverUrl: serverUrl, payloadJson: payloadJson, c: c);
+Future<VotingChainResponse> votechainResubmitShare({
+  required String serverUrl,
+  required String payloadJson,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotechainResubmitShare(
+  serverUrl: serverUrl,
+  payloadJson: payloadJson,
+  c: c,
+);
 
 /// Checks whether a helper has confirmed a share identified by its nullifier.
-Future<VotingChainResponse> votechainShareStatus(
-        {required String serverUrl,
-        required String roundId,
-        required String shareId,
-        required Coin c}) =>
-    RustLib.instance.api.crateApiVotingVotechainShareStatus(
-        serverUrl: serverUrl, roundId: roundId, shareId: shareId, c: c);
+Future<VotingChainResponse> votechainShareStatus({
+  required String serverUrl,
+  required String roundId,
+  required String shareId,
+  required Coin c,
+}) => RustLib.instance.api.crateApiVotingVotechainShareStatus(
+  serverUrl: serverUrl,
+  roundId: roundId,
+  shareId: shareId,
+  c: c,
+);
 
 /// The voter's terminal decision for one proposal.
 @freezed
