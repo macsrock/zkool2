@@ -631,30 +631,38 @@ where
     progress("Confirm on your Ledger".to_string()).await;
 
     // ── Collect signatures ────────────────────────────────────────────────
-    progress("Signing on Ledger".to_string()).await;
-
+    // The first signing command is the one that waits for the user's
+    // approval on the device, so nothing is reported as "signing" until a
+    // signature has actually come back; until then the user is still being
+    // asked to confirm.
     let ctin = pczt.transparent().inputs().len();
 
     let mut tsigs = Vec::with_capacity(ctin);
     for index in 0..ctin {
-        progress(format!(
-            "Signing transparent input {}/{}",
-            index + 1,
-            ctin
-        )).await;
         tsigs.push(sign_transparent_input(ledger, index as u32).await?);
+        progress(format!("Signed transparent input {}/{}", index + 1, ctin)).await;
     }
 
     let mut orchard_sigs = Vec::with_capacity(package.orchard_indices.len());
-    for index in &package.orchard_indices {
-        progress("Signing orchard spend".to_string()).await;
+    for (n, index) in package.orchard_indices.iter().enumerate() {
         orchard_sigs.push(sign_one(ledger, INS_PCZT_SIGN_ORCHARD, *index as u32).await?);
+        progress(format!(
+            "Signed orchard spend {}/{}",
+            n + 1,
+            package.orchard_indices.len()
+        ))
+        .await;
     }
 
     let mut ironwood_sigs = Vec::with_capacity(package.ironwood_indices.len());
-    for index in &package.ironwood_indices {
-        progress("Signing ironwood spend".to_string()).await;
+    for (n, index) in package.ironwood_indices.iter().enumerate() {
         ironwood_sigs.push(sign_one(ledger, INS_PCZT_SIGN_IRONWOOD, *index as u32).await?);
+        progress(format!(
+            "Signed ironwood spend {}/{}",
+            n + 1,
+            package.ironwood_indices.len()
+        ))
+        .await;
     }
 
     // ── Apply signatures, proofs, binding signature ───────────────────────
