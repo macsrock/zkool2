@@ -103,6 +103,27 @@ async fn send_command<D: Device>(
     packets: Vec<Vec<u8>>,
     finished: bool,
 ) -> Result<()> {
+    send_command_with::<D, _, _>(ledger, ins, packets, finished, None::<fn() -> std::future::Ready<()>>)
+        .await
+}
+
+/// Streams one bundle command. With `finished`, the last packet carries
+/// P2_FINISHED: the device puts its review on screen when that packet
+/// arrives and answers it only once the user has approved, so
+/// `before_finished` runs just before it is sent -- the moment to tell the
+/// user to look at the device.
+async fn send_command_with<D, F, Fut>(
+    ledger: &D,
+    ins: u8,
+    packets: Vec<Vec<u8>>,
+    finished: bool,
+    mut before_finished: Option<F>,
+) -> Result<()>
+where
+    D: Device,
+    F: FnOnce() -> Fut,
+    Fut: std::future::Future<Output = ()>,
+{
     let n = packets.len();
     for (i, data) in packets.into_iter().enumerate() {
         if data.len() > 255 {
@@ -120,6 +141,11 @@ async fn send_command<D: Device>(
         } else {
             P2_CONTINUE
         };
+        if p2 == P2_FINISHED {
+            if let Some(f) = before_finished.take() {
+                f().await;
+            }
+        }
         let res = ledger
             .execute(APDUCommand {
                 cla: CLA,
@@ -625,10 +651,18 @@ where
     // V6 defers the review to the ironwood command: it is always sent, even
     // with 0 actions, and its last packet carries P2_FINISHED.
     send_command(ledger, INS_PCZT_ORCHARD_ACTION, orchard_packets, false).await?;
-    send_command(ledger, INS_PCZT_IRONWOOD_ACTION, ironwood_packets, true).await?;
-    // The device draws its review only once that last packet has landed;
-    // this is the first moment there is anything for the user to confirm.
-    progress("Confirm on your Ledger".to_string()).await;
+    // The device draws its review when the final packet arrives and holds
+    // its reply until the user has approved, so the user is told to look at
+    // the device just before that packet goes out; the reply coming back
+    // means they have.
+    send_command_with(
+        ledger,
+        INS_PCZT_IRONWOOD_ACTION,
+        ironwood_packets,
+        true,
+        Some(|| progress("Confirm on your Ledger".to_string())),
+    )
+    .await?;
 
     // ── Collect signatures ────────────────────────────────────────────────
     // The first signing command is the one that waits for the user's
