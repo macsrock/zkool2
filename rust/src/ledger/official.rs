@@ -25,6 +25,10 @@ pub struct OfficialApp {}
 const CLA: u8 = 0xE0;
 const INS_GET_FIRMWARE_VERSION: u8 = 0xC4;
 const INS_GET_VK: u8 = 0x50;
+const INS_GET_SHIELD_ADDR: u8 = 0x51;
+const P1_NO_DISPLAY: u8 = 0x00;
+const P1_DISPLAY: u8 = 0x01;
+const P2_UNIFIED_ADDRESS: u8 = 0x00;
 const P1_FIRST: u8 = 0x00;
 const P1_CONTINUE: u8 = 0x80;
 const P2_UFVK: u8 = 0x00;
@@ -39,6 +43,81 @@ fn append_path(data: &mut Vec<u8>, purpose: u32, coin_type: u32, account: u32) -
     data.write_u32::<BE>(coin_type | HARDENED)?;
     data.write_u32::<BE>(account | HARDENED)?;
     Ok(())
+}
+
+/// m/44'/coin'/account'/0/0: the external address the device puts in its
+/// unified address, as GET_SHIELD_ADDR wants it.
+fn append_transparent_address_path(
+    data: &mut Vec<u8>,
+    coin_type: u32,
+    account: u32,
+) -> LedgerResult<()> {
+    data.write_u8(5)?;
+    data.write_u32::<BE>(44 | HARDENED)?;
+    data.write_u32::<BE>(coin_type | HARDENED)?;
+    data.write_u32::<BE>(account | HARDENED)?;
+    data.write_u32::<BE>(0)?;
+    data.write_u32::<BE>(0)?;
+    Ok(())
+}
+
+/// The account's default unified address as the device derives it.
+///
+/// With `display`, the device shows the address on its own screen and waits
+/// for the user to approve it; that screen is the only thing on the path a
+/// tampered link cannot alter, so the host shows the address it derived from
+/// the imported viewing key alongside, and the user compares the two. A
+/// refusal on the device is reported as such.
+pub async fn get_shield_address<D: Device>(
+    ledger: &D,
+    network: &Network,
+    aindex: u32,
+    display: bool,
+) -> LedgerResult<String> {
+    let coin_type = network.coin_type();
+    let mut data = vec![];
+    append_path(&mut data, 32, coin_type, aindex)?;
+    append_transparent_address_path(&mut data, coin_type, aindex)?;
+
+    let res = ledger
+        .execute(APDUCommand {
+            cla: CLA,
+            ins: INS_GET_SHIELD_ADDR,
+            p1: if display { P1_DISPLAY } else { P1_NO_DISPLAY },
+            p2: P2_UNIFIED_ADDRESS,
+            data,
+        })
+        .await?;
+    if res.retcode == SW_DENY {
+        return Err(LedgerError::Generic(
+            SW_DENY,
+            "user did not confirm the address on the device".into(),
+        ));
+    }
+    if res.retcode != SW_OK {
+        return Err(LedgerError::Execute(res.retcode, INS_GET_SHIELD_ADDR));
+    }
+    let payload = res.data;
+    if payload.len() < 2 {
+        return Err(LedgerError::Protocol("short address response".into()));
+    }
+    let len = u16::from_be_bytes([payload[0], payload[1]]) as usize;
+    let body = &payload[2..];
+    if body.len() < len {
+        return Err(LedgerError::Protocol(
+            "the device sent less of the address than it announced".into(),
+        ));
+    }
+    let address = String::from_utf8(body[..len].to_vec())
+        .map_err(|_| LedgerError::Protocol("invalid utf8 in address response".into()))?;
+    let parsed = zcash_address::ZcashAddress::try_from_encoded(&address)
+        .map_err(|_| LedgerError::Protocol("device returned an invalid address".into()))?;
+    if !parsed.can_receive_as(zcash_protocol::PoolType::ORCHARD) {
+        return Err(LedgerError::Protocol(
+            "device address has no Orchard receiver".into(),
+        ));
+    }
+    Ok(address)
 }
 
 /// Version of the Zcash app open on the device, as (major, minor, patch).
@@ -250,6 +329,66 @@ mod tests {
         let device = Scripted::new(vec![with_sw(first, SW_OK), vec![0x90, 0x00]]);
         let err = get_ufvk(&device, &Network::Main, 0).await.unwrap_err();
         assert!(matches!(err, LedgerError::Protocol(_)));
+    }
+
+    fn account_zero_address(network: &Network) -> String {
+        let usk = UnifiedSpendingKey::from_seed(network, &[7u8; 32], AccountId::ZERO).unwrap();
+        let ufvk = usk.to_unified_full_viewing_key();
+        let (ua, _) = ufvk
+            .default_address(zcash_keys::keys::UnifiedAddressRequest::AllAvailableKeys)
+            .unwrap();
+        ua.encode(network)
+    }
+
+    #[tokio::test]
+    async fn the_device_address_is_requested_on_screen_for_the_external_path() {
+        let network = Network::Main;
+        let ua = account_zero_address(&network);
+        let mut reply = (ua.len() as u16).to_be_bytes().to_vec();
+        reply.extend_from_slice(ua.as_bytes());
+        let device = Scripted::new(vec![with_sw(reply, SW_OK)]);
+
+        let got = get_shield_address(&device, &network, 0, true).await.unwrap();
+        assert_eq!(got, ua);
+
+        let sent = device.sent.lock().unwrap();
+        assert_eq!(sent.len(), 1);
+        assert_eq!(sent[0].ins, INS_GET_SHIELD_ADDR);
+        assert_eq!(sent[0].p1, P1_DISPLAY);
+        assert_eq!(sent[0].p2, P2_UNIFIED_ADDRESS);
+        // Orchard account path, then the five-component transparent address path.
+        assert_eq!(&sent[0].data[0..5], &[3, 0x80, 0, 0, 32]);
+        assert_eq!(&sent[0].data[13..18], &[5, 0x80, 0, 0, 44]);
+        assert_eq!(&sent[0].data[26..34], &[0, 0, 0, 0, 0, 0, 0, 0]);
+        assert_eq!(sent[0].data.len(), 13 + 21);
+    }
+
+    #[tokio::test]
+    async fn a_truncated_or_foreign_address_reply_is_refused() {
+        let network = Network::Main;
+        let ua = account_zero_address(&network);
+        let mut short = (ua.len() as u16).to_be_bytes().to_vec();
+        short.extend_from_slice(&ua.as_bytes()[..20]);
+        let device = Scripted::new(vec![with_sw(short, SW_OK)]);
+        assert!(matches!(
+            get_shield_address(&device, &network, 0, true).await.unwrap_err(),
+            LedgerError::Protocol(_)
+        ));
+
+        let junk = b"not an address";
+        let mut reply = (junk.len() as u16).to_be_bytes().to_vec();
+        reply.extend_from_slice(junk);
+        let device = Scripted::new(vec![with_sw(reply, SW_OK)]);
+        assert!(matches!(
+            get_shield_address(&device, &network, 0, true).await.unwrap_err(),
+            LedgerError::Protocol(_)
+        ));
+
+        let device = Scripted::new(vec![vec![0x69, 0x85]]);
+        assert!(matches!(
+            get_shield_address(&device, &network, 0, true).await.unwrap_err(),
+            LedgerError::Generic(SW_DENY, _)
+        ));
     }
 
     #[tokio::test]

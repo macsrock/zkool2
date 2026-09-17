@@ -193,6 +193,9 @@ async fn sign_transparent_input<D: Device>(
     // tag byte (sig[0] |= 0x01). The parity is irrelevant here — the signature
     // verifies against the pubkey from the PCZT's hash160 preimage — so clear
     // it before parsing.
+    if der.is_empty() {
+        anyhow::bail!("the device returned a transparent signature with no DER bytes");
+    }
     let mut der = der.to_vec();
     der[0] &= !0x01;
     secp256k1::ecdsa::Signature::from_der(&der).map_err(|e| {

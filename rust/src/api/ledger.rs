@@ -52,6 +52,22 @@ pub async fn ledger_get_ufvk(
     Ok(official::get_ufvk(&device, &c.network(), aindex).await?)
 }
 
+/// Has the device derive and show the account's default unified address on
+/// its own screen, returning it once the user approves there.
+///
+/// The screen is the one part of the path a tampered transport cannot alter,
+/// so the host shows the address it derived from the imported viewing key
+/// next to this call, and the user checks the two match.
+#[cfg(feature = "flutter")]
+pub async fn ledger_show_address(
+    aindex: u32,
+    c: &Coin,
+    exchange: impl Fn(Vec<u8>) -> DartFnFuture<Vec<u8>> + Send + Sync + 'static,
+) -> Result<String> {
+    let device = DartDevice::new(exchange);
+    Ok(official::get_shield_address(&device, &c.network(), aindex, true).await?)
+}
+
 /// Default unified address of a viewing key, for showing which account a
 /// device key belongs to before the account exists in the database.
 #[cfg(feature = "flutter")]

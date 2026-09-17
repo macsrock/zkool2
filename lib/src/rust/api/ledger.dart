@@ -30,6 +30,22 @@ Future<String> ledgerGetUfvk({
   exchange: exchange,
 );
 
+/// Has the device derive and show the account's default unified address on
+/// its own screen, returning it once the user approves there.
+///
+/// The screen is the one part of the path a tampered transport cannot alter,
+/// so the host shows the address it derived from the imported viewing key
+/// next to this call, and the user checks the two match.
+Future<String> ledgerShowAddress({
+  required int aindex,
+  required Coin c,
+  required FutureOr<Uint8List> Function(Uint8List) exchange,
+}) => RustLib.instance.api.crateApiLedgerLedgerShowAddress(
+  aindex: aindex,
+  c: c,
+  exchange: exchange,
+);
+
 /// Default unified address of a viewing key, for showing which account a
 /// device key belongs to before the account exists in the database.
 String ufvkDefaultAddress({required String ufvk, required Coin c}) =>
